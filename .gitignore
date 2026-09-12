@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build output
+dist/
+build/
+.vite/
+
+# Environment & secrets
+.env
+.env.*
+!.env.example
+
+# Deployment
+.vercel/
+
+# Ingestion run artifacts (raw responses, logs — not committed by design)
+.runs/
+*.log
+
+# Editor / OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+
+# Claude desktop delivery folder
+Claude outputs/
