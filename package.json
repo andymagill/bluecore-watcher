@@ -19,7 +19,20 @@
     "schema:check": "tsx scripts/schema-gen.ts --check",
     "validate:config": "tsx scripts/validate-config.ts",
     "ingest": "tsx scripts/ingest.ts",
-    "gate": "tsx scripts/gate.ts"
+    "gate": "tsx scripts/gate.ts",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "prettier --write",
+      "eslint --fix --max-warnings 0"
+    ],
+    "*.{json,md,css,yml,yaml}": [
+      "prettier --write"
+    ],
+    "config/*.config.ts": [
+      "npx tsx scripts/validate-staged-config.ts"
+    ]
   },
   "dependencies": {
     "@radix-ui/react-dialog": "^1.1.23",
@@ -50,7 +63,9 @@
     "ajv": "^8.17.1",
     "eslint": "^9.19.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
     "jsdom": "^30.0.1",
+    "lint-staged": "^17.5.1",
     "playwright": "^1.63.0",
     "prettier": "^3.9.6",
     "tailwindcss": "^4.3.3",
