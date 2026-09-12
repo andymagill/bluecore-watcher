@@ -1,11 +1,14 @@
 #!/usr/bin/env tsx
-// npm run gate
+// npm run gate [-- --preview-url <url>]
 // Standalone check of whatever is currently in public/data/ against the
 // generated schemas and the provenance-completeness half of the contract
-// invariants (03-INGESTION.md §3). `npm run ingest` already runs this gate
+// invariants (03-INGESTION.md §3). `npm run ingest` already runs checks 1-2
 // in-line before writing a changed run; this script re-validates the
 // resting state on disk — useful in CI as an independent check, or after
-// manual edits to public/data/.
+// manual edits to public/data/. `--preview-url` additionally runs check 3
+// (the smoke render, ADR-014) against a deployed Workers Builds preview —
+// this is how the M1 ingestion workflow gates a candidate run before merge
+// (see scripts/resolve-preview-url.ts for how that URL is resolved in CI).
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { runGate } from "../src/gate/index.js";
@@ -13,6 +16,11 @@ import { loadPreviousState } from "../src/ingest/persist.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+function getArg(flag: string): string | undefined {
+  const idx = process.argv.indexOf(flag);
+  return idx !== -1 ? process.argv[idx + 1] : undefined;
+}
 
 async function main() {
   const dataDir = join(root, "public", "data");
@@ -32,6 +40,7 @@ async function main() {
     health: state.health,
     targetFiles: [...state.targetFiles.values()],
     previousTargetFiles: new Map(),
+    previewUrl: getArg("--preview-url"),
   });
 
   console.log(`Gate: ${report.passed ? "PASSED" : "FAILED"}`);
