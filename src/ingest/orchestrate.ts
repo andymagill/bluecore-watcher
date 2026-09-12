@@ -12,6 +12,7 @@ import { getHandler } from "./extract/registry.js";
 import { processExtractor, type HealthEntryDraft } from "./process-extractor.js";
 import { AcknowledgementStore } from "./acknowledgements.js";
 import { buildHealth, buildManifest, computeFingerprint, loadPreviousState, writeAll } from "./persist.js";
+import { collectActiveSecretValues } from "./scrub.js";
 import type { Manifest } from "../contract/manifest.js";
 import type { Health } from "../contract/health.js";
 import { runGate, type GateReport } from "../gate/index.js";
@@ -173,7 +174,7 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
 
   const nowIso = ctx.now().toISOString();
   const manifest = buildManifest(opts.config, targetFiles, opts.runId, nowIso, opts.commit ?? "dry-run");
-  const health = buildHealth(previous.health, allHealthDrafts, targetFiles, opts.runId, nowIso);
+  const health = buildHealth(previous.health, allHealthDrafts, targetFiles, opts.runId, nowIso, collectActiveSecretValues(opts.config));
 
   const newFingerprint = computeFingerprint(manifest, targetFiles, health);
   const oldFingerprint =
