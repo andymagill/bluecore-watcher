@@ -15,5 +15,9 @@
     "resolveJsonModule": true,
     "noEmit": true
   },
-  "include": ["src", "scripts", "config", "tests"]
+  "include": ["src", "scripts", "config", "tests"],
+  // src/app/ is the SPA (React/JSX, DOM lib, bundler resolution) -- checked
+  // separately by tsconfig.app.json so the engine's Node/ES2023 config
+  // never has to accommodate it. tests/app/ mirrors that split.
+  "exclude": ["src/app", "tests/app"]
 }
