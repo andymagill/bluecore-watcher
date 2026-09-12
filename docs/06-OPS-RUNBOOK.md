@@ -30,7 +30,7 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 All GitHub Actions repository secrets. Never in config — config is committed, and a literal-secret pattern scan runs in CI (validation rule 11).
 
-Error text and `rawText` are scrubbed against active secret values before being written to `health.json`. A token echoed in a 401 body would otherwise land permanently in the Git history that serves as the audit trail.
+Error text and `rawText` are scrubbed against active secret values before being written to any committed file (`health.json` or a target file). A token echoed in a 401 body would otherwise land permanently in the Git history that serves as the audit trail.
 
 ---
 

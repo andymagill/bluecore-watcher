@@ -1,5 +1,6 @@
-// 03-INGESTION.md §1 "fetch". A Fetcher is keyed by `renderer`, not `kind` —
-// the same html document can come from a static request or a browser render.
+// 03-INGESTION.md §1 "fetch". One Fetcher instance serves every target in a
+// run; `renderer` is recorded on the target's `run` output, not used to pick
+// between fetcher implementations.
 import type { TargetDef } from "../../config/schema.js";
 
 export interface FetchResult {

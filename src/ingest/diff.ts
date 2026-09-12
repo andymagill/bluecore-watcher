@@ -22,8 +22,10 @@ export function computeScalarDelta(
       percent,
     };
   }
-  // Non-numeric (string/date/enum) scalar — direction is defined only by
-  // simple inequality; absolute/percent are not meaningful, reported as 0.
+  // Non-numeric (string/date/enum) scalar — there is no notion of direction,
+  // so "up" is reported as a change sentinel for any change at all (a
+  // downgrade renders identically to an upgrade); absolute/percent are not
+  // meaningful, reported as 0.
   return {
     kind: "scalar",
     previousValue,
