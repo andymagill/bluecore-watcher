@@ -26,7 +26,15 @@ function makeTargetFile(): TargetFile {
     label: "BlueCore Energy - Latest News",
     sourceUrl: "https://www.bluecore.energy/news-insights",
     ttlHours: 168,
-    run: { runId: "r1", startedAt: "2026-09-12T00:00:00Z", completedAt: "2026-09-12T00:00:00Z", durationMs: 100, status: "ok", renderer: "static", httpStatus: 200 },
+    run: {
+      runId: "r1",
+      startedAt: "2026-09-12T00:00:00Z",
+      completedAt: "2026-09-12T00:00:00Z",
+      durationMs: 100,
+      status: "ok",
+      renderer: "static",
+      httpStatus: 200,
+    },
     blocks: [
       {
         key: "latest_headline",
@@ -36,7 +44,13 @@ function makeTargetFile(): TargetFile {
         status: "ok",
         value: "BlueCore announces new milestone",
         displayValue: "BlueCore announces new milestone",
-        provenance: { sourceUrl: "https://www.bluecore.energy/news-insights", anchor: ".bc-n-ctitle:first", extractedAt: "2026-09-12T00:00:00Z", rawText: "BlueCore announces new milestone", contentHash: "sha256:aabbcc" },
+        provenance: {
+          sourceUrl: "https://www.bluecore.energy/news-insights",
+          anchor: ".bc-n-ctitle:first",
+          extractedAt: "2026-09-12T00:00:00Z",
+          rawText: "BlueCore announces new milestone",
+          contentHash: "sha256:aabbcc",
+        },
         delta: null,
         validation: { passed: true, warnings: [] },
       },
@@ -50,18 +64,38 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
     render(
       <SectionPanel
         section={{ id: "target", label: "Target Company State", order: 1 }}
-        manifestTargets={[{ id: "bluecore-newsroom", sectionId: "target", entityId: "bluecore-energy", label: tf.label, path: "sections/target/bluecore-newsroom.json", ttlHours: 168, lastRunStatus: "ok", lastSuccessAt: "2026-09-12T00:00:00Z" }]}
+        manifestTargets={[
+          {
+            id: "bluecore-newsroom",
+            sectionId: "target",
+            entityId: "bluecore-energy",
+            label: tf.label,
+            path: "sections/target/bluecore-newsroom.json",
+            ttlHours: 168,
+            lastRunStatus: "ok",
+            lastSuccessAt: "2026-09-12T00:00:00Z",
+          },
+        ]}
         targetFiles={new Map([["bluecore-newsroom", tf]])}
         now={NOW}
       />,
     );
     expect(screen.getByText("Target Company State")).toBeInTheDocument();
     expect(screen.getByText(tf.label)).toBeInTheDocument();
-    expect(document.querySelector('[data-block-key="bluecore-newsroom.latest_headline"]')).not.toBeNull();
+    expect(
+      document.querySelector('[data-block-key="bluecore-newsroom.latest_headline"]'),
+    ).not.toBeNull();
   });
 
   it("renders an explicit zero-state when the section has no targets (segment/regulatory/climate in M1)", () => {
-    render(<SectionPanel section={{ id: "segment", label: "Industry Segment", order: 2 }} manifestTargets={[]} targetFiles={new Map()} now={NOW} />);
+    render(
+      <SectionPanel
+        section={{ id: "segment", label: "Industry Segment", order: 2 }}
+        manifestTargets={[]}
+        targetFiles={new Map()}
+        now={NOW}
+      />,
+    );
     expect(screen.getByRole("heading", { name: "Industry Segment" })).toBeInTheDocument();
     expect(screen.getByText(/No targets configured for this section yet/)).toBeInTheDocument();
     // No block-bearing node should be counted for an empty section.

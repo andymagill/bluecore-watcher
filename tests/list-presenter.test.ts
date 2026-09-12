@@ -50,7 +50,11 @@ describe("list presenter — array shape and SetDelta", () => {
   it("first extraction produces an array value with null delta", async () => {
     const target = buildTarget();
     const handler = new HtmlHandler();
-    const doc = handler.parse({ body: "<ul><li class='docket'>A</li><li class='docket'>B</li></ul>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<ul><li class='docket'>A</li><li class='docket'>B</li></ul>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
 
     const result = await processExtractor({
       handler,
@@ -80,12 +84,22 @@ describe("list presenter — array shape and SetDelta", () => {
       status: "ok" as const,
       value: ["A", "B"],
       displayValue: ["A", "B"],
-      provenance: { sourceUrl: target.url, anchor: [".docket:nth-of-type(1)", ".docket:nth-of-type(2)"], extractedAt: "2026-09-01T00:00:00.000Z", rawText: ["A", "B"], contentHash: "sha256:dddd" },
+      provenance: {
+        sourceUrl: target.url,
+        anchor: [".docket:nth-of-type(1)", ".docket:nth-of-type(2)"],
+        extractedAt: "2026-09-01T00:00:00.000Z",
+        rawText: ["A", "B"],
+        contentHash: "sha256:dddd",
+      },
       delta: null,
       validation: { passed: true, warnings: [] },
     };
     // B dropped, C added.
-    const doc = handler.parse({ body: "<ul><li class='docket'>A</li><li class='docket'>C</li></ul>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<ul><li class='docket'>A</li><li class='docket'>C</li></ul>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
 
     const result = await processExtractor({
       handler,
@@ -99,13 +113,23 @@ describe("list presenter — array shape and SetDelta", () => {
     });
 
     expect(result.block.value).toEqual(["A", "C"]);
-    expect(result.block.delta).toMatchObject({ kind: "set", added: ["C"], removed: ["B"], count: 2, previousCount: 2 });
+    expect(result.block.delta).toMatchObject({
+      kind: "set",
+      added: ["C"],
+      removed: ["B"],
+      count: 2,
+      previousCount: 2,
+    });
   });
 
   it("assert.minItems rejects an empty list", async () => {
     const target = buildTarget();
     const handler = new HtmlHandler();
-    const doc = handler.parse({ body: "<ul></ul>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<ul></ul>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
 
     const result = await processExtractor({
       handler,

@@ -38,9 +38,13 @@ function applyRegex(rawText: string, extractor: ExtractorDef): string {
     const match = re.exec(rawText);
     const group = match?.[extractor.regexGroup];
     if (group === undefined) {
-      throw new IngestError("PARSE_ERROR", `regex "${extractor.regex}" did not match rawText for extractor "${extractor.key}": "${rawText}"`, {
-        failingSelector: failingSelectorOf(extractor),
-      });
+      throw new IngestError(
+        "PARSE_ERROR",
+        `regex "${extractor.regex}" did not match rawText for extractor "${extractor.key}": "${rawText}"`,
+        {
+          failingSelector: failingSelectorOf(extractor),
+        },
+      );
     }
     text = group;
   }
@@ -58,9 +62,13 @@ export async function extractOne<TDoc>(
 
   if (!isList) {
     if (located.matchCount === 0) {
-      throw new IngestError("SELECTOR_NO_MATCH", `Selector matched 0 nodes for extractor "${extractor.key}"`, {
-        failingSelector: failingSelectorOf(extractor),
-      });
+      throw new IngestError(
+        "SELECTOR_NO_MATCH",
+        `Selector matched 0 nodes for extractor "${extractor.key}"`,
+        {
+          failingSelector: failingSelectorOf(extractor),
+        },
+      );
     }
     if (located.matchCount > 1) {
       throw new IngestError(

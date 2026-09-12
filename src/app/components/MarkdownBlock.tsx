@@ -11,10 +11,23 @@ import { DeltaChip } from "./DeltaChip.js";
 import { ProvenancePopover } from "./ProvenancePopover.js";
 import { ZeroState } from "./ZeroState.js";
 
-export function MarkdownBlock({ targetId, block, ttlHours, now }: { targetId: string; block: ScalarBlock; ttlHours: number; now?: Date }) {
+export function MarkdownBlock({
+  targetId,
+  block,
+  ttlHours,
+  now,
+}: {
+  targetId: string;
+  block: ScalarBlock;
+  ttlHours: number;
+  now?: Date;
+}) {
   const state = useFreshness(block, ttlHours, now);
   const raw = typeof block.value === "string" ? block.value : "";
-  const html = useMemo(() => DOMPurify.sanitize(marked.parse(raw, { async: false }) as string), [raw]);
+  const html = useMemo(
+    () => DOMPurify.sanitize(marked.parse(raw, { async: false }) as string),
+    [raw],
+  );
 
   if (block.status === "missing" || !block.provenance) {
     return (
@@ -31,11 +44,19 @@ export function MarkdownBlock({ targetId, block, ttlHours, now }: { targetId: st
       <p className="text-xs text-neutral-500">{block.label}</p>
       {suppressed ? (
         <details>
-          <summary className="cursor-pointer text-sm text-neutral-500">Last known value from an earlier check</summary>
-          <div className="prose prose-invert prose-sm mt-1 max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
+          <summary className="cursor-pointer text-sm text-neutral-500">
+            Last known value from an earlier check
+          </summary>
+          <div
+            className="prose prose-invert prose-sm mt-1 max-w-none"
+            dangerouslySetInnerHTML={{ __html: html }}
+          />
         </details>
       ) : (
-        <div className="prose prose-invert prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
+        <div
+          className="prose prose-invert prose-sm max-w-none"
+          dangerouslySetInnerHTML={{ __html: html }}
+        />
       )}
       <div className="flex flex-wrap items-center gap-2">
         <FreshnessBadge block={block} state={state} />

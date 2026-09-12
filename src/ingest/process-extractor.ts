@@ -6,9 +6,19 @@ import type { Block, ListBlock, ScalarBlock } from "../contract/block.js";
 import type { ExtractorDef, TargetDef } from "../config/schema.js";
 import type { Acknowledgement } from "../contract/acknowledgements.js";
 import { IngestError, toErrorClass } from "./errors.js";
-import { extractOne, type Candidate, type ListCandidate, type ScalarCandidate } from "./extract/pipeline.js";
+import {
+  extractOne,
+  type Candidate,
+  type ListCandidate,
+  type ScalarCandidate,
+} from "./extract/pipeline.js";
 import type { ExtractHandler } from "./extract/types.js";
-import { checkEnum, checkListCountGuard, checkScalarGuard, checkShapeAssertions } from "./validate.js";
+import {
+  checkEnum,
+  checkListCountGuard,
+  checkScalarGuard,
+  checkShapeAssertions,
+} from "./validate.js";
 import { computeScalarDelta, computeSetDelta } from "./diff.js";
 import type { AcknowledgementStore } from "./acknowledgements.js";
 
@@ -46,7 +56,16 @@ function emptyBlockCommon(extractor: ExtractorDef) {
 function missingBlock(extractor: ExtractorDef): Block {
   const common = emptyBlockCommon(extractor);
   if (extractor.presenter === "list") {
-    return { ...common, presenter: "list", status: "missing", value: null, displayValue: null, provenance: null, delta: null, validation: { passed: false, warnings: [] } } as ListBlock;
+    return {
+      ...common,
+      presenter: "list",
+      status: "missing",
+      value: null,
+      displayValue: null,
+      provenance: null,
+      delta: null,
+      validation: { passed: false, warnings: [] },
+    } as ListBlock;
   }
   return {
     ...common,
@@ -61,7 +80,11 @@ function missingBlock(extractor: ExtractorDef): Block {
 }
 
 function cachedBlock(previousBlock: Block): Block {
-  return { ...previousBlock, status: "cached", validation: { passed: false, warnings: previousBlock.validation.warnings } };
+  return {
+    ...previousBlock,
+    status: "cached",
+    validation: { passed: false, warnings: previousBlock.validation.warnings },
+  };
 }
 
 function failureResult(
@@ -88,8 +111,11 @@ function failureResult(
   };
 }
 
-export async function processExtractor<TDoc>(params: ProcessExtractorParams<TDoc>): Promise<ProcessExtractorResult> {
-  const { handler, doc, extractor, target, previousBlock, acknowledgements, now, httpStatus } = params;
+export async function processExtractor<TDoc>(
+  params: ProcessExtractorParams<TDoc>,
+): Promise<ProcessExtractorResult> {
+  const { handler, doc, extractor, target, previousBlock, acknowledgements, now, httpStatus } =
+    params;
   const nowIso = now.toISOString();
 
   let candidate: Candidate;
@@ -111,7 +137,10 @@ export async function processExtractor<TDoc>(params: ProcessExtractorParams<TDoc
   // Enum membership is a shape assertion in spirit (02-CONFIG-SCHEMA.md:
   // "anything else -> ASSERTION_FAILED") even though it's driven by `type`
   // rather than `assert`.
-  const enumFailures = candidate.presenter !== "list" ? checkEnum((candidate as ScalarCandidate).value as string, extractor) : [];
+  const enumFailures =
+    candidate.presenter !== "list"
+      ? checkEnum((candidate as ScalarCandidate).value as string, extractor)
+      : [];
   const shapeFailures = [...checkShapeAssertions(candidate, extractor), ...enumFailures];
   if (shapeFailures.length > 0) {
     return failureResult(
@@ -126,15 +155,26 @@ export async function processExtractor<TDoc>(params: ProcessExtractorParams<TDoc
   }
 
   const previousProvenance = previousBlock?.provenance ?? null;
-  const unchanged = previousProvenance !== null && previousProvenance.contentHash === candidate.contentHash;
+  const unchanged =
+    previousProvenance !== null && previousProvenance.contentHash === candidate.contentHash;
 
   if (unchanged && previousBlock && previousBlock.provenance) {
     // Re-verified, nothing moved: extractedAt advances honestly (ADR-011),
     // delta is carried forward untouched (01-DATA-CONTRACT.md §4, corrected).
     const block: Block =
       previousBlock.presenter === "list"
-        ? { ...previousBlock, status: "ok", provenance: { ...previousBlock.provenance, extractedAt: nowIso }, validation: { passed: true, warnings: [] } }
-        : { ...previousBlock, status: "ok", provenance: { ...previousBlock.provenance, extractedAt: nowIso }, validation: { passed: true, warnings: [] } };
+        ? {
+            ...previousBlock,
+            status: "ok",
+            provenance: { ...previousBlock.provenance, extractedAt: nowIso },
+            validation: { passed: true, warnings: [] },
+          }
+        : {
+            ...previousBlock,
+            status: "ok",
+            provenance: { ...previousBlock.provenance, extractedAt: nowIso },
+            validation: { passed: true, warnings: [] },
+          };
     return { block, healthEntryDraft: null, consumedAcknowledgement: null };
   }
 
@@ -142,8 +182,16 @@ export async function processExtractor<TDoc>(params: ProcessExtractorParams<TDoc
   const guardTrip =
     previousBlock && previousBlock.value !== null
       ? candidate.presenter === "list"
-        ? checkListCountGuard((candidate as ListCandidate).value.length, (previousBlock.value as string[]).length, extractor.assert ?? {})
-        : checkScalarGuard((candidate as ScalarCandidate).value as number, previousBlock.value as number, extractor.assert ?? {})
+        ? checkListCountGuard(
+            (candidate as ListCandidate).value.length,
+            (previousBlock.value as string[]).length,
+            extractor.assert ?? {},
+          )
+        : checkScalarGuard(
+            (candidate as ScalarCandidate).value as number,
+            previousBlock.value as number,
+            extractor.assert ?? {},
+          )
       : null;
 
   if (guardTrip) {
@@ -179,10 +227,16 @@ export async function processExtractor<TDoc>(params: ProcessExtractorParams<TDoc
       };
     }
     // Acknowledged (ADR-012): fall through to publish, consuming the entry.
-    return { ...publish(candidate, extractor, target, previousBlock, nowIso), consumedAcknowledgement: ack };
+    return {
+      ...publish(candidate, extractor, target, previousBlock, nowIso),
+      consumedAcknowledgement: ack,
+    };
   }
 
-  return { ...publish(candidate, extractor, target, previousBlock, nowIso), consumedAcknowledgement: null };
+  return {
+    ...publish(candidate, extractor, target, previousBlock, nowIso),
+    consumedAcknowledgement: null,
+  };
 }
 
 function publish(
@@ -196,7 +250,8 @@ function publish(
 
   if (candidate.presenter === "list") {
     const c = candidate as ListCandidate;
-    const previousValues = previousBlock && previousBlock.value !== null ? (previousBlock.value as string[]) : [];
+    const previousValues =
+      previousBlock && previousBlock.value !== null ? (previousBlock.value as string[]) : [];
     const delta = previousBlock ? computeSetDelta(c.value, previousValues, nowIso) : null;
     const block: ListBlock = {
       ...common,
@@ -204,7 +259,13 @@ function publish(
       status: "ok",
       value: c.value,
       displayValue: c.displayValue,
-      provenance: { sourceUrl: target.url, anchor: c.anchor, extractedAt: nowIso, rawText: c.rawText, contentHash: c.contentHash },
+      provenance: {
+        sourceUrl: target.url,
+        anchor: c.anchor,
+        extractedAt: nowIso,
+        rawText: c.rawText,
+        contentHash: c.contentHash,
+      },
       delta,
       validation: { passed: true, warnings: [] },
     };
@@ -214,7 +275,12 @@ function publish(
   const c = candidate as ScalarCandidate;
   const delta =
     previousBlock && previousBlock.value !== null
-      ? computeScalarDelta(c.value, previousBlock.value as number | string, previousBlock.provenance!.extractedAt, nowIso)
+      ? computeScalarDelta(
+          c.value,
+          previousBlock.value as number | string,
+          previousBlock.provenance!.extractedAt,
+          nowIso,
+        )
       : null;
   const block: ScalarBlock = {
     ...common,
@@ -222,7 +288,13 @@ function publish(
     status: "ok",
     value: c.value,
     displayValue: c.displayValue,
-    provenance: { sourceUrl: target.url, anchor: c.anchor, extractedAt: nowIso, rawText: c.rawText, contentHash: c.contentHash },
+    provenance: {
+      sourceUrl: target.url,
+      anchor: c.anchor,
+      extractedAt: nowIso,
+      rawText: c.rawText,
+      contentHash: c.contentHash,
+    },
     delta,
     validation: { passed: true, warnings: [] },
   };

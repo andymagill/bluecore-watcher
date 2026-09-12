@@ -138,24 +138,57 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
 
   // Rule 8 — currency/enum coupling, plus minItems/maxItems <-> list.
   if (ex.type === "currency" && !ex.currency) {
-    ctx.issues.push({ code: "custom", input: ex, message: "currency required when type is \"currency\" (rule 8)", path: ["currency"] });
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'currency required when type is "currency" (rule 8)',
+      path: ["currency"],
+    });
   }
   if (ex.currency && ex.type !== "currency") {
-    ctx.issues.push({ code: "custom", input: ex, message: "currency set but type is not \"currency\" (rule 8)", path: ["currency"] });
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'currency set but type is not "currency" (rule 8)',
+      path: ["currency"],
+    });
   }
   if (ex.type === "enum" && (!ex.enumValues || ex.enumValues.length === 0)) {
-    ctx.issues.push({ code: "custom", input: ex, message: "enumValues required when type is \"enum\" (rule 8)", path: ["enumValues"] });
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'enumValues required when type is "enum" (rule 8)',
+      path: ["enumValues"],
+    });
   }
   if (ex.enumValues && ex.type !== "enum") {
-    ctx.issues.push({ code: "custom", input: ex, message: "enumValues set but type is not \"enum\" (rule 8)", path: ["enumValues"] });
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'enumValues set but type is not "enum" (rule 8)',
+      path: ["enumValues"],
+    });
   }
-  if ((ex.assert?.minItems !== undefined || ex.assert?.maxItems !== undefined) && ex.presenter !== "list") {
-    ctx.issues.push({ code: "custom", input: ex, message: "minItems/maxItems only apply to presenter \"list\" (rule 8)", path: ["assert"] });
+  if (
+    (ex.assert?.minItems !== undefined || ex.assert?.maxItems !== undefined) &&
+    ex.presenter !== "list"
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'minItems/maxItems only apply to presenter "list" (rule 8)',
+      path: ["assert"],
+    });
   }
 
   // multiple: true only makes sense for html + list.
   if (ex.kind === "html" && ex.multiple && ex.presenter !== "list") {
-    ctx.issues.push({ code: "custom", input: ex, message: "multiple: true is only meaningful with presenter \"list\"", path: ["multiple"] });
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'multiple: true is only meaningful with presenter "list"',
+      path: ["multiple"],
+    });
   }
 });
 export type ExtractorDef = z.infer<typeof ExtractorBase> & LocationDef;
@@ -188,14 +221,24 @@ export const TargetDef = z
     // Rule 10 — https only (no allowInsecure exception in v1; deferred to M1
     // per the M0.5 scope cut, see the plan's "Deferred to M1" section).
     if (!t.url.startsWith("https://")) {
-      ctx.issues.push({ code: "custom", input: t, message: `url must be https (rule 10): ${t.url}`, path: ["url"] });
+      ctx.issues.push({
+        code: "custom",
+        input: t,
+        message: `url must be https (rule 10): ${t.url}`,
+        path: ["url"],
+      });
     }
 
     // Rule 4 — extractor.key unique within target.
     const seen = new Set<string>();
     for (const [i, ex] of t.extractors.entries()) {
       if (seen.has(ex.key)) {
-        ctx.issues.push({ code: "custom", input: t, message: `duplicate extractor key "${ex.key}" (rule 4)`, path: ["extractors", i, "key"] });
+        ctx.issues.push({
+          code: "custom",
+          input: t,
+          message: `duplicate extractor key "${ex.key}" (rule 4)`,
+          path: ["extractors", i, "key"],
+        });
       }
       seen.add(ex.key);
 
@@ -294,14 +337,29 @@ export const CmieConfig = z
     for (const [i, t] of cfg.targets.entries()) {
       // Rule 2 — entityId / sectionId resolve.
       if (!entityIds.has(t.entityId)) {
-        ctx.issues.push({ code: "custom", input: cfg, message: `target "${t.id}" has unknown entityId "${t.entityId}" (rule 2)`, path: ["targets", i, "entityId"] });
+        ctx.issues.push({
+          code: "custom",
+          input: cfg,
+          message: `target "${t.id}" has unknown entityId "${t.entityId}" (rule 2)`,
+          path: ["targets", i, "entityId"],
+        });
       }
       if (!sectionIds.has(t.sectionId)) {
-        ctx.issues.push({ code: "custom", input: cfg, message: `target "${t.id}" has unknown sectionId "${t.sectionId}" (rule 2)`, path: ["targets", i, "sectionId"] });
+        ctx.issues.push({
+          code: "custom",
+          input: cfg,
+          message: `target "${t.id}" has unknown sectionId "${t.sectionId}" (rule 2)`,
+          path: ["targets", i, "sectionId"],
+        });
       }
       // Rule 3 — target.id unique (format already enforced by the field schema).
       if (targetIds.has(t.id)) {
-        ctx.issues.push({ code: "custom", input: cfg, message: `duplicate target id "${t.id}" (rule 3)`, path: ["targets", i, "id"] });
+        ctx.issues.push({
+          code: "custom",
+          input: cfg,
+          message: `duplicate target id "${t.id}" (rule 3)`,
+          path: ["targets", i, "id"],
+        });
       }
       targetIds.add(t.id);
 
@@ -309,7 +367,12 @@ export const CmieConfig = z
       // *Env fields are used. Existence of the *value* is a runtime check
       // (AUTH_ERROR skip), not enforceable here.
       if (t.auth && !t.auth.secretEnv) {
-        ctx.issues.push({ code: "custom", input: cfg, message: `target "${t.id}" auth.secretEnv must be set (rule 9)`, path: ["targets", i, "auth", "secretEnv"] });
+        ctx.issues.push({
+          code: "custom",
+          input: cfg,
+          message: `target "${t.id}" auth.secretEnv must be set (rule 9)`,
+          path: ["targets", i, "auth", "secretEnv"],
+        });
       }
     }
 
@@ -322,13 +385,19 @@ export const CmieConfig = z
     // regex (which expects a literal `"`) never match.
     const suspicious = /(?:secret|token|password|api[_-]?key)\s*[:=]\s*["'][^"'$][^"']{7,}["']/i;
     if (collectStrings(cfg).some((s) => suspicious.test(s))) {
-      ctx.issues.push({ code: "custom", input: cfg, message: "config appears to contain a literal secret (rule 11) — use secretEnv instead", path: [] });
+      ctx.issues.push({
+        code: "custom",
+        input: cfg,
+        message: "config appears to contain a literal secret (rule 11) — use secretEnv instead",
+        path: [],
+      });
     }
   });
 
 function collectStrings(value: unknown, out: string[] = []): string[] {
   if (typeof value === "string") out.push(value);
-  else if (value !== null && typeof value === "object") for (const v of Object.values(value)) collectStrings(v, out);
+  else if (value !== null && typeof value === "object")
+    for (const v of Object.values(value)) collectStrings(v, out);
   return out;
 }
 export type CmieConfig = z.infer<typeof CmieConfig>;

@@ -47,14 +47,14 @@ The CMIE is intentionally positioned as a **"Deal Command Center"** rather than 
 
 ### **2. Core Principles & Requirements**
 
-* **Deterministic Provenance:** Absolute auditability. Every metric block and natural language block MUST explicitly store and render its raw source URL, DOM anchor, extraction timestamp, and the raw pre-parse text, to eliminate trust deficits.
-* **Current-State Snapshot with Change Awareness:** **[Amended — ADR-002]** Displays active, verified state, annotated with what changed and when. Excludes commit timelines and time-series charts from the UI, while leveraging Git under the hood for data versioning. A monitoring tool that cannot answer "what moved since I last looked?" is a report, not a monitor.
-* **Extraction Integrity:** **[Added — ADR-002]** A selector that throws is caught by the health log; a selector that silently resolves to the wrong node publishes a confident, sourced, wrong number. Shape assertions, ambiguity detection, and change-magnitude guards are mandatory parts of the extraction contract, not optional hardening.
-* **GitOps for Data / Git Scraping:** **[Amended — ADR-005]** The Git repository functions as both the time-series data warehouse and the deployment trigger. Each ingestion run commits to a short-lived branch, is gated on a validated preview deploy, and squash-merges to `main` only after proving that the exact data renders in the exact application.
-* **Single-Environment Scope:** A single deployment environment hosts one active configuration defining one primary target entity and optional related entities (e.g., key competitors or parent holding structures).
-* **Pipeline Health & Degradation Tracking:** Proactive capture of failing DOM selectors or stale sources logged to a health log artifact and surfaced in a dedicated UI Health Modal.
-* **Flat-File Architecture:** Zero database. Uses modular, isolated flat JSON storage as the runtime state snapshot to ensure clean, readable Git diffs. Scale ceiling stated explicitly in ADR-007.
-* **Zero-LLM Runtime:** **[Amended — ADR-003]** No LLM call occurs during ingestion, transformation, or rendering. LLMs may be used offline to draft extractor configs and propose replacement selectors, delivered as reviewed pull requests subject to the same validation gate. The determinism guarantee is about the data path; selector maintenance is not the data path.
+- **Deterministic Provenance:** Absolute auditability. Every metric block and natural language block MUST explicitly store and render its raw source URL, DOM anchor, extraction timestamp, and the raw pre-parse text, to eliminate trust deficits.
+- **Current-State Snapshot with Change Awareness:** **[Amended — ADR-002]** Displays active, verified state, annotated with what changed and when. Excludes commit timelines and time-series charts from the UI, while leveraging Git under the hood for data versioning. A monitoring tool that cannot answer "what moved since I last looked?" is a report, not a monitor.
+- **Extraction Integrity:** **[Added — ADR-002]** A selector that throws is caught by the health log; a selector that silently resolves to the wrong node publishes a confident, sourced, wrong number. Shape assertions, ambiguity detection, and change-magnitude guards are mandatory parts of the extraction contract, not optional hardening.
+- **GitOps for Data / Git Scraping:** **[Amended — ADR-005]** The Git repository functions as both the time-series data warehouse and the deployment trigger. Each ingestion run commits to a short-lived branch, is gated on a validated preview deploy, and squash-merges to `main` only after proving that the exact data renders in the exact application.
+- **Single-Environment Scope:** A single deployment environment hosts one active configuration defining one primary target entity and optional related entities (e.g., key competitors or parent holding structures).
+- **Pipeline Health & Degradation Tracking:** Proactive capture of failing DOM selectors or stale sources logged to a health log artifact and surfaced in a dedicated UI Health Modal.
+- **Flat-File Architecture:** Zero database. Uses modular, isolated flat JSON storage as the runtime state snapshot to ensure clean, readable Git diffs. Scale ceiling stated explicitly in ADR-007.
+- **Zero-LLM Runtime:** **[Amended — ADR-003]** No LLM call occurs during ingestion, transformation, or rendering. LLMs may be used offline to draft extractor configs and propose replacement selectors, delivered as reviewed pull requests subject to the same validation gate. The determinism guarantee is about the data path; selector maintenance is not the data path.
 
 ### **3. Core Intelligence Dimensions**
 
@@ -69,15 +69,15 @@ Section identifiers are configuration, not framework constants. Another environm
 
 ### **4. Strategic Positioning & Market Differentiation**
 
-| Feature / Capability | Configurable Market Intelligence Engine | Enterprise Terminals (PitchBook) | AI Platforms (AlphaSense) | Custom RPA (Apify/AWS) |
-| :---- | :---- | :---- | :---- | :---- |
-| **Data Determinism** | **High** (Rigid DOM/Regex exact matching) | Medium (Human/algorithmic error potential) | Low (LLM hallucination risk) | High |
-| **Hyper-Niche Tracking** | **Excellent** (Configurable to any DOM node) | Poor (Only tracks standard market data) | Medium (Dependent on search index) | Excellent |
-| **Infrastructure Cost** | **Near-Zero** (Serverless, Git repo, static CDN) | High ($10k–$25k+ per seat/year) | High ($5k+ per seat/year) | Medium (Database, compute, API costs) |
-| **Auditability & Provenance** | **Absolute** (Git commit history + Source URLs) | Medium (Cites general sources) | Low (Opaque AI synthesis) | Medium (Requires custom logging) |
-| **Maintenance Overhead** | **Low–Moderate** (Self-contained orchestrator, UI health modal) | Zero (Managed by vendor) | Zero (Managed by vendor) | High (Database maintenance, DevOps) |
+| Feature / Capability          | Configurable Market Intelligence Engine                         | Enterprise Terminals (PitchBook)           | AI Platforms (AlphaSense)          | Custom RPA (Apify/AWS)                |
+| :---------------------------- | :-------------------------------------------------------------- | :----------------------------------------- | :--------------------------------- | :------------------------------------ |
+| **Data Determinism**          | **High** (Rigid DOM/Regex exact matching)                       | Medium (Human/algorithmic error potential) | Low (LLM hallucination risk)       | High                                  |
+| **Hyper-Niche Tracking**      | **Excellent** (Configurable to any DOM node)                    | Poor (Only tracks standard market data)    | Medium (Dependent on search index) | Excellent                             |
+| **Infrastructure Cost**       | **Near-Zero** (Serverless, Git repo, static CDN)                | High ($10k–$25k+ per seat/year)            | High ($5k+ per seat/year)          | Medium (Database, compute, API costs) |
+| **Auditability & Provenance** | **Absolute** (Git commit history + Source URLs)                 | Medium (Cites general sources)             | Low (Opaque AI synthesis)          | Medium (Requires custom logging)      |
+| **Maintenance Overhead**      | **Low–Moderate** (Self-contained orchestrator, UI health modal) | Zero (Managed by vendor)                   | Zero (Managed by vendor)           | High (Database maintenance, DevOps)   |
 
-**[Amended]** The maintenance row previously read "Low." Rigid DOM selectors across ~20 sources break on a predictable cadence, and because the dashboards are operated as a service, that cost falls on the operator rather than the client. The honest claim is that maintenance is low *relative to running database and pipeline infrastructure*, not that it is negligible. Current working estimate and its basis are in `docs/06-OPS-RUNBOOK.md` §7.
+**[Amended]** The maintenance row previously read "Low." Rigid DOM selectors across ~20 sources break on a predictable cadence, and because the dashboards are operated as a service, that cost falls on the operator rather than the client. The honest claim is that maintenance is low _relative to running database and pipeline infrastructure_, not that it is negligible. Current working estimate and its basis are in `docs/06-OPS-RUNBOOK.md` §7.
 
 **[Amended 2026-09-12 — ADR-013.]** Host is Cloudflare (Pages + Workers), not Vercel — Vercel was never an accepted decision, despite appearing throughout this document and the decision log until this correction. "Near-Zero" infrastructure cost is comparative, not literal: it holds through M1–M3 on free tiers (GitHub Actions, Cloudflare Pages, a Git repo). Whether the first client deliverable (M4) forces a paid Cloudflare tier is unverified as of this writing — the earlier version of this note asserted a specific Vercel Hobby restriction that does not simply carry over to a different vendor. Still near-zero next to the $5k–$25k/seat/year rows beside it either way.
 
@@ -85,11 +85,11 @@ Section identifiers are configuration, not framework constants. Another environm
 
 ### **1. Technology Stack Constraints**
 
-* **Frontend UI:** React + Vite + Tailwind CSS + shadcn/ui components (compiled as a static Single Page Application).
-* **Ingestion Engine:** Node.js with TypeScript.
-* **Scraping Frameworks:**
-  * **Cheerio:** Primary lightweight HTML parser for static pages and fast execution.
-  * **Playwright:** Strictly reserved as an optional fallback for complex, client-side rendered (SPA) targets requiring JavaScript execution.
+- **Frontend UI:** React + Vite + Tailwind CSS + shadcn/ui components (compiled as a static Single Page Application).
+- **Ingestion Engine:** Node.js with TypeScript.
+- **Scraping Frameworks:**
+  - **Cheerio:** Primary lightweight HTML parser for static pages and fast execution.
+  - **Playwright:** Strictly reserved as an optional fallback for complex, client-side rendered (SPA) targets requiring JavaScript execution.
 
 > **[Amended 2026-09-12 — ADR-010.]** Extraction is a handler registry keyed on `kind`, not a hard commitment to two libraries. Cheerio and Playwright are the v1 handlers because the anticipated source set is predominantly HTML; a PDF or other non-HTML share no longer invalidates the architecture — it's an additional handler module (`docs/02-CONFIG-SCHEMA.md` §7). Q2 is downgraded to informational: it affects build order, not this constraint.
 
@@ -114,16 +114,16 @@ Full design in `docs/03-INGESTION.md`.
 1. **Trigger:** CI/CD workflow runs on a scheduled cron and invokes the Orchestrator script under a single concurrency group, so runs are serialized.
 2. **Filtering & Queueing:** The Orchestrator reads target configurations, evaluates execution frequency and TTL relative to current time, and dynamically constructs a runtime target queue.
 3. **Secure & Proxied Execution:**
-   * **Secrets Injection:** Secret keys are injected from CI/CD environment variables based on configuration mappings. Secret values are scrubbed from all committed output.
-   * **Edge Proxy Routing:** Target HTTP requests may be routed through production edge proxies to mitigate runner IP blocking. Applied per target, default off. **Unvalidated — see ADR-006.**
-   * **Proxy Authentication:** Edge proxies must require a Pre-Shared Key (PSK) passed via custom request headers to prevent unauthorized public compute usage.
+   - **Secrets Injection:** Secret keys are injected from CI/CD environment variables based on configuration mappings. Secret values are scrubbed from all committed output.
+   - **Edge Proxy Routing:** Target HTTP requests may be routed through production edge proxies to mitigate runner IP blocking. Applied per target, default off. **Unvalidated — see ADR-006.**
+   - **Proxy Authentication:** Edge proxies must require a Pre-Shared Key (PSK) passed via custom request headers to prevent unauthorized public compute usage.
 4. **Isolated Extraction, Validation & Error Handling:** Handlers parse target data, then validate it against shape assertions and change-magnitude guards. If extraction or validation fails:
-   * Retains the existing cached data file.
-   * Marks status as failed using cached fallback.
-   * Logs error class, failing DOM selectors, and stack traces to a centralized health log artifact.
+   - Retains the existing cached data file.
+   - Marks status as failed using cached fallback.
+   - Logs error class, failing DOM selectors, and stack traces to a centralized health log artifact.
 5. **Validated Preview Merge:** **[Amended — ADR-005]** Updated data files are committed to a short-lived `ingest/<runId>` branch, which produces a preview deployment. The run then gates on JSON Schema validation, contract assertions, and a smoke render of the preview URL. On pass, the branch squash-merges to `main` and production rebuilds. On fail, the branch is left open, an issue is raised, and `main` is untouched — production continues serving the last verified snapshot.
 
-   *This supersedes the original long-lived `data/latest` branch design. The build-thrashing rationale is retired: data commits do reach `main` and do trigger a production build. For a static Vite SPA that build is cheap, and it buys a real integration test on every run.*
+   _This supersedes the original long-lived `data/latest` branch design. The build-thrashing rationale is retired: data commits do reach `main` and do trigger a production build. For a static Vite SPA that build is cheap, and it buys a real integration test on every run._
 
 ## **Part 4: Presentation & Frontend Specifications**
 
@@ -131,16 +131,16 @@ Full design in `docs/04-FRONTEND.md`.
 
 ### **1. UI Layout & Component Requirements**
 
-* **Header Bar:** Displays entity names alongside a global Pipeline Health Indicator.
-* **Grid Layout:** Renders active operational sections mapped to configuration definitions.
-* **Value Presenters:**
-  * **Metric Presenter:** Prominent display of quantitative values, value units, human-readable labels, and direct hyperlink source attribution.
-  * **Markdown Presenter:** Formatted natural language narrative blocks rendered via a Markdown parser with source link attribution.
-  * **List and Status Presenters:** **[Added]** Multi-item extractions and enumerated state values.
-* **Delta Indicators:** **[Added — ADR-002]** Each block renders what changed, by how much, and when — including the unchanged case ("unchanged for 34 days"), which is frequently the finding.
-* **Provenance Disclosure:** **[Added]** Every value is one interaction from its source URL, resolved anchor, extraction timestamp, and raw pre-parse text.
-* **Zero-State Handler:** Modules or sections lacking ingested data render an explicit placeholder.
-* **Pipeline Health Modal:** Clickable drawer or modal surfacing system health logs, allowing analysts to inspect failing DOM selectors, stale sources, and stack traces.
+- **Header Bar:** Displays entity names alongside a global Pipeline Health Indicator.
+- **Grid Layout:** Renders active operational sections mapped to configuration definitions.
+- **Value Presenters:**
+  - **Metric Presenter:** Prominent display of quantitative values, value units, human-readable labels, and direct hyperlink source attribution.
+  - **Markdown Presenter:** Formatted natural language narrative blocks rendered via a Markdown parser with source link attribution.
+  - **List and Status Presenters:** **[Added]** Multi-item extractions and enumerated state values.
+- **Delta Indicators:** **[Added — ADR-002]** Each block renders what changed, by how much, and when — including the unchanged case ("unchanged for 34 days"), which is frequently the finding.
+- **Provenance Disclosure:** **[Added]** Every value is one interaction from its source URL, resolved anchor, extraction timestamp, and raw pre-parse text.
+- **Zero-State Handler:** Modules or sections lacking ingested data render an explicit placeholder.
+- **Pipeline Health Modal:** Clickable drawer or modal surfacing system health logs, allowing analysts to inspect failing DOM selectors, stale sources, and stack traces.
 
 ### **2. Client-Side Runtime Freshness Logic**
 
@@ -156,16 +156,16 @@ Data files are part of the production build output and are served from the produ
 
 Cache correctness is handled by the manifest: `manifest.json` is served short-cache, and its `runId` query-busts every section file, so long-lived CDN caching of data files cannot serve a stale snapshot.
 
-*The original design mapped a long-lived `data` branch to the production domain root. The static host (Cloudflare Pages, per ADR-013) maps one branch per project to production, so that approach assumed a capability that does not exist natively.*
+_The original design mapped a long-lived `data` branch to the production domain root. The static host (Cloudflare Pages, per ADR-013) maps one branch per project to production, so that approach assumed a capability that does not exist natively._
 
 ## **Part 6: Known Gaps**
 
 **[Added]**
 
-* **Access control.** The specification defined no authentication. v1 ships without it, which means the deployment is public and nothing damaging-if-crawled may be ingested until whole-site auth lands (ADR-004).
-* **Legal posture.** robots.txt stance, target-site terms of service, and rate-limiting policy are unwritten. Required before any client deliverable (open question Q6).
-* **Source inventory.** The engine is specified; its fuel is not. `docs/05-SOURCES.md` is empty and blocks all extraction work (open question Q1).
-* **PDF extraction.** Unbuilt, not undesigned — ADR-010 made source kinds additive, so this is a handler module to write once a triaged source needs it, not an architectural risk.
+- **Access control.** The specification defined no authentication. v1 ships without it, which means the deployment is public and nothing damaging-if-crawled may be ingested until whole-site auth lands (ADR-004).
+- **Legal posture.** robots.txt stance, target-site terms of service, and rate-limiting policy are unwritten. Required before any client deliverable (open question Q6).
+- **Source inventory.** The engine is specified; its fuel is not. `docs/05-SOURCES.md` is empty and blocks all extraction work (open question Q1).
+- **PDF extraction.** Unbuilt, not undesigned — ADR-010 made source kinds additive, so this is a handler module to write once a triaged source needs it, not an architectural risk.
 
 ---
 

@@ -35,7 +35,11 @@ export function computeScalarDelta(
   };
 }
 
-export function computeSetDelta(candidateValues: string[], previousValues: string[], now: string): SetDelta {
+export function computeSetDelta(
+  candidateValues: string[],
+  previousValues: string[],
+  now: string,
+): SetDelta {
   const prevSet = new Set(previousValues);
   const currSet = new Set(candidateValues);
   const added = candidateValues.filter((v) => !prevSet.has(v));

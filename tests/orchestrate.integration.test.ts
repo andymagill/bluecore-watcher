@@ -77,7 +77,11 @@ describe("orchestrator — end-to-end against the synthetic config", () => {
       const { readFile, stat } = await import("node:fs/promises");
       const statBefore = await stat(manifestPath);
 
-      const second = await runAndPersist({ ...opts, now: () => new Date("2026-09-12T07:00:00Z") }, false, schemasDir);
+      const second = await runAndPersist(
+        { ...opts, now: () => new Date("2026-09-12T07:00:00Z") },
+        false,
+        schemasDir,
+      );
       expect(second.changed).toBe(false);
 
       const statAfter = await stat(manifestPath);
@@ -96,7 +100,14 @@ describe("orchestrator — end-to-end against the synthetic config", () => {
     try {
       const config = CmieConfig.parse(exampleConfig);
       const result = await runAndPersist(
-        { config, dataDir, fixturesDir, acknowledgementsPath: await freshAckPath(dataDir), runId: "r1", now: () => new Date("2026-09-12T06:00:00Z") },
+        {
+          config,
+          dataDir,
+          fixturesDir,
+          acknowledgementsPath: await freshAckPath(dataDir),
+          runId: "r1",
+          now: () => new Date("2026-09-12T06:00:00Z"),
+        },
         false,
         schemasDir,
       );

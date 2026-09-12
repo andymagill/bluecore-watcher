@@ -9,7 +9,8 @@ import { buildPreviewUrl, parseVersionId } from "../scripts/resolve-preview-url.
 
 describe("parseVersionId", () => {
   it("extracts the Version ID from a real Workers Builds check summary", () => {
-    const summary = "\nBuild ID: [d3449823-a4ee-4488-82d0-335e802cbddf](https://dash.cloudflare.com/...)\nScript: [bluecore-watcher](...)\nVersion ID: 25e0b07c-3a58-4293-ba78-a75e61b9ce86\n";
+    const summary =
+      "\nBuild ID: [d3449823-a4ee-4488-82d0-335e802cbddf](https://dash.cloudflare.com/...)\nScript: [bluecore-watcher](...)\nVersion ID: 25e0b07c-3a58-4293-ba78-a75e61b9ce86\n";
     expect(parseVersionId(summary)).toBe("25e0b07c-3a58-4293-ba78-a75e61b9ce86");
   });
 
@@ -18,7 +19,9 @@ describe("parseVersionId", () => {
   });
 
   it("throws when no Version ID is present", () => {
-    expect(() => parseVersionId("Build ID: abc, no version here")).toThrow(/Could not find a Version ID/);
+    expect(() => parseVersionId("Build ID: abc, no version here")).toThrow(
+      /Could not find a Version ID/,
+    );
   });
 
   it("throws when the summary is null", () => {
@@ -34,8 +37,8 @@ describe("buildPreviewUrl", () => {
   });
 
   it("uses whatever alias/name/subdomain it's given, generically", () => {
-    expect(buildPreviewUrl("ingest-2026-09-12t18-00-00-000z-abc1234", "my-worker", "my-subdomain")).toBe(
-      "https://ingest-2026-09-12t18-00-00-000z-abc1234-my-worker.my-subdomain.workers.dev",
-    );
+    expect(
+      buildPreviewUrl("ingest-2026-09-12t18-00-00-000z-abc1234", "my-worker", "my-subdomain"),
+    ).toBe("https://ingest-2026-09-12t18-00-00-000z-abc1234-my-worker.my-subdomain.workers.dev");
   });
 });

@@ -40,7 +40,9 @@ function main() {
       const path = join(schemasDir, filename);
       const existing = existsSync(path) ? readFileSync(path, "utf-8") : null;
       if (existing !== content) {
-        console.error(`DRIFT: ${filename} does not match its Zod source. Run "npm run schema:gen".`);
+        console.error(
+          `DRIFT: ${filename} does not match its Zod source. Run "npm run schema:gen".`,
+        );
         drifted = true;
       }
     }

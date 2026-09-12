@@ -26,7 +26,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const schemasDir = join(root, "schemas");
 
-const REAL_HEADLINE = "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach";
+const REAL_HEADLINE =
+  "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach";
 const NEW_HEADLINE = "BlueCore Energy Announces Expanded Port of Long Beach Berth Allocation";
 
 class BodyFetcher implements Fetcher {
@@ -51,7 +52,10 @@ function getBlock(tf: TargetFile, key: string) {
 
 describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
   it("a genuinely broken required selector retains the entire prior file, with a health entry, per Invariant 1", async () => {
-    const realHtml = await readFile(join(root, "fixtures", "bluecore-newsroom", "response.html"), "utf-8");
+    const realHtml = await readFile(
+      join(root, "fixtures", "bluecore-newsroom", "response.html"),
+      "utf-8",
+    );
     const dataDir = await mkdtemp(join(tmpdir(), "cmie-newsroom-"));
     try {
       const ctx = { runId: "run-1", now: () => new Date("2026-09-08T13:00:00Z") };
@@ -76,10 +80,19 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // e.g. a page redesign. Everything else about the page is unchanged.
       const brokenConfig = newsroomOnlyConfig((target) => ({
         ...target,
-        extractors: target.extractors.map((ex) => (ex.key === "latest_headline" && ex.kind === "html" ? { ...ex, selector: ".bc-n-ctitle-DOES-NOT-EXIST:first" } : ex)),
+        extractors: target.extractors.map((ex) =>
+          ex.key === "latest_headline" && ex.kind === "html"
+            ? { ...ex, selector: ".bc-n-ctitle-DOES-NOT-EXIST:first" }
+            : ex,
+        ),
       }));
       const second = await runAndPersist(
-        { ...opts, config: brokenConfig, runId: "run-2", now: () => new Date("2026-09-09T13:00:00Z") },
+        {
+          ...opts,
+          config: brokenConfig,
+          runId: "run-2",
+          now: () => new Date("2026-09-09T13:00:00Z"),
+        },
         false,
         schemasDir,
       );
@@ -106,15 +119,22 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // The retained value really was written to disk -- "does not reach
       // production" is about the *broken* value, not about withholding the
       // failure record itself (which is exactly what the health entry is for).
-      const onDisk = JSON.parse(await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"));
-      expect(onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline").value).toBe(REAL_HEADLINE);
+      const onDisk = JSON.parse(
+        await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"),
+      );
+      expect(onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline").value).toBe(
+        REAL_HEADLINE,
+      );
     } finally {
       await rm(dataDir, { recursive: true, force: true });
     }
   });
 
   it("a value change produces delta.changedAt at the moment it changed, then carries it forward untouched while unchanged", async () => {
-    const realHtml = await readFile(join(root, "fixtures", "bluecore-newsroom", "response.html"), "utf-8");
+    const realHtml = await readFile(
+      join(root, "fixtures", "bluecore-newsroom", "response.html"),
+      "utf-8",
+    );
     const updatedHtml = realHtml.replace(REAL_HEADLINE, NEW_HEADLINE);
     expect(updatedHtml).not.toBe(realHtml); // sanity: the replace actually matched
 
@@ -130,7 +150,12 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
 
       // Run 1: first extraction ever -- delta is null (01-DATA-CONTRACT §4).
       const first = await runAndPersist(
-        { ...baseOpts, runId: "r1", now: () => new Date("2026-09-08T13:00:00Z"), fetcher: new BodyFetcher(() => realHtml) },
+        {
+          ...baseOpts,
+          runId: "r1",
+          now: () => new Date("2026-09-08T13:00:00Z"),
+          fetcher: new BodyFetcher(() => realHtml),
+        },
         false,
         schemasDir,
       );
@@ -138,7 +163,12 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
 
       // Run 2: the headline actually changes -- changedAt is set to *this* run's time.
       const second = await runAndPersist(
-        { ...baseOpts, runId: "r2", now: () => new Date("2026-09-11T13:00:00Z"), fetcher: new BodyFetcher(() => updatedHtml) },
+        {
+          ...baseOpts,
+          runId: "r2",
+          now: () => new Date("2026-09-11T13:00:00Z"),
+          fetcher: new BodyFetcher(() => updatedHtml),
+        },
         false,
         schemasDir,
       );
@@ -150,7 +180,12 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // Run 3: same (updated) content, days later -- ADR-011 says no commit
       // at all, and 01-DATA-CONTRACT §4 says changedAt survives untouched.
       const third = await runAndPersist(
-        { ...baseOpts, runId: "r3", now: () => new Date("2026-09-15T13:00:00Z"), fetcher: new BodyFetcher(() => updatedHtml) },
+        {
+          ...baseOpts,
+          runId: "r3",
+          now: () => new Date("2026-09-15T13:00:00Z"),
+          fetcher: new BodyFetcher(() => updatedHtml),
+        },
         false,
         schemasDir,
       );
@@ -158,7 +193,9 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
 
       // Confirm what's actually committed on disk still reflects run 2's
       // changedAt -- this is exactly what powers "unchanged for N days".
-      const onDisk = JSON.parse(await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"));
+      const onDisk = JSON.parse(
+        await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"),
+      );
       const onDiskBlock = onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline");
       expect(onDiskBlock.delta.changedAt).toBe("2026-09-11T13:00:00.000Z");
     } finally {

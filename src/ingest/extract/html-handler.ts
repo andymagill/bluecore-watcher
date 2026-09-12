@@ -50,9 +50,7 @@ function resolveAnchor($: cheerio.CheerioAPI, el: Element, sourceUrl: string): s
     const tag = current.name;
     const parent: ParentNode | null = current.parent;
     if (parent && parent.type === "tag") {
-      const siblings = $(parent)
-        .children(tag)
-        .toArray();
+      const siblings = $(parent).children(tag).toArray();
       const index = siblings.indexOf(current) + 1;
       segments.unshift(siblings.length > 1 ? `${tag}:nth-of-type(${index})` : tag);
     } else {

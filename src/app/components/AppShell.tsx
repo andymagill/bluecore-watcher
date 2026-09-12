@@ -6,7 +6,10 @@ import { loadDashboardData, type LoadedData } from "../lib/load-data.js";
 import { HeaderBar } from "./HeaderBar.js";
 import { SectionGrid } from "./SectionGrid.js";
 
-type LoadState = { status: "loading" } | { status: "error"; message: string } | { status: "ready"; data: LoadedData };
+type LoadState =
+  | { status: "loading" }
+  | { status: "error"; message: string }
+  | { status: "ready"; data: LoadedData };
 
 export function AppShell() {
   const [state, setState] = useState<LoadState>({ status: "loading" });
@@ -18,7 +21,8 @@ export function AppShell() {
         if (!cancelled) setState({ status: "ready", data });
       })
       .catch((err: unknown) => {
-        if (!cancelled) setState({ status: "error", message: err instanceof Error ? err.message : String(err) });
+        if (!cancelled)
+          setState({ status: "error", message: err instanceof Error ? err.message : String(err) });
       });
     return () => {
       cancelled = true;

@@ -9,7 +9,15 @@ function daysLabel(days: number): string {
   return `${days} days ago`;
 }
 
-export function DeltaChip({ delta, ttlHours, now }: { delta: Delta | null; ttlHours: number; now?: Date }) {
+export function DeltaChip({
+  delta,
+  ttlHours,
+  now,
+}: {
+  delta: Delta | null;
+  ttlHours: number;
+  now?: Date;
+}) {
   const display = computeDeltaDisplay(now ?? new Date(), delta, ttlHours);
 
   if (display.kind === "none") return null; // "First observations get no chip."
@@ -17,7 +25,10 @@ export function DeltaChip({ delta, ttlHours, now }: { delta: Delta | null; ttlHo
   if (display.kind === "changed-scalar") {
     const arrow = display.direction === "up" ? "▲" : "▼";
     return (
-      <span className="inline-flex items-center gap-1 text-xs text-neutral-300 tabular-nums" data-delta-kind="changed">
+      <span
+        className="inline-flex items-center gap-1 text-xs text-neutral-300 tabular-nums"
+        data-delta-kind="changed"
+      >
         <span aria-hidden>{arrow}</span>
         <span>
           {Math.abs(display.absolute).toLocaleString()} ({Math.abs(display.percent).toFixed(1)}%)

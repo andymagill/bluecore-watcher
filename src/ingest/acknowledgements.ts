@@ -24,7 +24,10 @@ export class AcknowledgementStore {
   find(targetId: string, extractorKey: string, contentHash: string): Acknowledgement | null {
     return (
       this.acknowledgements.find(
-        (a) => a.targetId === targetId && a.extractorKey === extractorKey && a.contentHash === contentHash,
+        (a) =>
+          a.targetId === targetId &&
+          a.extractorKey === extractorKey &&
+          a.contentHash === contentHash,
       ) ?? null
     );
   }
@@ -34,7 +37,10 @@ export class AcknowledgementStore {
   }
 
   async save(): Promise<void> {
-    const file = AcknowledgementsFile.parse({ schemaVersion: 1, acknowledgements: this.acknowledgements });
+    const file = AcknowledgementsFile.parse({
+      schemaVersion: 1,
+      acknowledgements: this.acknowledgements,
+    });
     await writeFile(this.path, JSON.stringify(file, null, 2) + "\n", "utf-8");
   }
 }

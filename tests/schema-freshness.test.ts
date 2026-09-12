@@ -24,7 +24,8 @@ describe("schemas/ matches src/contract and src/config (run `npm run schema:gen`
   for (const [filename, schema] of Object.entries(schemasByFile)) {
     it(filename, async () => {
       const committed = await readFile(join(schemasDir, filename), "utf-8");
-      const regenerated = JSON.stringify(z.toJSONSchema(schema, { target: "draft-7", io: "output" }), null, 2) + "\n";
+      const regenerated =
+        JSON.stringify(z.toJSONSchema(schema, { target: "draft-7", io: "output" }), null, 2) + "\n";
       expect(committed).toBe(regenerated);
     });
   }

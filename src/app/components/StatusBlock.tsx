@@ -9,7 +9,12 @@ import { DeltaChip } from "./DeltaChip.js";
 import { ProvenancePopover } from "./ProvenancePopover.js";
 import { ZeroState } from "./ZeroState.js";
 
-const PILL_COLORS = ["bg-blue-900/60 text-blue-300", "bg-purple-900/60 text-purple-300", "bg-teal-900/60 text-teal-300", "bg-pink-900/60 text-pink-300"];
+const PILL_COLORS = [
+  "bg-blue-900/60 text-blue-300",
+  "bg-purple-900/60 text-purple-300",
+  "bg-teal-900/60 text-teal-300",
+  "bg-pink-900/60 text-pink-300",
+];
 
 function colorFor(value: string): string {
   let hash = 0;
@@ -17,7 +22,17 @@ function colorFor(value: string): string {
   return PILL_COLORS[hash % PILL_COLORS.length]!;
 }
 
-export function StatusBlock({ targetId, block, ttlHours, now }: { targetId: string; block: ScalarBlock; ttlHours: number; now?: Date }) {
+export function StatusBlock({
+  targetId,
+  block,
+  ttlHours,
+  now,
+}: {
+  targetId: string;
+  block: ScalarBlock;
+  ttlHours: number;
+  now?: Date;
+}) {
   const state = useFreshness(block, ttlHours, now);
 
   if (block.status === "missing" || !block.provenance) {
@@ -33,7 +48,11 @@ export function StatusBlock({ targetId, block, ttlHours, now }: { targetId: stri
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
       <p className="text-xs text-neutral-500">{block.label}</p>
-      <span className={`inline-block rounded-full px-2 py-0.5 text-sm font-medium ${colorFor(value)}`}>{block.displayValue}</span>
+      <span
+        className={`inline-block rounded-full px-2 py-0.5 text-sm font-medium ${colorFor(value)}`}
+      >
+        {block.displayValue}
+      </span>
       <div className="flex flex-wrap items-center gap-2">
         <FreshnessBadge block={block} state={state} />
         <DeltaChip delta={block.delta} ttlHours={ttlHours} now={now} />

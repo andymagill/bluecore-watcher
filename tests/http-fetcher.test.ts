@@ -11,7 +11,9 @@ import { IngestError } from "../src/ingest/errors.js";
 
 type Handler = (req: IncomingMessage, res: ServerResponse) => void;
 
-async function startServer(handler: Handler): Promise<{ url: string; server: Server; hits: () => number }> {
+async function startServer(
+  handler: Handler,
+): Promise<{ url: string; server: Server; hits: () => number }> {
   let hitCount = 0;
   const server = createServer((req, res) => {
     hitCount++;
@@ -42,7 +44,18 @@ function buildTarget(url: string, overrides: Partial<TargetDef> = {}): TargetDef
     schedule: { cron: "0 6 * * *", ttlHours: 72, jitterSeconds: 0 },
     politeness: { minIntervalMs: 0, respectRobotsTxt: false },
     extractors: [
-      { key: "ex1", label: "E1", presenter: "metric", kind: "html", type: "number", selector: "p", required: false, regexGroup: 1, trim: true, locale: "en-US" },
+      {
+        key: "ex1",
+        label: "E1",
+        presenter: "metric",
+        kind: "html",
+        type: "number",
+        selector: "p",
+        required: false,
+        regexGroup: 1,
+        trim: true,
+        locale: "en-US",
+      },
     ],
     ...overrides,
   };
@@ -96,7 +109,9 @@ describe("HttpFetcher", () => {
     openServer = server;
 
     const fetcher = new HttpFetcher({ retries: 3 });
-    await expect(fetcher.fetch(buildTarget(url), ctx)).rejects.toMatchObject({ errorClass: "BLOCKED" });
+    await expect(fetcher.fetch(buildTarget(url), ctx)).rejects.toMatchObject({
+      errorClass: "BLOCKED",
+    });
     expect(hits()).toBe(1);
   });
 
@@ -107,7 +122,9 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    await expect(new HttpFetcher({ retries: 3 }).fetch(buildTarget(url), ctx)).rejects.toMatchObject({ errorClass: "BLOCKED" });
+    await expect(
+      new HttpFetcher({ retries: 3 }).fetch(buildTarget(url), ctx),
+    ).rejects.toMatchObject({ errorClass: "BLOCKED" });
     expect(hits()).toBe(1);
   });
 
@@ -118,7 +135,9 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    await expect(new HttpFetcher({ retries: 3 }).fetch(buildTarget(url), ctx)).rejects.toMatchObject({ errorClass: "HTTP_ERROR", httpStatus: 404 });
+    await expect(
+      new HttpFetcher({ retries: 3 }).fetch(buildTarget(url), ctx),
+    ).rejects.toMatchObject({ errorClass: "HTTP_ERROR", httpStatus: 404 });
     expect(hits()).toBe(1);
   });
 
@@ -129,7 +148,9 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    await expect(new HttpFetcher().fetch(buildTarget(url), ctx)).rejects.toMatchObject({ errorClass: "AUTH_ERROR" });
+    await expect(new HttpFetcher().fetch(buildTarget(url), ctx)).rejects.toMatchObject({
+      errorClass: "AUTH_ERROR",
+    });
   });
 
   it("a configured auth.secretEnv missing from process.env -> AUTH_ERROR, no request sent", async () => {
@@ -140,8 +161,12 @@ describe("HttpFetcher", () => {
     openServer = server;
     delete process.env.TEST_MISSING_SECRET_XYZ;
 
-    const target = buildTarget(url, { auth: { type: "bearer", secretEnv: "TEST_MISSING_SECRET_XYZ" } });
-    await expect(new HttpFetcher().fetch(target, ctx)).rejects.toMatchObject({ errorClass: "AUTH_ERROR" });
+    const target = buildTarget(url, {
+      auth: { type: "bearer", secretEnv: "TEST_MISSING_SECRET_XYZ" },
+    });
+    await expect(new HttpFetcher().fetch(target, ctx)).rejects.toMatchObject({
+      errorClass: "AUTH_ERROR",
+    });
     expect(hits()).toBe(0);
   });
 
@@ -174,7 +199,20 @@ describe("HttpFetcher", () => {
     const target = buildTarget(url, {
       kind: "api",
       auth: { type: "query", name: "api_key", secretEnv: "TEST_QUERY_SECRET" },
-      extractors: [{ key: "ex1", label: "E1", presenter: "metric", kind: "api", type: "number", jsonPath: "$.x", required: false, regexGroup: 1, trim: true, locale: "en-US" }],
+      extractors: [
+        {
+          key: "ex1",
+          label: "E1",
+          presenter: "metric",
+          kind: "api",
+          type: "number",
+          jsonPath: "$.x",
+          required: false,
+          regexGroup: 1,
+          trim: true,
+          locale: "en-US",
+        },
+      ],
     });
     await new HttpFetcher().fetch(target, ctx);
     expect(seenQuery).toContain("api_key=qkey");
@@ -208,8 +246,12 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    const target = buildTarget(`${url}/private/page`, { politeness: { minIntervalMs: 0, respectRobotsTxt: true } });
-    await expect(new HttpFetcher().fetch(target, ctx)).rejects.toMatchObject({ errorClass: "BLOCKED" });
+    const target = buildTarget(`${url}/private/page`, {
+      politeness: { minIntervalMs: 0, respectRobotsTxt: true },
+    });
+    await expect(new HttpFetcher().fetch(target, ctx)).rejects.toMatchObject({
+      errorClass: "BLOCKED",
+    });
     // robots.txt itself is one hit; the disallowed page must never be requested.
     expect(hits()).toBe(1);
   });
@@ -226,7 +268,9 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    const target = buildTarget(`${url}/public/page`, { politeness: { minIntervalMs: 0, respectRobotsTxt: true } });
+    const target = buildTarget(`${url}/public/page`, {
+      politeness: { minIntervalMs: 0, respectRobotsTxt: true },
+    });
     const result = await new HttpFetcher().fetch(target, ctx);
     expect(result.httpStatus).toBe(200);
   });
@@ -238,7 +282,9 @@ describe("HttpFetcher", () => {
     });
     openServer = server;
 
-    const target = buildTarget(url, { politeness: { minIntervalMs: 150, respectRobotsTxt: false } });
+    const target = buildTarget(url, {
+      politeness: { minIntervalMs: 150, respectRobotsTxt: false },
+    });
     const fetcher = new HttpFetcher();
     const start = Date.now();
     await fetcher.fetch(target, ctx);
@@ -256,7 +302,9 @@ describe("HttpFetcher", () => {
     openServer = server;
 
     const target = buildTarget(url);
-    await expect(new HttpFetcher({ timeoutMs: 20, retries: 0 }).fetch(target, ctx)).rejects.toMatchObject({ errorClass: "TIMEOUT" });
+    await expect(
+      new HttpFetcher({ timeoutMs: 20, retries: 0 }).fetch(target, ctx),
+    ).rejects.toMatchObject({ errorClass: "TIMEOUT" });
   });
 });
 

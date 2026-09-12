@@ -102,16 +102,16 @@ Fetched first. Everything else is discovered from it.
     "renderer": "static",
     "httpStatus": 200
   },
-  "blocks": [ /* see §4 */ ]
+  "blocks": [/* see §4 */]
 }
 ```
 
 ### `run.status`
 
-| Value | Meaning |
-|---|---|
-| `ok` | Fetched and every required extractor produced a validated value. |
-| `partial` | Fetched, but one or more non-required extractors failed. Successful blocks are fresh; failed blocks carry cached values. |
+| Value           | Meaning                                                                                                                          |
+| --------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `ok`            | Fetched and every required extractor produced a validated value.                                                                 |
+| `partial`       | Fetched, but one or more non-required extractors failed. Successful blocks are fresh; failed blocks carry cached values.         |
 | `failed_cached` | The run did not produce usable data. **The entire previous file is retained unchanged except `run`**, which records the failure. |
 
 A `failed_cached` run never destroys data. That is the single most important invariant in this contract.
@@ -159,26 +159,26 @@ A block is one rendered fact. Every block carries its own provenance — not inh
 
 **`value` / `displayValue`.** `value` is machine-typed (number, ISO date string, markdown source). `displayValue` is the formatted string the UI renders. Formatting happens at ingestion, once, so the client does no locale work and two clients cannot disagree about how a number looks.
 
-**`provenance.rawText`** is the extracted text *before* regex and coercion. When a value looks wrong, this is the first thing anyone reads. Non-optional.
+**`provenance.rawText`** is the extracted text _before_ regex and coercion. When a value looks wrong, this is the first thing anyone reads. Non-optional.
 
 **`provenance.contentHash`** hashes `rawText`. Diffing hashes rather than parsed values catches changes that coercion would flatten (e.g. `"approx. 48,200"` → `"48,200"` both parse to `48200`).
 
 **`provenance.anchor`** is the resolved selector path, not the configured one. If config says `.capacity-table td` and it matched, the anchor records which node — so a future ambiguity failure is diagnosable.
 
-**`delta`** is `null` only on first extraction. On every subsequent run it is present: when `contentHash` changed, it is recomputed against the previous value; when `contentHash` is unchanged, the entire object — including `changedAt` — is **carried forward untouched** from the prior committed file. `changedAt` is the extraction time at which the value *became* its current value, and because it survives unchanged runs, it is what powers "unchanged for 34 days" (see `04-FRONTEND.md` §4). *(Corrected 2026-09-12 — this file previously said `delta` is null when `contentHash` is unchanged, which is incompatible with `changedAt` surviving unchanged runs, since `changedAt` lives inside `delta`. `03-INGESTION.md` §1 "diff" was already correct; this file was the bug.)*
+**`delta`** is `null` only on first extraction. On every subsequent run it is present: when `contentHash` changed, it is recomputed against the previous value; when `contentHash` is unchanged, the entire object — including `changedAt` — is **carried forward untouched** from the prior committed file. `changedAt` is the extraction time at which the value _became_ its current value, and because it survives unchanged runs, it is what powers "unchanged for 34 days" (see `04-FRONTEND.md` §4). _(Corrected 2026-09-12 — this file previously said `delta` is null when `contentHash` is unchanged, which is incompatible with `changedAt` surviving unchanged runs, since `changedAt` lives inside `delta`. `03-INGESTION.md` §1 "diff" was already correct; this file was the bug.)_
 
 **`validation.warnings`** is non-empty when a change guard quarantined a candidate value. Each warning records the rejected candidate, the guard that rejected it, and the retained value — everything a human needs to adjudicate without re-fetching. See §6.
 
 ### `status` (block level)
 
-| Value | Meaning | Renders as |
-|---|---|---|
-| `ok` | Extracted and validated this run. | Normal |
-| `cached` | This run failed; value is from a prior successful run. | Value + failure marker |
+| Value     | Meaning                                                                                                                                                                                           | Renders as                   |
+| --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------- |
+| `ok`      | Extracted and validated this run.                                                                                                                                                                 | Normal                       |
+| `cached`  | This run failed; value is from a prior successful run.                                                                                                                                            | Value + failure marker       |
 | `flagged` | A new value was extracted but quarantined by a change guard. **The displayed value is the prior one**; the candidate is recorded in `validation.warnings` and in the health log for adjudication. | Prior value + caution marker |
-| `missing` | Configured but never successfully extracted. | Zero-state |
+| `missing` | Configured but never successfully extracted.                                                                                                                                                      | Zero-state                   |
 
-**`missing` is the one status where `provenance` and `delta` are `null`** rather than the object shapes in §4/§4.1 — there is no prior value to attribute or diff against. Every other status carries full, non-null provenance, consistent with Invariant 2 ("every *rendered* value has a sourceUrl, anchor, extractedAt, and rawText") — `missing` renders nothing.
+**`missing` is the one status where `provenance` and `delta` are `null`** rather than the object shapes in §4/§4.1 — there is no prior value to attribute or diff against. Every other status carries full, non-null provenance, consistent with Invariant 2 ("every _rendered_ value has a sourceUrl, anchor, extractedAt, and rawText") — `missing` renders nothing.
 
 ---
 
@@ -235,14 +235,14 @@ Computed in browser memory at render time from `T_now`. Never baked into the dat
 
 Let `age = T_now − extractedAt`, `ttl = ttlHours`, and `ceiling = ttl × 3` (overridable per target).
 
-| State | Condition | UI |
-|---|---|---|
-| `never` | No block, or `status: missing` | Zero-state placeholder. No value shown. |
-| `fresh` | `age ≤ ttl` and `run.status = ok` | Value, neutral badge with relative age. |
-| `stale` | `ttl < age ≤ ceiling` | Value, amber badge: "Updated 3 days ago". |
-| `expired` | `age > ceiling` | **Value suppressed.** Shows "Last known value from 4 Aug" behind a disclosure. |
-| `failing` | `block.status = cached` | Value, red badge, links to Health Modal. Age still shown. |
-| `flagged` | `block.status = flagged` | Value, caution marker, links to the warning text. |
+| State     | Condition                         | UI                                                                             |
+| --------- | --------------------------------- | ------------------------------------------------------------------------------ |
+| `never`   | No block, or `status: missing`    | Zero-state placeholder. No value shown.                                        |
+| `fresh`   | `age ≤ ttl` and `run.status = ok` | Value, neutral badge with relative age.                                        |
+| `stale`   | `ttl < age ≤ ceiling`             | Value, amber badge: "Updated 3 days ago".                                      |
+| `expired` | `age > ceiling`                   | **Value suppressed.** Shows "Last known value from 4 Aug" behind a disclosure. |
+| `failing` | `block.status = cached`           | Value, red badge, links to Health Modal. Age still shown.                      |
+| `flagged` | `block.status = flagged`          | Value, caution marker, links to the warning text.                              |
 
 `expired` is the answer to a specific failure: a source breaks quietly, nobody fixes it, and six weeks later an analyst reads a number as current. Past the ceiling the dashboard stops asserting the value and starts reporting a historical observation. The distinction matters legally as much as operationally.
 
@@ -305,20 +305,20 @@ Tuning is expected to be iterative — start permissive, tighten as you learn ea
 
 Fixed set. Anything not classifiable is `UNKNOWN`, and an `UNKNOWN` appearing in production is itself a defect to be triaged into the list.
 
-| Code | Cause | Typical fix |
-|---|---|---|
-| `NETWORK_ERROR` | DNS, TLS, connection reset | Retry; investigate if persistent |
-| `TIMEOUT` | Exceeded per-target budget | Raise budget or switch renderer |
-| `HTTP_ERROR` | Non-2xx that isn't a block signal | Check URL drift |
-| `BLOCKED` | 403, 429, or captcha heuristic | Evidence for the proxy decision (ADR-006) |
-| `AUTH_ERROR` | 401, or missing secret env var | Rotate or set credential |
-| `SELECTOR_NO_MATCH` | Matched 0 nodes | Repair selector |
-| `SELECTOR_AMBIGUOUS` | Matched >1 without `multiple: true` | Tighten selector |
-| `PARSE_ERROR` | Regex missed, or coercion failed | Fix regex or `type` |
-| `ASSERTION_FAILED` | Shape assertion rejected the value | Investigate source, then retune |
-| `CHANGE_GUARD_TRIPPED` | Moved beyond tolerance | Human adjudication |
-| `SCHEMA_INVALID` | Output failed its own JSON Schema | Engine defect — always a bug |
-| `UNKNOWN` | Unclassified | Triage into this table |
+| Code                   | Cause                               | Typical fix                               |
+| ---------------------- | ----------------------------------- | ----------------------------------------- |
+| `NETWORK_ERROR`        | DNS, TLS, connection reset          | Retry; investigate if persistent          |
+| `TIMEOUT`              | Exceeded per-target budget          | Raise budget or switch renderer           |
+| `HTTP_ERROR`           | Non-2xx that isn't a block signal   | Check URL drift                           |
+| `BLOCKED`              | 403, 429, or captcha heuristic      | Evidence for the proxy decision (ADR-006) |
+| `AUTH_ERROR`           | 401, or missing secret env var      | Rotate or set credential                  |
+| `SELECTOR_NO_MATCH`    | Matched 0 nodes                     | Repair selector                           |
+| `SELECTOR_AMBIGUOUS`   | Matched >1 without `multiple: true` | Tighten selector                          |
+| `PARSE_ERROR`          | Regex missed, or coercion failed    | Fix regex or `type`                       |
+| `ASSERTION_FAILED`     | Shape assertion rejected the value  | Investigate source, then retune           |
+| `CHANGE_GUARD_TRIPPED` | Moved beyond tolerance              | Human adjudication                        |
+| `SCHEMA_INVALID`       | Output failed its own JSON Schema   | Engine defect — always a bug              |
+| `UNKNOWN`              | Unclassified                        | Triage into this table                    |
 
 `BLOCKED` is separated from `HTTP_ERROR` on purpose: it is the evidence base for whether the edge proxy solves a real problem.
 
@@ -334,7 +334,7 @@ Non-negotiable properties. Each should have a test.
 4. Data files validate against their JSON Schema before merge, and an invalid file blocks the merge.
 5. `main` only ever contains data that has been proven to render.
 6. No block is published with a value that failed a hard assertion.
-7. **Serialization is deterministic, and a semantically-unchanged run produces no commit at all** (ADR-011). Key order is stable and byte-for-byte reproducible for the same logical content. This is *not* "timestamps never move" — `provenance.extractedAt` must advance on every successful re-verification, or the freshness state machine in §5 cannot distinguish a value checked an hour ago from one checked 90 days ago and never touched since. Instead, `persist` computes a semantic fingerprint per run (block `key` + `status` + `contentHash` + typed `value`, target metadata, and the health entry set — explicitly excluding `runId` and all timestamps) and skips the commit entirely when every fingerprint matches the previous one. *(Restated 2026-09-12 — the original wording paired "timestamps are the only expected churn" with "an unchanged run produces a zero-line diff," which are incompatible: timestamp movement is itself diff content. See ADR-011.)*
+7. **Serialization is deterministic, and a semantically-unchanged run produces no commit at all** (ADR-011). Key order is stable and byte-for-byte reproducible for the same logical content. This is _not_ "timestamps never move" — `provenance.extractedAt` must advance on every successful re-verification, or the freshness state machine in §5 cannot distinguish a value checked an hour ago from one checked 90 days ago and never touched since. Instead, `persist` computes a semantic fingerprint per run (block `key` + `status` + `contentHash` + typed `value`, target metadata, and the health entry set — explicitly excluding `runId` and all timestamps) and skips the commit entirely when every fingerprint matches the previous one. _(Restated 2026-09-12 — the original wording paired "timestamps are the only expected churn" with "an unchanged run produces a zero-line diff," which are incompatible: timestamp movement is itself diff content. See ADR-011.)_
 8. `firstSeenAt` and `consecutiveFailures` in `health.json` are computed from the previous **committed** health plus the current run's artifact — never reset by a run whose gate fails. A run that never reaches `main` must not erase the maintenance backlog it was trying to report.
 
 Invariant 7 matters more than it looks. Non-deterministic serialization produces noisy diffs, noisy diffs make ingestion PRs unreviewable, and unreviewable PRs quietly become auto-merged — at which point the audit trail is decorative.

@@ -6,13 +6,13 @@ Per ADR-001 the dashboards are operated as a service. This document is the opera
 
 ## 1. Deployment topology
 
-| Piece | Where | Notes |
-|---|---|---|
-| App + data | One Cloudflare Worker (Static Assets), builds from `main` via Workers Builds | Static Vite output; `public/data/**` ships with the build |
-| Ingestion | GitHub Actions, cron | Concurrency group `ingest`, serialized |
-| Preview gate | Workers Builds preview per `ingest/*` branch | Blocks the merge |
-| Edge relay | Cloudflare Worker, separate route (or route on the same Worker — undecided, see ADR-014) | Optional per target; PSK header (ADR-006) |
-| Alerts | GitHub Issues | v1 channel |
+| Piece        | Where                                                                                    | Notes                                                     |
+| ------------ | ---------------------------------------------------------------------------------------- | --------------------------------------------------------- |
+| App + data   | One Cloudflare Worker (Static Assets), builds from `main` via Workers Builds             | Static Vite output; `public/data/**` ships with the build |
+| Ingestion    | GitHub Actions, cron                                                                     | Concurrency group `ingest`, serialized                    |
+| Preview gate | Workers Builds preview per `ingest/*` branch                                             | Blocks the merge                                          |
+| Edge relay   | Cloudflare Worker, separate route (or route on the same Worker — undecided, see ADR-014) | Optional per target; PSK header (ADR-006)                 |
+| Alerts       | GitHub Issues                                                                            | v1 channel                                                |
 
 Host is Cloudflare per ADR-013 — this table previously named Vercel throughout, which was never an accepted decision. The SPA-hosting row is corrected again per **ADR-014**: Pages is being phased out in favor of Workers, so the static SPA and its preview deployments live on a Worker (Static Assets + Workers Builds), not Pages.
 
@@ -22,11 +22,11 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 ## 2. Secrets
 
-| Name | Purpose |
-|---|---|
-| `CLOUDFLARE_API_TOKEN` | Preview URL resolution in the gate |
-| `INGEST_PSK` | Edge relay authentication |
-| `<SOURCE>_API_KEY` | Per authenticated source, named in config |
+| Name                   | Purpose                                   |
+| ---------------------- | ----------------------------------------- |
+| `CLOUDFLARE_API_TOKEN` | Preview URL resolution in the gate        |
+| `INGEST_PSK`           | Edge relay authentication                 |
+| `<SOURCE>_API_KEY`     | Per authenticated source, named in config |
 
 All GitHub Actions repository secrets. Never in config — config is committed, and a literal-secret pattern scan runs in CI (validation rule 11).
 
@@ -59,7 +59,7 @@ The routine failure. Expect these weekly.
 This is the system working. A number moved more than its configured tolerance and is waiting for a human.
 
 1. Open the source page. Is the new value real?
-2. **Real, and a one-off** (ADR-012) → add an entry to the committed acknowledgements file, keyed by `targetId.extractorKey` and the candidate's `contentHash`. Merge; the next run publishes that exact candidate and consumes the entry. The guard's tolerance is untouched, so it still catches the *next* anomalous move at the same target.
+2. **Real, and a one-off** (ADR-012) → add an entry to the committed acknowledgements file, keyed by `targetId.extractorKey` and the candidate's `contentHash`. Merge; the next run publishes that exact candidate and consumes the entry. The guard's tolerance is untouched, so it still catches the _next_ anomalous move at the same target.
 3. **Real, and the source's normal volatility has changed** → widen `maxChangePct`, merge, re-run. Reserve this for when the guard was tuned too tight for how this source actually behaves, not for a single legitimate spike — widening on every real move ratchets the guard toward meaningless over time.
 4. **Wrong** → you just caught a silent-wrong before it published. Repair the selector per §3.
 
@@ -98,13 +98,13 @@ The branch is a complete reproduction. Check it out, run locally, fix forward. N
 
 Open question Q4 asks for an honest number. The shape, to be replaced with measurement:
 
-| Activity | Cadence | Est. |
-|---|---|---|
-| Triage health entries | Weekly | 15–30 min |
-| Repair broken selectors | ~1–2/week at 20 sources | 20–40 min each |
-| Review drift-check warnings | Weekly | 10 min |
-| Retune guards | Monthly, front-loaded | 30 min |
-| **Total** | | **~1.5–3 hrs/week** |
+| Activity                    | Cadence                 | Est.                |
+| --------------------------- | ----------------------- | ------------------- |
+| Triage health entries       | Weekly                  | 15–30 min           |
+| Repair broken selectors     | ~1–2/week at 20 sources | 20–40 min each      |
+| Review drift-check warnings | Weekly                  | 10 min              |
+| Retune guards               | Monthly, front-loaded   | 30 min              |
+| **Total**                   |                         | **~1.5–3 hrs/week** |
 
 This is the number the competitive table's "Low maintenance" claim has to survive. It is low compared to running database infrastructure. It is not zero, and it scales with source count — 50 sources is not 1.5 hours a week. Price accordingly, and be straight about it with clients.
 
@@ -130,11 +130,11 @@ If any step requires touching application code, ADR-001 is violated and the sche
 
 ## 9. Unresolved operational risks
 
-| Risk | Status |
-|---|---|
-| No authentication — deployment is public (ADR-004) | **Open.** Do not ingest anything damaging if crawled, until auth ships. |
-| robots.txt / ToS posture unwritten (Q6) | **Deferred to M3/M4 by decision.** `respectRobotsTxt` defaults to `true` until then. Needed before any client deliverable. |
-| Git retention past ~2,000 commits (Q7) | Deferred. |
-| Single operator — no coverage | Accepted for now. The `notes` field and this runbook are the mitigation. |
-| Edge relay unvalidated (ADR-006) | Gathering evidence via §5. |
+| Risk                                                                                                                    | Status                                                                                                                                                                                            |
+| ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| No authentication — deployment is public (ADR-004)                                                                      | **Open.** Do not ingest anything damaging if crawled, until auth ships.                                                                                                                           |
+| robots.txt / ToS posture unwritten (Q6)                                                                                 | **Deferred to M3/M4 by decision.** `respectRobotsTxt` defaults to `true` until then. Needed before any client deliverable.                                                                        |
+| Git retention past ~2,000 commits (Q7)                                                                                  | Deferred.                                                                                                                                                                                         |
+| Single operator — no coverage                                                                                           | Accepted for now. The `notes` field and this runbook are the mitigation.                                                                                                                          |
+| Edge relay unvalidated (ADR-006)                                                                                        | Gathering evidence via §5.                                                                                                                                                                        |
 | Cloudflare's actual free-tier terms for this usage pattern haven't been re-verified since the host correction (ADR-013) | **Open.** The retired Vercel-specific finding (Hobby tier prohibits commercial use, forcing Pro at M4) does not necessarily transfer to Cloudflare Pages. Verify before treating M4 as cost-free. |

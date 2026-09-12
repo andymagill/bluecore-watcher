@@ -53,7 +53,10 @@ async function cloudflareJson<T>(path: string, token: string): Promise<T> {
     headers: { authorization: `Bearer ${token}` },
   });
   const body = (await res.json()) as { success: boolean; result: T; errors: unknown[] };
-  if (!res.ok || !body.success) throw new Error(`Cloudflare API ${path} returned ${res.status}: ${JSON.stringify(body.errors)}`);
+  if (!res.ok || !body.success)
+    throw new Error(
+      `Cloudflare API ${path} returned ${res.status}: ${JSON.stringify(body.errors)}`,
+    );
   return body.result;
 }
 
@@ -64,14 +67,24 @@ interface CheckRun {
   output: { summary: string | null };
 }
 
-async function waitForBuildCheck(repo: string, sha: string, token: string, deadline: number): Promise<CheckRun> {
+async function waitForBuildCheck(
+  repo: string,
+  sha: string,
+  token: string,
+  deadline: number,
+): Promise<CheckRun> {
   const checkName = `Workers Builds: ${WORKER_NAME}`;
   for (;;) {
-    const { check_runs } = await githubJson<{ check_runs: CheckRun[] }>(`/repos/${repo}/commits/${sha}/check-runs`, token);
+    const { check_runs } = await githubJson<{ check_runs: CheckRun[] }>(
+      `/repos/${repo}/commits/${sha}/check-runs`,
+      token,
+    );
     const check = check_runs.find((c) => c.name === checkName);
     if (check && check.status === "completed") return check;
     if (Date.now() > deadline) {
-      throw new Error(`Timed out waiting for "${checkName}" check run on ${sha} (last seen: ${check ? check.status : "not yet reported"})`);
+      throw new Error(
+        `Timed out waiting for "${checkName}" check run on ${sha} (last seen: ${check ? check.status : "not yet reported"})`,
+      );
     }
     await sleep(POLL_INTERVAL_MS);
   }
@@ -83,7 +96,8 @@ async function waitForBuildCheck(repo: string, sha: string, token: string, deadl
 // the real repo/Worker during M1 build (2026-09-12).
 export function parseVersionId(summary: string | null): string {
   const match = summary?.match(/Version ID:\s*([0-9a-f-]+)/i);
-  if (!match) throw new Error(`Could not find a Version ID in the build check's summary: ${summary}`);
+  if (!match)
+    throw new Error(`Could not find a Version ID in the build check's summary: ${summary}`);
   return match[1]!;
 }
 
@@ -94,7 +108,9 @@ export function buildPreviewUrl(alias: string, workerName: string, subdomain: st
 async function main() {
   const sha = getArg("--sha");
   if (!sha) {
-    console.error("Usage: tsx scripts/resolve-preview-url.ts --sha <commit-sha> [--timeout-ms 180000]");
+    console.error(
+      "Usage: tsx scripts/resolve-preview-url.ts --sha <commit-sha> [--timeout-ms 180000]",
+    );
     process.exit(2);
   }
   const timeoutMs = Number(getArg("--timeout-ms") ?? 180_000);
@@ -108,7 +124,9 @@ async function main() {
 
   const check = await waitForBuildCheck(repo, sha, githubToken, deadline);
   if (check.conclusion !== "success") {
-    throw new Error(`Workers Builds check concluded "${check.conclusion}" for ${sha} -- build failed, no preview to gate against`);
+    throw new Error(
+      `Workers Builds check concluded "${check.conclusion}" for ${sha} -- build failed, no preview to gate against`,
+    );
   }
 
   const versionId = parseVersionId(check.output.summary);
@@ -118,9 +136,15 @@ async function main() {
     cfToken,
   );
   const alias = version.annotations?.["workers/alias"];
-  if (!alias) throw new Error(`Version ${versionId} has no "workers/alias" annotation -- cannot resolve a preview URL`);
+  if (!alias)
+    throw new Error(
+      `Version ${versionId} has no "workers/alias" annotation -- cannot resolve a preview URL`,
+    );
 
-  const { subdomain } = await cloudflareJson<{ subdomain: string }>(`/accounts/${cfAccount}/workers/subdomain`, cfToken);
+  const { subdomain } = await cloudflareJson<{ subdomain: string }>(
+    `/accounts/${cfAccount}/workers/subdomain`,
+    cfToken,
+  );
 
   const previewUrl = buildPreviewUrl(alias, WORKER_NAME, subdomain);
   console.log(previewUrl);

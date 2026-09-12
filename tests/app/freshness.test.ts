@@ -18,7 +18,13 @@ function block(overrides: Partial<ScalarBlock> = {}): ScalarBlock {
     status: "ok",
     value: "hello",
     displayValue: "hello",
-    provenance: { sourceUrl: "https://example.test", anchor: "p", extractedAt: EXTRACTED_AT, rawText: "hello", contentHash: "sha256:aabbcc" },
+    provenance: {
+      sourceUrl: "https://example.test",
+      anchor: "p",
+      extractedAt: EXTRACTED_AT,
+      rawText: "hello",
+      contentHash: "sha256:aabbcc",
+    },
     delta: null,
     validation: { passed: true, warnings: [] },
     ...overrides,
@@ -27,15 +33,25 @@ function block(overrides: Partial<ScalarBlock> = {}): ScalarBlock {
 
 describe("computeFreshness -- the freshness state machine, driven by a fake clock", () => {
   it("never: no block", () => {
-    expect(computeFreshness({ now: new Date(EXTRACTED_AT), block: undefined, ttlHours: TTL_HOURS })).toBe("never");
+    expect(
+      computeFreshness({ now: new Date(EXTRACTED_AT), block: undefined, ttlHours: TTL_HOURS }),
+    ).toBe("never");
   });
 
   it("never: status missing", () => {
-    expect(computeFreshness({ now: new Date(EXTRACTED_AT), block: block({ status: "missing", provenance: null, delta: null }), ttlHours: TTL_HOURS })).toBe("never");
+    expect(
+      computeFreshness({
+        now: new Date(EXTRACTED_AT),
+        block: block({ status: "missing", provenance: null, delta: null }),
+        ttlHours: TTL_HOURS,
+      }),
+    ).toBe("never");
   });
 
   it("fresh: just extracted", () => {
-    expect(computeFreshness({ now: new Date(EXTRACTED_AT), block: block(), ttlHours: TTL_HOURS })).toBe("fresh");
+    expect(
+      computeFreshness({ now: new Date(EXTRACTED_AT), block: block(), ttlHours: TTL_HOURS }),
+    ).toBe("fresh");
   });
 
   it("fresh: age exactly at ttl boundary is still fresh (age <= ttl)", () => {
@@ -60,25 +76,43 @@ describe("computeFreshness -- the freshness state machine, driven by a fake cloc
 
   it("expired: honours a custom staleCeilingMultiplier override", () => {
     const now = new Date(new Date(EXTRACTED_AT).getTime() + TTL_HOURS * 2 * 3_600_000 + 1);
-    expect(computeFreshness({ now, block: block(), ttlHours: TTL_HOURS, staleCeilingMultiplier: 2 })).toBe("expired");
+    expect(
+      computeFreshness({ now, block: block(), ttlHours: TTL_HOURS, staleCeilingMultiplier: 2 }),
+    ).toBe("expired");
   });
 
   it("failing: block.status cached, still within ttl", () => {
-    expect(computeFreshness({ now: new Date(EXTRACTED_AT), block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe("failing");
+    expect(
+      computeFreshness({
+        now: new Date(EXTRACTED_AT),
+        block: block({ status: "cached" }),
+        ttlHours: TTL_HOURS,
+      }),
+    ).toBe("failing");
   });
 
   it("failing takes precedence over stale (co-occurrence, per 04-FRONTEND.md §3)", () => {
     const now = new Date(new Date(EXTRACTED_AT).getTime() + (TTL_HOURS + 1) * 3_600_000);
-    expect(computeFreshness({ now, block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe("failing");
+    expect(computeFreshness({ now, block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe(
+      "failing",
+    );
   });
 
   it("expired takes precedence even over a failing (cached) block once past the ceiling", () => {
     const now = new Date(new Date(EXTRACTED_AT).getTime() + TTL_HOURS * 3 * 3_600_000 + 1);
-    expect(computeFreshness({ now, block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe("expired");
+    expect(computeFreshness({ now, block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe(
+      "expired",
+    );
   });
 
   it("flagged: block.status flagged", () => {
-    expect(computeFreshness({ now: new Date(EXTRACTED_AT), block: block({ status: "flagged" }), ttlHours: TTL_HOURS })).toBe("flagged");
+    expect(
+      computeFreshness({
+        now: new Date(EXTRACTED_AT),
+        block: block({ status: "flagged" }),
+        ttlHours: TTL_HOURS,
+      }),
+    ).toBe("flagged");
   });
 
   it("the same block transitions fresh -> stale -> expired purely as the injected clock advances", () => {

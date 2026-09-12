@@ -10,7 +10,7 @@ No database. No LLM in the data path. No hallucination surface.
 
 ## How it works
 
-A scheduled GitHub Action reads a config file describing *what to watch and where*, fetches each source, extracts values with rigid CSS selectors or JSON paths, validates them, and writes flat JSON files. Those files are committed to a short-lived branch, deployed to a preview URL, and merged to `main` only after proving they render correctly. The React SPA fetches them same-origin and computes freshness in the browser.
+A scheduled GitHub Action reads a config file describing _what to watch and where_, fetches each source, extracts values with rigid CSS selectors or JSON paths, validates them, and writes flat JSON files. Those files are committed to a short-lived branch, deployed to a preview URL, and merged to `main` only after proving they render correctly. The React SPA fetches them same-origin and computes freshness in the browser.
 
 Git is the data warehouse, the audit trail, and the deployment trigger.
 
@@ -34,17 +34,17 @@ LLMs are used — offline, to draft extractor configs and propose replacement se
 
 Read in order. `docs/00-DECISIONS.md` is the status of record; where it and `SPEC.md` disagree, the decision log wins.
 
-| Doc | What's in it |
-|---|---|
-| [`SPEC.md`](SPEC.md) | Product canvas, positioning, competitive framing |
-| [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md) | ADR log — accepted, open, and rejected decisions |
+| Doc                                                    | What's in it                                                                                                             |
+| ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| [`SPEC.md`](SPEC.md)                                   | Product canvas, positioning, competitive framing                                                                         |
+| [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md)         | ADR log — accepted, open, and rejected decisions                                                                         |
 | [`docs/01-DATA-CONTRACT.md`](docs/01-DATA-CONTRACT.md) | **Start here for implementation.** File layout, block envelope, provenance, freshness states, error taxonomy, invariants |
-| [`docs/02-CONFIG-SCHEMA.md`](docs/02-CONFIG-SCHEMA.md) | TypeScript types, validation rules, annotated example |
-| [`docs/03-INGESTION.md`](docs/03-INGESTION.md) | Orchestrator lifecycle, Git write protocol, the validation gate, testing |
-| [`docs/04-FRONTEND.md`](docs/04-FRONTEND.md) | Component inventory, block states, provenance UI |
-| [`docs/05-SOURCES.md`](docs/05-SOURCES.md) | Source inventory and triage method — **currently empty** |
-| [`docs/06-OPS-RUNBOOK.md`](docs/06-OPS-RUNBOOK.md) | Deploy topology, secrets, failure runbooks, maintenance cost |
-| [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md) | Milestones M0–M4 with exit criteria |
+| [`docs/02-CONFIG-SCHEMA.md`](docs/02-CONFIG-SCHEMA.md) | TypeScript types, validation rules, annotated example                                                                    |
+| [`docs/03-INGESTION.md`](docs/03-INGESTION.md)         | Orchestrator lifecycle, Git write protocol, the validation gate, testing                                                 |
+| [`docs/04-FRONTEND.md`](docs/04-FRONTEND.md)           | Component inventory, block states, provenance UI                                                                         |
+| [`docs/05-SOURCES.md`](docs/05-SOURCES.md)             | Source inventory and triage method — **currently empty**                                                                 |
+| [`docs/06-OPS-RUNBOOK.md`](docs/06-OPS-RUNBOOK.md)     | Deploy topology, secrets, failure runbooks, maintenance cost                                                             |
+| [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md)             | Milestones M0–M4 with exit criteria                                                                                      |
 
 `01-DATA-CONTRACT.md` constrains both the ingestion output and the React props. Change it deliberately; change it in one place.
 
@@ -71,10 +71,10 @@ React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingest
 
 ## Current blockers
 
-| # | Blocker | Impact |
-|---|---|---|
-| Q1 | The source inventory is empty | Blocks M0–M2 config work and the client deliverable. **Does not block the engine spine** (M0.5) — that runs concurrently against a synthetic config, per ADR-001. |
-| Q6 | robots.txt and ToS posture unwritten | Needed before any client deliverable. Deferred to M3/M4 by decision. |
+| #   | Blocker                              | Impact                                                                                                                                                            |
+| --- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Q1  | The source inventory is empty        | Blocks M0–M2 config work and the client deliverable. **Does not block the engine spine** (M0.5) — that runs concurrently against a synthetic config, per ADR-001. |
+| Q6  | robots.txt and ToS posture unwritten | Needed before any client deliverable. Deferred to M3/M4 by decision.                                                                                              |
 
 Q2 (PDF / session-state share) is resolved as informational, not blocking — ADR-010 made source kinds additive, so no share of PDFs can invalidate the stack. Full list in [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md#open).
 
@@ -93,3 +93,5 @@ Q2 (PDF / session-state share) is resolved as informational, not blocking — AD
 M0.5 (engine spine) is in progress — see [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md). It builds the contract layer, config validator, and `html`/`api` extraction handlers against a synthetic config, proven with an offline dry run. No cron, no real target, no deploy yet.
 
 The walking skeleton (M1) — one real Bluecore source driven end to end, with a freshness badge and a delta chip in production — starts once both M0.5 and `docs/05-SOURCES.md` are done. Filling in that source inventory is the other concurrent track.
+
+**Before committing:** `npm run format` (Prettier) and `npm run lint` (ESLint — also enforces the ADR-010 import boundaries). A pre-commit hook runs both, plus `validate:config`, on staged files automatically; `.github/workflows/ci.yml` runs the full set (including `typecheck`, `schema:check`, and `test`) on every PR.

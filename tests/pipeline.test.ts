@@ -57,21 +57,37 @@ describe("HtmlHandler + extractOne", () => {
   it("throws SELECTOR_NO_MATCH when the selector matches nothing", async () => {
     const target = buildTarget({ selector: "#does-not-exist" });
     const handler = new HtmlHandler();
-    const doc = handler.parse({ body: "<html><body><p id='x'>1</p></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
-    await expect(extractOne(handler, doc, target.extractors[0]!, target)).rejects.toMatchObject({ errorClass: "SELECTOR_NO_MATCH" } satisfies Partial<IngestError>);
+    const doc = handler.parse({
+      body: "<html><body><p id='x'>1</p></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    await expect(extractOne(handler, doc, target.extractors[0]!, target)).rejects.toMatchObject({
+      errorClass: "SELECTOR_NO_MATCH",
+    } satisfies Partial<IngestError>);
   });
 
   it("throws SELECTOR_AMBIGUOUS when the selector matches more than one node without multiple: true", async () => {
     const target = buildTarget({ selector: ".val" });
     const handler = new HtmlHandler();
-    const doc = handler.parse({ body: "<html><body><span class='val'>1</span><span class='val'>2</span></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
-    await expect(extractOne(handler, doc, target.extractors[0]!, target)).rejects.toMatchObject({ errorClass: "SELECTOR_AMBIGUOUS" });
+    const doc = handler.parse({
+      body: "<html><body><span class='val'>1</span><span class='val'>2</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    await expect(extractOne(handler, doc, target.extractors[0]!, target)).rejects.toMatchObject({
+      errorClass: "SELECTOR_AMBIGUOUS",
+    });
   });
 
   it("extracts a scalar value with full provenance", async () => {
     const target = buildTarget({ selector: "#capacity", unit: "TEU" });
     const handler = new HtmlHandler();
-    const doc = handler.parse({ body: "<html><body><span id='capacity'>48,200</span></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<html><body><span id='capacity'>48,200</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
     const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
     expect(candidate.value).toBe(48200);
     expect(candidate.rawText).toBe("48,200");
@@ -92,11 +108,21 @@ describe("processExtractor — shape assertions and change guards", () => {
       status: "ok" as const,
       value: 50000,
       displayValue: "50,000",
-      provenance: { sourceUrl: target.url, anchor: "#capacity", extractedAt: "2026-09-01T00:00:00.000Z", rawText: "50,000", contentHash: "sha256:aaaa" },
+      provenance: {
+        sourceUrl: target.url,
+        anchor: "#capacity",
+        extractedAt: "2026-09-01T00:00:00.000Z",
+        rawText: "50,000",
+        contentHash: "sha256:aaaa",
+      },
       delta: null,
       validation: { passed: true, warnings: [] },
     };
-    const doc = handler.parse({ body: "<html><body><span id='capacity'>1</span></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<html><body><span id='capacity'>1</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
 
     await withAckStore(async (acks) => {
       const result = await processExtractor({
@@ -126,12 +152,22 @@ describe("processExtractor — shape assertions and change guards", () => {
       status: "ok" as const,
       value: 40000,
       displayValue: "40,000",
-      provenance: { sourceUrl: target.url, anchor: "#capacity", extractedAt: "2026-09-01T00:00:00.000Z", rawText: "40,000", contentHash: "sha256:bbbb" },
+      provenance: {
+        sourceUrl: target.url,
+        anchor: "#capacity",
+        extractedAt: "2026-09-01T00:00:00.000Z",
+        rawText: "40,000",
+        contentHash: "sha256:bbbb",
+      },
       delta: null,
       validation: { passed: true, warnings: [] },
     };
     // 90,000 is +125% vs 40,000 — well past a 25% tolerance.
-    const doc = handler.parse({ body: "<html><body><span id='capacity'>90,000</span></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<html><body><span id='capacity'>90,000</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
 
     await withAckStore(async (acks) => {
       const result = await processExtractor({
@@ -163,18 +199,35 @@ describe("processExtractor — shape assertions and change guards", () => {
       status: "ok" as const,
       value: 40000,
       displayValue: "40,000",
-      provenance: { sourceUrl: target.url, anchor: "#capacity", extractedAt: "2026-09-01T00:00:00.000Z", rawText: "40,000", contentHash: "sha256:cccc" },
+      provenance: {
+        sourceUrl: target.url,
+        anchor: "#capacity",
+        extractedAt: "2026-09-01T00:00:00.000Z",
+        rawText: "40,000",
+        contentHash: "sha256:cccc",
+      },
       delta: null,
       validation: { passed: true, warnings: [] },
     };
-    const doc = handler.parse({ body: "<html><body><span id='capacity'>90,000</span></body></html>", httpStatus: 200, fetchedAt: new Date().toISOString() });
+    const doc = handler.parse({
+      body: "<html><body><span id='capacity'>90,000</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
     const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
 
     await withAckStore(async (acks) => {
       // Manually seed the store the way a real acknowledgements.json would.
       // @ts-expect-error accessing private state for the test seed
       acks.acknowledgements = [
-        { targetId: target.id, extractorKey: "ex1", contentHash: candidate.contentHash, reason: "verified real spike", acknowledgedBy: "test", acknowledgedAt: "2026-09-12T00:00:00.000Z" },
+        {
+          targetId: target.id,
+          extractorKey: "ex1",
+          contentHash: candidate.contentHash,
+          reason: "verified real spike",
+          acknowledgedBy: "test",
+          acknowledgedAt: "2026-09-12T00:00:00.000Z",
+        },
       ];
       const result = await processExtractor({
         handler,

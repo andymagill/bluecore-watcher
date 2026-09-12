@@ -1,0 +1,58 @@
+# PR/main gate: format, lint, typecheck, schema drift, config validity, and
+# tests. Pre-commit (.husky/pre-commit) runs a subset of this on staged
+# files as a convenience; it's bypassable with --no-verify, so this workflow
+# is the real gate. Chromium is installed because tests/smoke-render.test.ts
+# exercises src/gate/smoke-render.ts's real chromium.launch() (gate check 3,
+# docs/03-INGESTION.md), same as ingest.yml.
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Chromium (for smoke-render tests)
+        run: npx playwright install --with-deps chromium
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Schema drift (schemas/ vs src/contract, src/config)
+        run: npm run schema:check
+
+      - name: Validate configs
+        run: |
+          npm run validate:config -- --env bluecore
+          npm run validate:config -- --env example
+
+      - name: Test
+        run: npm run test
