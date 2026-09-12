@@ -1,0 +1,55 @@
+# PR/main gate: format, lint, typecheck, schema drift, config validity, and
+# tests. Pre-commit (.husky/pre-commit) runs a subset of this on staged
+# files as a convenience; it's bypassable with --no-verify, so this workflow
+# is the real gate. No Chromium install here (unlike ingest.yml) -- tests/
+# run under jsdom/vitest; Playwright is only needed by the gate's live
+# preview check (docs/03-INGESTION.md), which this workflow doesn't run.
+name: CI
+
+on:
+  pull_request: {}
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  ci:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Schema drift (schemas/ vs src/contract, src/config)
+        run: npm run schema:check
+
+      - name: Validate configs
+        run: |
+          npm run validate:config -- --env bluecore
+          npm run validate:config -- --env example
+
+      - name: Test
+        run: npm run test
