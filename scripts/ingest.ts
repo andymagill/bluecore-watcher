@@ -89,6 +89,7 @@ async function main() {
     console.log(`\nGate: ${result.gate.passed ? "PASSED" : "FAILED"}`);
     for (const e of result.gate.schemaErrors) console.log(`  schema: ${e}`);
     for (const v of result.gate.contractViolations) console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
+    for (const e of result.gate.smokeRenderErrors) console.log(`  smoke render: ${e}`);
     if (!result.gate.passed) process.exit(1);
   } else if (!dryRun && !result.changed) {
     console.log("\nNo semantic change — no branch, no write (ADR-011).");

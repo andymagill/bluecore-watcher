@@ -37,6 +37,7 @@ async function main() {
   console.log(`Gate: ${report.passed ? "PASSED" : "FAILED"}`);
   for (const e of report.schemaErrors) console.log(`  schema: ${e}`);
   for (const v of report.contractViolations) console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
+  for (const e of report.smokeRenderErrors) console.log(`  smoke render: ${e}`);
 
   if (!report.passed) process.exit(1);
 }
