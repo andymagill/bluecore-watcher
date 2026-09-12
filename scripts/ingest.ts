@@ -16,12 +16,27 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { randomUUID } from "node:crypto";
+import { execFileSync } from "node:child_process";
 import { CmieConfig } from "../src/config/index.js";
 import { runAndPersist } from "../src/ingest/orchestrate.js";
 import { HttpFetcher } from "../src/ingest/fetch/http-fetcher.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
+
+// manifest.commit (01-DATA-CONTRACT.md §2) is meant to be a real short SHA,
+// not the literal string "dry-run" runAndPersist defaults to when nobody
+// supplies one -- which every real (non-dry) write was doing until this
+// fix. This is the commit the run was *based on* (main's HEAD when
+// ingestion started), not the commit the data ends up in -- that commit
+// doesn't exist yet when this script runs (git commit happens after).
+function getBaseCommitSha(): string {
+  try {
+    return execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf-8" }).trim();
+  } catch {
+    return "unknown";
+  }
+}
 
 function getEnvArg(): string {
   const idx = process.argv.indexOf("--env");
@@ -68,6 +83,7 @@ async function main() {
       runId: `${new Date().toISOString().replace(/[:.]/g, "-")}-${randomUUID().slice(0, 7)}`,
       now: () => new Date(),
       fetcher: live ? new HttpFetcher(config.defaults) : undefined,
+      commit: getBaseCommitSha(),
     },
     dryRun,
     join(root, "schemas"),
