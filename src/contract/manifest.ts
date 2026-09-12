@@ -34,6 +34,7 @@ export const ManifestTarget = z.object({
 export type ManifestTarget = z.infer<typeof ManifestTarget>;
 
 export const HealthSummaryOverall = z.enum(["ok", "degraded", "failed"]);
+export type HealthSummaryOverall = z.infer<typeof HealthSummaryOverall>;
 
 export const Manifest = z.object({
   schemaVersion: z.literal(1),

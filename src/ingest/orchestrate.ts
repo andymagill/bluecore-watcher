@@ -18,7 +18,7 @@ import {
   loadPreviousState,
   writeAll,
 } from "./persist.js";
-import { collectActiveSecretValues } from "./scrub.js";
+import { collectActiveSecretValues, scrubBlockProvenance } from "./scrub.js";
 import type { Manifest } from "../contract/manifest.js";
 import type { Health } from "../contract/health.js";
 import { runGate, type GateReport } from "../gate/index.js";
@@ -31,7 +31,7 @@ export interface RunOptions {
   runId: string;
   now: () => Date;
   commit?: string;
-  fetcher?: Fetcher; // defaults to FixtureFetcher — production wires a real one in M1
+  fetcher?: Fetcher; // defaults to FixtureFetcher — HttpFetcher is wired behind --live (scripts/ingest.ts)
 }
 
 export interface RunResult {
@@ -139,7 +139,8 @@ async function runOneTarget(
   }
 
   const status: RunStatus = anyRequiredFailed ? "failed_cached" : anyFailed ? "partial" : "ok";
-  const startedAt = previousTargetFile?.run.completedAt ?? nowIso;
+  const completedAtIso = ctx.now().toISOString();
+  const durationMs = Math.max(0, new Date(completedAtIso).getTime() - new Date(nowIso).getTime());
 
   // failed_cached retains the ENTIRE previous file unchanged except `run`
   // (01-DATA-CONTRACT.md §3) — a required extractor's failure must not let
@@ -158,9 +159,9 @@ async function runOneTarget(
     ttlHours: target.schedule.ttlHours,
     run: {
       runId: ctx.runId,
-      startedAt,
-      completedAt: nowIso,
-      durationMs: 0,
+      startedAt: nowIso,
+      completedAt: completedAtIso,
+      durationMs,
       status,
       renderer: target.renderer,
       httpStatus: fetchError ? fetchError.httpStatus : httpStatus,
@@ -198,10 +199,19 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
     consumedCount += c;
   }
 
+  // Scrub secrets out of provenance.rawText before anything gets committed
+  // (03-INGESTION.md §6) -- contentHash is left alone; it's a fingerprint of
+  // the pre-scrub text and doesn't feed ADR-011's fingerprint either way.
+  const activeSecretValues = collectActiveSecretValues(opts.config);
+  const scrubbedTargetFiles = targetFiles.map((tf) => ({
+    ...tf,
+    blocks: tf.blocks.map((b) => scrubBlockProvenance(b, activeSecretValues)),
+  }));
+
   const nowIso = ctx.now().toISOString();
   const manifest = buildManifest(
     opts.config,
-    targetFiles,
+    scrubbedTargetFiles,
     opts.runId,
     nowIso,
     opts.commit ?? "dry-run",
@@ -209,13 +219,13 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
   const health = buildHealth(
     previous.health,
     allHealthDrafts,
-    targetFiles,
+    scrubbedTargetFiles,
     opts.runId,
     nowIso,
-    collectActiveSecretValues(opts.config),
+    activeSecretValues,
   );
 
-  const newFingerprint = computeFingerprint(manifest, targetFiles, health);
+  const newFingerprint = computeFingerprint(manifest, scrubbedTargetFiles, health);
   const oldFingerprint =
     previous.manifest && previous.health
       ? computeFingerprint(previous.manifest, [...previous.targetFiles.values()], previous.health)
@@ -226,7 +236,7 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
     changed,
     manifest,
     health,
-    targetFiles,
+    targetFiles: scrubbedTargetFiles,
     consumedAcknowledgements: consumedCount,
     acknowledgementStore: acknowledgements,
     previousTargetFiles: previous.targetFiles,
@@ -237,12 +247,14 @@ export interface RunAndPersistResult extends RunResult {
   gate: GateReport | null; // null when there was nothing to gate (unchanged, or dry run)
 }
 
-// M0.5 stand-in for ADR-005's real sequencing (commit to branch -> preview
-// -> gate -> merge): with no branch/CI yet, the gate runs synchronously
-// before the write it would otherwise guard. "The gate must actually gate"
-// — a failing gate leaves public/data untouched, same as a failed merge
-// leaves `main` untouched. M1 moves the gate to run against the real
-// branch/preview per doc 03 §3's staged plan.
+// This offline gate (checks 1-2: schema + contract) runs synchronously,
+// before the write it would otherwise guard -- it's what `npm run ingest`
+// and the local dry-run path use. "The gate must actually gate" — a failing
+// gate leaves public/data untouched, same as a failed merge leaves `main`
+// untouched. The full three-check gate (adding check 3, a real smoke
+// render) runs separately in CI against the deployed preview URL, via
+// `npm run gate --preview-url`, before .github/workflows/ingest.yml merges
+// (ADR-005's staged sequencing, doc 03 §3).
 export async function runAndPersist(
   opts: RunOptions,
   dryRun: boolean,

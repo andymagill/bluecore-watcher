@@ -276,7 +276,7 @@ export type TargetDef = z.infer<typeof TargetDef>;
 // daily/hourly/weekly shapes used in the doc examples; anything else is
 // left to a human (returns null, which skips the check rather than
 // producing a false positive).
-export function estimateCronIntervalHours(cron: string): number | null {
+function estimateCronIntervalHours(cron: string): number | null {
   const parts = cron.trim().split(/\s+/);
   if (parts.length !== 5) return null;
   const [minute, hour, dom, , dow] = parts;

@@ -83,7 +83,8 @@ export const config: CmieConfigInput = {
     },
 
     // Recommended M1 walking-skeleton target (see docs/05-SOURCES.md §6.3):
-    // one page, three extractors, one section, real anchors, weekly cadence.
+    // one page, three extractors, one section, real anchors, polled daily
+    // against a source that updates roughly weekly (hence ttlHours: 168).
     {
       id: "bluecore-newsroom",
       label: "BlueCore Energy — Latest News",

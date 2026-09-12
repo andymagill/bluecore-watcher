@@ -19,9 +19,6 @@ export const BlockType = z.enum([
 ]);
 export type BlockType = z.infer<typeof BlockType>;
 
-export const Presenter = z.enum(["metric", "markdown", "list", "status"]);
-export type Presenter = z.infer<typeof Presenter>;
-
 // ---- Delta union — 01-DATA-CONTRACT.md §4.1 ----
 // `kind: "scalar"` for every non-list presenter, `kind: "set"` for `list`.
 // A set has no single direction of movement, so ScalarDelta's `direction`

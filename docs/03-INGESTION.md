@@ -174,7 +174,7 @@ The drift check is the highest-leverage test in this list and the one easiest to
 
 - Stored as GitHub Actions repository secrets, referenced by name from config.
 - Injected as env vars; `${ENV_VAR}` in `headers`/`url` is interpolated at run time only.
-- Never written to any committed file. `rawText` and error messages are scrubbed against the active secret values before being written to `health.json` — a bearer token echoed in an error response would otherwise be committed to a Git history that is the audit trail.
+- Never written to any committed file. `rawText` and error messages are scrubbed against the active secret values before being written to any committed file — a bearer token echoed in an error response would otherwise be committed to a Git history that is the audit trail.
 - A missing secret skips its target with `AUTH_ERROR`. It does not fail the run.
 
 ---

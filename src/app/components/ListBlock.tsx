@@ -1,7 +1,7 @@
 // 04-FRONTEND.md §2: "Bulleted items, per-item anchors." Built for contract
-// completeness (01-DATA-CONTRACT.md §4.1) even though no M1 target uses
-// presenter: "list" -- bluecore-newsroom's three extractors are markdown/
-// metric/status. Exercising this path is left to M2's real list source.
+// completeness (01-DATA-CONTRACT.md §4.1) even though no current target uses
+// presenter: "list" -- every M1 extractor is markdown/metric/status.
+// Exercising this path is left to M2's real list source.
 import type { ListBlock as ListBlockType } from "../../contract/block.js";
 import { useFreshness } from "../lib/use-freshness.js";
 import { FreshnessBadge } from "./FreshnessBadge.js";
