@@ -27,7 +27,9 @@ async function main() {
   const state = await loadPreviousState(dataDir);
 
   if (!state.manifest || !state.health) {
-    console.log(`No data at ${dataDir} yet — nothing to gate. Run "npm run ingest -- --env <id>" first.`);
+    console.log(
+      `No data at ${dataDir} yet — nothing to gate. Run "npm run ingest -- --env <id>" first.`,
+    );
     return;
   }
 
@@ -45,7 +47,8 @@ async function main() {
 
   console.log(`Gate: ${report.passed ? "PASSED" : "FAILED"}`);
   for (const e of report.schemaErrors) console.log(`  schema: ${e}`);
-  for (const v of report.contractViolations) console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
+  for (const v of report.contractViolations)
+    console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
   for (const e of report.smokeRenderErrors) console.log(`  smoke render: ${e}`);
 
   if (!report.passed) process.exit(1);

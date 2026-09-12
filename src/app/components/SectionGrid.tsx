@@ -7,7 +7,15 @@ import type { TargetFile } from "../../contract/target-file.js";
 import { SectionPanel } from "./SectionPanel.js";
 import { ErrorBoundary } from "./ErrorBoundary.js";
 
-export function SectionGrid({ manifest, targetFiles, now }: { manifest: Manifest; targetFiles: Map<string, TargetFile>; now?: Date }) {
+export function SectionGrid({
+  manifest,
+  targetFiles,
+  now,
+}: {
+  manifest: Manifest;
+  targetFiles: Map<string, TargetFile>;
+  now?: Date;
+}) {
   const sections = [...manifest.sections].sort((a, b) => a.order - b.order);
 
   return (
@@ -16,7 +24,12 @@ export function SectionGrid({ manifest, targetFiles, now }: { manifest: Manifest
         const manifestTargets = manifest.targets.filter((t) => t.sectionId === section.id);
         return (
           <ErrorBoundary key={section.id} sectionLabel={section.label}>
-            <SectionPanel section={section} manifestTargets={manifestTargets} targetFiles={targetFiles} now={now} />
+            <SectionPanel
+              section={section}
+              manifestTargets={manifestTargets}
+              targetFiles={targetFiles}
+              now={now}
+            />
           </ErrorBoundary>
         );
       })}

@@ -36,7 +36,10 @@ function relativeAge(block: Block): string {
 
 function formatDate(block: Block): string {
   if (!block.provenance) return "";
-  return new Date(block.provenance.extractedAt).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  return new Date(block.provenance.extractedAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+  });
 }
 
 export function FreshnessBadge({ block, state }: { block: Block; state: FreshnessState }) {

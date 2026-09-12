@@ -8,7 +8,17 @@ import { FreshnessBadge } from "./FreshnessBadge.js";
 import { DeltaChip } from "./DeltaChip.js";
 import { ZeroState } from "./ZeroState.js";
 
-export function ListBlock({ targetId, block, ttlHours, now }: { targetId: string; block: ListBlockType; ttlHours: number; now?: Date }) {
+export function ListBlock({
+  targetId,
+  block,
+  ttlHours,
+  now,
+}: {
+  targetId: string;
+  block: ListBlockType;
+  ttlHours: number;
+  now?: Date;
+}) {
   const state = useFreshness(block, ttlHours, now);
 
   if (block.status === "missing" || !block.provenance || !block.value) {
@@ -27,7 +37,10 @@ export function ListBlock({ targetId, block, ttlHours, now }: { targetId: string
       <ul className="list-disc space-y-0.5 pl-4 text-sm">
         {(block.displayValue ?? []).map((item, i) => (
           <li key={i}>
-            <a href={`${sourceUrl}#${encodeURIComponent(anchor[i] ?? "")}`} className="hover:underline">
+            <a
+              href={`${sourceUrl}#${encodeURIComponent(anchor[i] ?? "")}`}
+              className="hover:underline"
+            >
               {item}
             </a>
           </li>

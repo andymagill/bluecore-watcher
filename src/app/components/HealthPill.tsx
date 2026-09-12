@@ -7,7 +7,13 @@ const COLOR: Record<"ok" | "degraded" | "failed", string> = {
   failed: "bg-red-900/60 text-red-300",
 };
 
-export function HealthPill({ overall, onClick }: { overall: "ok" | "degraded" | "failed"; onClick: () => void }) {
+export function HealthPill({
+  overall,
+  onClick,
+}: {
+  overall: "ok" | "degraded" | "failed";
+  onClick: () => void;
+}) {
   return (
     <button
       type="button"

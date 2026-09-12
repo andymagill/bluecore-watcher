@@ -19,24 +19,24 @@ export interface CmieConfig {
 }
 
 export interface EnvironmentDef {
-  id: string;                 // slug, e.g. "bluecore"
-  displayName: string;        // "Bluecore Watcher"
+  id: string; // slug, e.g. "bluecore"
+  displayName: string; // "Bluecore Watcher"
   entities: EntityDef[];
-  staleCeilingMultiplier?: number;   // default 3 — see freshness state machine
+  staleCeilingMultiplier?: number; // default 3 — see freshness state machine
 }
 
 export interface EntityDef {
-  id: string;                 // "bluecore-energy"
-  name: string;               // "Bluecore Energy"
+  id: string; // "bluecore-energy"
+  name: string; // "Bluecore Energy"
   role: "primary" | "competitor" | "parent" | "counterparty" | "regulator";
-  aliases?: string[];         // for human reference and future entity resolution
+  aliases?: string[]; // for human reference and future entity resolution
 }
 
 export interface SectionDef {
-  id: string;                 // "regulatory"
-  label: string;              // "Regulatory Landscape"
+  id: string; // "regulatory"
+  label: string; // "Regulatory Landscape"
   order: number;
-  description?: string;       // rendered as section subhead
+  description?: string; // rendered as section subhead
 }
 ```
 
@@ -50,44 +50,44 @@ One target = one fetchable resource. If two facts come from one page, they are t
 
 ```ts
 export interface TargetDef {
-  id: string;                 // slug, unique; becomes the data filename
+  id: string; // slug, unique; becomes the data filename
   label: string;
-  entityId: string;           // → EntityDef.id
-  sectionId: string;          // → SectionDef.id
+  entityId: string; // → EntityDef.id
+  sectionId: string; // → SectionDef.id
 
-  kind: "html" | "api";        // v1 handlers (ADR-010); a new kind adds a member here — see §7
+  kind: "html" | "api"; // v1 handlers (ADR-010); a new kind adds a member here — see §7
   url: string;
-  renderer?: "static" | "browser";   // cheerio | playwright. Default "static"
+  renderer?: "static" | "browser"; // cheerio | playwright. Default "static"
   method?: "GET" | "POST";
-  headers?: Record<string, string>;  // values support ${ENV_VAR}
+  headers?: Record<string, string>; // values support ${ENV_VAR}
   body?: string;
   auth?: AuthDef;
-  proxy?: "none" | "edge";           // default "none" — see ADR-006
+  proxy?: "none" | "edge"; // default "none" — see ADR-006
 
   schedule: ScheduleDef;
   politeness?: PolitenessDef;
   extractors: ExtractorDef[];
 
-  notes?: string;             // why this source, what's fragile about it
+  notes?: string; // why this source, what's fragile about it
 }
 
 export interface AuthDef {
   type: "bearer" | "header" | "query";
-  secretEnv: string;          // env var NAME, never a value
-  name?: string;              // header or query param name
+  secretEnv: string; // env var NAME, never a value
+  name?: string; // header or query param name
 }
 
 export interface ScheduleDef {
-  cron: string;               // when the orchestrator may consider it
-  ttlHours: number;           // age past which the UI calls it stale
-  jitterSeconds?: number;     // default 0–120, avoids thundering herd
+  cron: string; // when the orchestrator may consider it
+  ttlHours: number; // age past which the UI calls it stale
+  jitterSeconds?: number; // default 0–120, avoids thundering herd
   staleCeilingHours?: number; // overrides environment multiplier
   ttlOverrideReason?: string; // required when ttlHours < 2× the cron interval — see rule 5
 }
 
 export interface PolitenessDef {
-  minIntervalMs?: number;     // enforced floor between requests to this host
-  userAgent?: string;         // default: identifying UA with a contact URL
+  minIntervalMs?: number; // enforced floor between requests to this host
+  userAgent?: string; // default: identifying UA with a contact URL
   respectRobotsTxt?: boolean; // default true — see Q6
 }
 ```
@@ -96,8 +96,8 @@ export interface PolitenessDef {
 
 Two knobs that get confused, so state it plainly:
 
-- **`cron`** is *when we may fetch*. It is about politeness and cost.
-- **`ttlHours`** is *how long a value stays believable*. It is about the reader.
+- **`cron`** is _when we may fetch_. It is about politeness and cost.
+- **`ttlHours`** is _how long a value stays believable_. It is about the reader.
 
 They are independent. A quarterly filing may be polled daily (`cron: "0 6 * * *"`) while remaining fresh for 90 days (`ttlHours: 2160`) — polling often, staleness rarely. Setting `ttlHours` from the cron interval is the common mistake and produces a dashboard permanently painted amber.
 
@@ -117,23 +117,23 @@ Per ADR-010, location is a **discriminated union keyed on `kind`** — the targe
 export type ExtractorDef = ExtractorBase & LocationDef;
 
 interface ExtractorBase {
-  key: string;                // stable, unique within target; becomes block.key
-  label: string;              // human-facing
+  key: string; // stable, unique within target; becomes block.key
+  label: string; // human-facing
   presenter: "metric" | "markdown" | "list" | "status";
-  required?: boolean;         // default false; true → failure fails the target
+  required?: boolean; // default false; true → failure fails the target
 
   // ---- Narrowing (applied after location resolves rawText) ----
   regex?: string;
-  regexGroup?: number;        // default 1
-  trim?: boolean;             // default true
+  regexGroup?: number; // default 1
+  trim?: boolean; // default true
 
   // ---- Typing ----
   type: "number" | "currency" | "percent" | "date" | "string" | "markdown" | "enum";
-  unit?: string;              // "TEU", "MW", "bbl/d"
-  currency?: string;          // ISO 4217
-  locale?: string;            // default "en-US"
-  dateFormat?: string;        // when the source is unparseable by Date
-  enumValues?: string[];      // type: "enum"; anything else → ASSERTION_FAILED
+  unit?: string; // "TEU", "MW", "bbl/d"
+  currency?: string; // ISO 4217
+  locale?: string; // default "en-US"
+  dateFormat?: string; // when the source is unparseable by Date
+  enumValues?: string[]; // type: "enum"; anything else → ASSERTION_FAILED
 
   // ---- Validation ----
   assert?: AssertDef;
@@ -155,11 +155,11 @@ export interface AssertDef {
   notEmpty?: boolean;
   min?: number;
   max?: number;
-  pattern?: string;           // regex the final value must satisfy
+  pattern?: string; // regex the final value must satisfy
   maxLength?: number;
-  minItems?: number;          // presenter: "list" only — bounds array length
-  maxItems?: number;          // presenter: "list" only
-  maxChangePct?: number;      // vs previous committed value; for "list", vs item count
+  minItems?: number; // presenter: "list" only — bounds array length
+  maxItems?: number; // presenter: "list" only
+  maxChangePct?: number; // vs previous committed value; for "list", vs item count
   maxChangeAbs?: number;
   expectMonotonic?: "increasing" | "decreasing";
 }
@@ -169,9 +169,9 @@ For `multiple: true` / `presenter: "list"` extractors: `notEmpty`, `pattern`, an
 
 ```ts
 export interface AlertDef {
-  on: "any-change" | "threshold" | "never";   // default "never"
+  on: "any-change" | "threshold" | "never"; // default "never"
   thresholdPct?: number;
-  quietHours?: number;        // suppress repeat alerts for this key
+  quietHours?: number; // suppress repeat alerts for this key
   severity?: "info" | "warn" | "critical";
 }
 ```
@@ -180,16 +180,16 @@ export interface AlertDef {
 
 Per `01-DATA-CONTRACT.md` §6, these are the only defence against a selector that matches the wrong node. Two minutes writing `min`/`max` at authoring time is the cheapest work in this system. Default to writing them.
 
-`maxChangePct` deserves care: it withholds a value when it moves too far, which means a *genuine* large move gets withheld too. That is the intended trade — a real jump surfaces as a health entry a human clears in a minute, while a silent wrong number may never surface at all. Set the tolerance from the source's observed volatility, not from a guess, and expect to retune in the first month.
+`maxChangePct` deserves care: it withholds a value when it moves too far, which means a _genuine_ large move gets withheld too. That is the intended trade — a real jump surfaces as a health entry a human clears in a minute, while a silent wrong number may never surface at all. Set the tolerance from the source's observed volatility, not from a guess, and expect to retune in the first month.
 
 ### Presenters
 
-| `presenter` | Accepts `type` | Renders |
-|---|---|---|
-| `metric` | number, currency, percent, date | Large value, unit, label, source link |
-| `markdown` | markdown, string | Prose block via markdown parser, source link |
-| `list` | string (with `multiple: true`) | Bulleted items, each with its own anchor |
-| `status` | enum | Coloured pill, states mapped in the section theme |
+| `presenter` | Accepts `type`                  | Renders                                           |
+| ----------- | ------------------------------- | ------------------------------------------------- |
+| `metric`    | number, currency, percent, date | Large value, unit, label, source link             |
+| `markdown`  | markdown, string                | Prose block via markdown parser, source link      |
+| `list`      | string (with `multiple: true`)  | Bulleted items, each with its own anchor          |
+| `status`    | enum                            | Coloured pill, states mapped in the section theme |
 
 ---
 
@@ -200,15 +200,15 @@ export interface TargetDefaults {
   renderer?: "static" | "browser";
   proxy?: "none" | "edge";
   politeness?: PolitenessDef;
-  timeoutMs?: number;         // default 20000 static, 45000 browser
-  retries?: number;           // default 2, exponential backoff
+  timeoutMs?: number; // default 20000 static, 45000 browser
+  retries?: number; // default 2, exponential backoff
 }
 
 export interface AlertingConfig {
   channel: "github-issue" | "webhook" | "email";
   webhookUrlEnv?: string;
   emailToEnv?: string;
-  minSeverity?: "info" | "warn" | "critical";   // default "warn"
+  minSeverity?: "info" | "warn" | "critical"; // default "warn"
 }
 ```
 
@@ -224,11 +224,11 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 2. Every `target.entityId` and `target.sectionId` resolves.
 3. `target.id` is unique and filename-safe (`^[a-z0-9][a-z0-9-]*$`).
 4. `extractor.key` is unique within its target.
-5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, **or** `schedule.ttlOverrideReason` is a non-empty string. *(Corrected 2026-09-12 — the original override mechanism was a `// eslint-disable`-style comment, which a JSON Schema / Zod validator cannot see. `ttlOverrideReason` is a real schema field so the override is machine-checkable and self-documenting.)*
+5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, **or** `schedule.ttlOverrideReason` is a non-empty string. _(Corrected 2026-09-12 — the original override mechanism was a `// eslint-disable`-style comment, which a JSON Schema / Zod validator cannot see. `ttlOverrideReason` is a real schema field so the override is machine-checkable and self-documenting.)_
 6. Location fields match `kind` per the discriminated union in §3: `{ kind: "html", selector, ... }` requires the target's `kind` to be `"html"`; `{ kind: "api", jsonPath }` requires `"api"`. Mismatch is a type error at author time (the union makes it unrepresentable), and a defence-in-depth runtime check for anything hand-constructed.
 7. `type` and `presenter` are compatible per the table in §3.
 8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`. `minItems`/`maxItems` set ⟹ `presenter: "list"`.
-9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the *name*, not the *value*, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. *(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)*
+9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the _name_, not the _value_, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. _(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)_
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
 
@@ -250,16 +250,14 @@ export const config: CmieConfigInput = {
   environment: {
     id: "bluecore",
     displayName: "Bluecore Watcher",
-    entities: [
-      { id: "bluecore-energy", name: "Bluecore Energy", role: "primary" },
-    ],
+    entities: [{ id: "bluecore-energy", name: "Bluecore Energy", role: "primary" }],
   },
 
   sections: [
-    { id: "target",     label: "Target Company State",  order: 1 },
-    { id: "segment",    label: "Industry Segment",      order: 2 },
-    { id: "regulatory", label: "Regulatory Landscape",  order: 3 },
-    { id: "climate",    label: "Market Climate",        order: 4 },
+    { id: "target", label: "Target Company State", order: 1 },
+    { id: "segment", label: "Industry Segment", order: 2 },
+    { id: "regulatory", label: "Regulatory Landscape", order: 3 },
+    { id: "climate", label: "Market Climate", order: 4 },
   ],
 
   defaults: {
@@ -369,4 +367,4 @@ Per ADR-010, `kind` is a registry, not a closed switch statement. Adding one —
 3. **Register the handler** against `kind` in the handler map (`src/ingest/extract/`).
 4. **Add a fixture and a unit test.** No config, no live target, no ADR required to ship the module — only to point a real target at it.
 
-**PDF specifically remains unbuilt** until a triaged source is one — see `05-SOURCES.md` §1. The reasons it's a genuinely different extraction model still apply and belong in its handler's design, not in this schema: text position rather than DOM structure, no stable anchors, and a scanned document needs OCR, which pulls in a dependency and an accuracy question that sits uncomfortably beside a determinism guarantee — likely a labelled, lower-confidence result class rather than a normal one. None of that is a reason to delay building the *other* v1 handlers, which is the mistake the original framing invited.
+**PDF specifically remains unbuilt** until a triaged source is one — see `05-SOURCES.md` §1. The reasons it's a genuinely different extraction model still apply and belong in its handler's design, not in this schema: text position rather than DOM structure, no stable anchors, and a scanned document needs OCR, which pulls in a dependency and an accuracy question that sits uncomfortably beside a determinism guarantee — likely a labelled, lower-confidence result class rather than a normal one. None of that is a reason to delay building the _other_ v1 handlers, which is the mistake the original framing invited.

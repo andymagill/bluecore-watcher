@@ -75,7 +75,9 @@ describe("computeDeltaDisplay", () => {
   it("the same delta transitions from 'changed' to 'unchanged' purely as the clock advances past the ttl window", () => {
     const delta = scalarDelta();
     const justAfterChange = new Date(new Date(delta.changedAt).getTime() + 3_600_000); // 1h later
-    const wellAfterChange = new Date(new Date(delta.changedAt).getTime() + (TTL_HOURS + 1) * 3_600_000);
+    const wellAfterChange = new Date(
+      new Date(delta.changedAt).getTime() + (TTL_HOURS + 1) * 3_600_000,
+    );
     expect(computeDeltaDisplay(justAfterChange, delta, TTL_HOURS).kind).toBe("changed-scalar");
     expect(computeDeltaDisplay(wellAfterChange, delta, TTL_HOURS).kind).toBe("unchanged-scalar");
   });

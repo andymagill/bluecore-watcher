@@ -23,24 +23,24 @@ No state library. `useState` in an app shell, passed down. The data is read-only
 
 ## 2. Component inventory
 
-| Component | Responsibility |
-|---|---|
-| `AppShell` | Loads data, holds state, renders header + grid |
-| `HeaderBar` | Entity names, global health pill, last-run timestamp |
-| `HealthPill` | `ok` / `degraded` / `failed` from `manifest.health`; opens the modal |
-| `SectionGrid` | Renders sections by `order` |
-| `SectionPanel` | Section label, description, target cards |
-| `TargetCard` | One target: label, source link, run status, its blocks |
-| `MetricBlock` | Large value, unit, label, delta chip, freshness badge |
-| `MarkdownBlock` | Narrative prose via markdown parser, sanitised |
-| `ListBlock` | Bulleted items, per-item anchors |
-| `StatusBlock` | Enum rendered as a coloured pill |
-| `FreshnessBadge` | Computes and renders the freshness state |
-| `DeltaChip` | Direction arrow, magnitude, "changed N days ago" |
-| `ProvenancePopover` | Source URL, anchor, `extractedAt`, `rawText` |
-| `ZeroState` | Explicit placeholder for missing data |
-| `HealthModal` | Full health log: failing selectors, error classes, stacks |
-| `ErrorBoundary` | Per-section, so one bad block cannot blank the board |
+| Component           | Responsibility                                                       |
+| ------------------- | -------------------------------------------------------------------- |
+| `AppShell`          | Loads data, holds state, renders header + grid                       |
+| `HeaderBar`         | Entity names, global health pill, last-run timestamp                 |
+| `HealthPill`        | `ok` / `degraded` / `failed` from `manifest.health`; opens the modal |
+| `SectionGrid`       | Renders sections by `order`                                          |
+| `SectionPanel`      | Section label, description, target cards                             |
+| `TargetCard`        | One target: label, source link, run status, its blocks               |
+| `MetricBlock`       | Large value, unit, label, delta chip, freshness badge                |
+| `MarkdownBlock`     | Narrative prose via markdown parser, sanitised                       |
+| `ListBlock`         | Bulleted items, per-item anchors                                     |
+| `StatusBlock`       | Enum rendered as a coloured pill                                     |
+| `FreshnessBadge`    | Computes and renders the freshness state                             |
+| `DeltaChip`         | Direction arrow, magnitude, "changed N days ago"                     |
+| `ProvenancePopover` | Source URL, anchor, `extractedAt`, `rawText`                         |
+| `ZeroState`         | Explicit placeholder for missing data                                |
+| `HealthModal`       | Full health log: failing selectors, error classes, stacks            |
+| `ErrorBoundary`     | Per-section, so one bad block cannot blank the board                 |
 
 `ErrorBoundary` at section granularity matters: the smoke render gate asserts the app mounts without an error boundary trip, so a boundary wrapping the whole app would let a single malformed block fail the entire run.
 
@@ -50,14 +50,14 @@ No state library. `useState` in an app shell, passed down. The data is read-only
 
 Implements the state machine in `01-DATA-CONTRACT.md` §5. Computed at render from `Date.now()`, never precomputed.
 
-| State | Badge | Value |
-|---|---|---|
-| `fresh` | Neutral, relative age | Shown |
-| `stale` | Amber, "Updated 3 days ago" | Shown |
-| `expired` | Grey, "Last verified 4 Aug" | **Hidden** behind a disclosure |
-| `failing` | Red, links to Health Modal | Shown, marked |
-| `flagged` | Caution marker, links to warning | Shown, marked |
-| `never` | — | `ZeroState` |
+| State     | Badge                            | Value                          |
+| --------- | -------------------------------- | ------------------------------ |
+| `fresh`   | Neutral, relative age            | Shown                          |
+| `stale`   | Amber, "Updated 3 days ago"      | Shown                          |
+| `expired` | Grey, "Last verified 4 Aug"      | **Hidden** behind a disclosure |
+| `failing` | Red, links to Health Modal       | Shown, marked                  |
+| `flagged` | Caution marker, links to warning | Shown, marked                  |
+| `never`   | —                                | `ZeroState`                    |
 
 `expired` is the important one. Past the stale ceiling the UI stops presenting the value as current and presents it as a historical observation with a date. An analyst should not be able to misread a six-week-old number as today's, and the interface — not a footnote — is what enforces that.
 

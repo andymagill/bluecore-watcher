@@ -30,7 +30,11 @@ describe("ADR-010 — extraction handlers are additive", () => {
 
     const cfg = CmieConfig.parse({
       schemaVersion: 1,
-      environment: { id: "t", displayName: "T", entities: [{ id: "p", name: "P", role: "primary" }] },
+      environment: {
+        id: "t",
+        displayName: "T",
+        entities: [{ id: "p", name: "P", role: "primary" }],
+      },
       sections: [{ id: "s", label: "S", order: 1 }],
       targets: [
         {
@@ -41,7 +45,16 @@ describe("ADR-010 — extraction handlers are additive", () => {
           kind: "html", // schema validation isn't the point here — see note below
           url: "https://example.test/page",
           schedule: { cron: "0 6 * * *", ttlHours: 72 },
-          extractors: [{ key: "ex1", label: "Ex 1", presenter: "markdown", kind: "html", selector: "#x", type: "string" }],
+          extractors: [
+            {
+              key: "ex1",
+              label: "Ex 1",
+              presenter: "markdown",
+              kind: "html",
+              selector: "#x",
+              type: "string",
+            },
+          ],
         },
       ],
     });
@@ -49,7 +62,12 @@ describe("ADR-010 — extraction handlers are additive", () => {
 
     // The stub handler and the shared pipeline (regex/coerce/format/hash)
     // cooperate exactly like any built-in handler would.
-    const candidate = await extractOne(extendedRegistry.stub, "hello world", target.extractors[0]!, target);
+    const candidate = await extractOne(
+      extendedRegistry.stub,
+      "hello world",
+      target.extractors[0]!,
+      target,
+    );
     expect(candidate.value).toBe("HELLO WORLD");
     expect(candidate.contentHash).toMatch(/^sha256:/);
   });

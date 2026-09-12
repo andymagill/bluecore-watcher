@@ -10,12 +10,22 @@ import type { Delta } from "../../contract/block.js";
 
 export type DeltaDisplay =
   | { kind: "none" }
-  | { kind: "changed-scalar"; direction: "up" | "down"; absolute: number; percent: number; daysAgo: number }
+  | {
+      kind: "changed-scalar";
+      direction: "up" | "down";
+      absolute: number;
+      percent: number;
+      daysAgo: number;
+    }
   | { kind: "unchanged-scalar"; daysAgo: number }
   | { kind: "changed-set"; added: string[]; removed: string[]; daysAgo: number }
   | { kind: "unchanged-set"; daysAgo: number };
 
-export function computeDeltaDisplay(now: Date, delta: Delta | null, ttlHours: number): DeltaDisplay {
+export function computeDeltaDisplay(
+  now: Date,
+  delta: Delta | null,
+  ttlHours: number,
+): DeltaDisplay {
   if (!delta) return { kind: "none" };
 
   const changedAt = new Date(delta.changedAt).getTime();
@@ -25,7 +35,13 @@ export function computeDeltaDisplay(now: Date, delta: Delta | null, ttlHours: nu
 
   if (delta.kind === "scalar") {
     return isRecent
-      ? { kind: "changed-scalar", direction: delta.direction, absolute: delta.absolute, percent: delta.percent, daysAgo }
+      ? {
+          kind: "changed-scalar",
+          direction: delta.direction,
+          absolute: delta.absolute,
+          percent: delta.percent,
+          daysAgo,
+        }
       : { kind: "unchanged-scalar", daysAgo };
   }
 

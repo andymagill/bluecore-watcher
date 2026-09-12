@@ -40,11 +40,24 @@ function isRetryable(err: unknown): boolean {
 function classifyThrown(err: unknown, url: string): IngestError {
   if (err instanceof IngestError) return err;
   const name = (err as { name?: string })?.name;
-  const code = (err as { code?: string; cause?: { code?: string } })?.code ?? (err as { cause?: { code?: string } })?.cause?.code;
-  if (name === "TimeoutError" || name === "AbortError" || code === "UND_ERR_CONNECT_TIMEOUT" || code === "UND_ERR_HEADERS_TIMEOUT" || code === "UND_ERR_BODY_TIMEOUT") {
+  const code =
+    (err as { code?: string; cause?: { code?: string } })?.code ??
+    (err as { cause?: { code?: string } })?.cause?.code;
+  if (
+    name === "TimeoutError" ||
+    name === "AbortError" ||
+    code === "UND_ERR_CONNECT_TIMEOUT" ||
+    code === "UND_ERR_HEADERS_TIMEOUT" ||
+    code === "UND_ERR_BODY_TIMEOUT"
+  ) {
     return new IngestError("TIMEOUT", `Timed out fetching ${url}`);
   }
-  if (code === "ENOTFOUND" || code === "ECONNREFUSED" || code === "ECONNRESET" || code === "EAI_AGAIN") {
+  if (
+    code === "ENOTFOUND" ||
+    code === "ECONNREFUSED" ||
+    code === "ECONNRESET" ||
+    code === "EAI_AGAIN"
+  ) {
     return new IngestError("NETWORK_ERROR", `${code} fetching ${url}`);
   }
   return new IngestError("UNKNOWN", `${(err as Error)?.message ?? String(err)} fetching ${url}`);
@@ -68,12 +81,16 @@ export class HttpFetcher implements Fetcher {
     if (respectRobotsTxt) {
       const rules = await this.getRobotsRules(url, userAgent);
       if (isDisallowed(url.pathname, rules)) {
-        throw new IngestError("BLOCKED", `robots.txt disallows ${url.pathname} for UA "${userAgent}" on ${url.host}`);
+        throw new IngestError(
+          "BLOCKED",
+          `robots.txt disallows ${url.pathname} for UA "${userAgent}" on ${url.host}`,
+        );
       }
     }
 
     const headers: Record<string, string> = { "user-agent": userAgent };
-    for (const [k, v] of Object.entries(target.headers ?? {})) headers[k.toLowerCase()] = interpolateEnv(v);
+    for (const [k, v] of Object.entries(target.headers ?? {}))
+      headers[k.toLowerCase()] = interpolateEnv(v);
 
     let requestUrl = url;
     if (target.auth) {
@@ -81,7 +98,10 @@ export class HttpFetcher implements Fetcher {
       if (!secretValue) {
         // A missing secret skips the target with AUTH_ERROR; it does not
         // fail the whole run (03-INGESTION.md §6).
-        throw new IngestError("AUTH_ERROR", `Missing secret env var "${target.auth.secretEnv}" for target "${target.id}"`);
+        throw new IngestError(
+          "AUTH_ERROR",
+          `Missing secret env var "${target.auth.secretEnv}" for target "${target.id}"`,
+        );
       }
       if (target.auth.type === "bearer") {
         headers.authorization = `Bearer ${secretValue}`;
@@ -118,7 +138,12 @@ export class HttpFetcher implements Fetcher {
     timeoutMs: number,
     ctx: RunContext,
   ): Promise<FetchResult> {
-    const res = await request(url, { method, headers, body, signal: AbortSignal.timeout(timeoutMs) });
+    const res = await request(url, {
+      method,
+      headers,
+      body,
+      signal: AbortSignal.timeout(timeoutMs),
+    });
     const status = res.statusCode;
 
     if (status === 403 || status === 429) {

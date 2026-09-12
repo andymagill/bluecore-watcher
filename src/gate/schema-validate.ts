@@ -32,13 +32,19 @@ export async function loadSchema(schemasDir: string, filename: string): Promise<
 const ajv = new Ajv({ strict: false, allErrors: true });
 addFormats(ajv);
 
-export async function validateAgainstSchema(schemasDir: string, filename: string, value: unknown): Promise<SchemaValidationResult> {
+export async function validateAgainstSchema(
+  schemasDir: string,
+  filename: string,
+  value: unknown,
+): Promise<SchemaValidationResult> {
   const schema = await loadSchema(schemasDir, filename);
   const validateFn = ajv.compile(schema);
   const valid = validateFn(value);
   if (valid) return { valid: true, errors: [] };
   return {
     valid: false,
-    errors: (validateFn.errors ?? []).map((e: ErrorObject) => `${filename}${e.instancePath || ""} ${e.message ?? "invalid"}`),
+    errors: (validateFn.errors ?? []).map(
+      (e: ErrorObject) => `${filename}${e.instancePath || ""} ${e.message ?? "invalid"}`,
+    ),
   };
 }

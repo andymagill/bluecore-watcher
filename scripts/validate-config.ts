@@ -12,7 +12,7 @@ function getEnvArg(): string {
   const idx = process.argv.indexOf("--env");
   const env = idx !== -1 ? process.argv[idx + 1] : undefined;
   if (!env) {
-    console.error('Usage: npm run validate:config -- --env <environmentId>');
+    console.error("Usage: npm run validate:config -- --env <environmentId>");
     process.exit(2);
   }
   return env;
@@ -30,7 +30,9 @@ async function main() {
 
   const result = CmieConfig.safeParse(raw);
   if (result.success) {
-    console.log(`config/${envId}.config.ts is valid — ${result.data.targets.length} target(s), ${result.data.targets.reduce((n, t) => n + t.extractors.length, 0)} extractor(s).`);
+    console.log(
+      `config/${envId}.config.ts is valid — ${result.data.targets.length} target(s), ${result.data.targets.reduce((n, t) => n + t.extractors.length, 0)} extractor(s).`,
+    );
     return;
   }
 

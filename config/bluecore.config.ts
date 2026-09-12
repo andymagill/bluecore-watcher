@@ -146,7 +146,7 @@ export const config: CmieConfigInput = {
       schedule: { cron: "0 14 * * *", ttlHours: 168 },
       politeness: { minIntervalMs: 1000 }, // Lever's robots.txt sets Crawl-delay: 1
       notes:
-        '$.length is jsonpath-plus\'s array-length pseudo-property (verified against the live payload: ' +
+        "$.length is jsonpath-plus's array-length pseudo-property (verified against the live payload: " +
         "returns [9], a single match) — cheaper and more durable than counting DOM job-listing rows.",
       extractors: [
         {
@@ -249,7 +249,8 @@ export const config: CmieConfigInput = {
       kind: "api",
       url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest",
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
-      notes: "Revisit once/if a Bluecore-specific NRC docket opens; until then this tracks the class of reactor, not the company.",
+      notes:
+        "Revisit once/if a Bluecore-specific NRC docket opens; until then this tracks the class of reactor, not the company.",
       extractors: [
         {
           key: "nrc_smr_document_count",

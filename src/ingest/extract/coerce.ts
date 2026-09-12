@@ -14,7 +14,10 @@ export function coerce(rawText: string, extractor: ExtractorDef): CoercedValue {
       const stripped = rawText.replace(/[^0-9.-]/g, "");
       const n = Number(stripped);
       if (stripped === "" || Number.isNaN(n)) {
-        throw new IngestError("PARSE_ERROR", `Could not coerce "${rawText}" to ${extractor.type} for extractor "${extractor.key}"`);
+        throw new IngestError(
+          "PARSE_ERROR",
+          `Could not coerce "${rawText}" to ${extractor.type} for extractor "${extractor.key}"`,
+        );
       }
       return n;
     }
@@ -23,7 +26,10 @@ export function coerce(rawText: string, extractor: ExtractorDef): CoercedValue {
         ? parseDateFns(rawText, extractor.dateFormat, new Date())
         : new Date(rawText);
       if (Number.isNaN(parsed.getTime())) {
-        throw new IngestError("PARSE_ERROR", `Could not coerce "${rawText}" to a date for extractor "${extractor.key}"`);
+        throw new IngestError(
+          "PARSE_ERROR",
+          `Could not coerce "${rawText}" to a date for extractor "${extractor.key}"`,
+        );
       }
       return parsed.toISOString();
     }
@@ -46,9 +52,10 @@ export function formatDisplayValue(value: CoercedValue, extractor: ExtractorDef)
         currency: extractor.currency,
       }).format(value as number);
     case "percent":
-      return new Intl.NumberFormat(extractor.locale, { style: "percent", maximumFractionDigits: 2 }).format(
-        (value as number) / 100,
-      );
+      return new Intl.NumberFormat(extractor.locale, {
+        style: "percent",
+        maximumFractionDigits: 2,
+      }).format((value as number) / 100);
     case "date":
       return formatDate(new Date(value as string), "d MMM yyyy");
     case "string":

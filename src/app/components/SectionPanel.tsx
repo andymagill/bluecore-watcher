@@ -29,7 +29,15 @@ export function SectionPanel({
         <div className="space-y-3">
           {manifestTargets.map((mt) => {
             const tf = targetFiles.get(mt.id);
-            return tf ? <TargetCard key={mt.id} targetFile={tf} now={now} /> : <ZeroState key={mt.id} label={mt.label} reason="Data not yet available for this target." />;
+            return tf ? (
+              <TargetCard key={mt.id} targetFile={tf} now={now} />
+            ) : (
+              <ZeroState
+                key={mt.id}
+                label={mt.label}
+                reason="Data not yet available for this target."
+              />
+            );
           })}
         </div>
       )}

@@ -11,7 +11,10 @@ export class ApiHandler implements ExtractHandler<unknown> {
     try {
       return JSON.parse(fetchResult.body);
     } catch (err) {
-      throw new IngestError("PARSE_ERROR", `Response body is not valid JSON: ${(err as Error).message}`);
+      throw new IngestError(
+        "PARSE_ERROR",
+        `Response body is not valid JSON: ${(err as Error).message}`,
+      );
     }
   }
 

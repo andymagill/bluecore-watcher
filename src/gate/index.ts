@@ -31,10 +31,18 @@ export interface GateReport {
 export async function runGate(input: GateInput): Promise<GateReport> {
   const schemaErrors: string[] = [];
 
-  const manifestResult = await validateAgainstSchema(input.schemasDir, "manifest.schema.json", input.manifest);
+  const manifestResult = await validateAgainstSchema(
+    input.schemasDir,
+    "manifest.schema.json",
+    input.manifest,
+  );
   schemaErrors.push(...manifestResult.errors);
 
-  const healthResult = await validateAgainstSchema(input.schemasDir, "health.schema.json", input.health);
+  const healthResult = await validateAgainstSchema(
+    input.schemasDir,
+    "health.schema.json",
+    input.health,
+  );
   schemaErrors.push(...healthResult.errors);
 
   for (const tf of input.targetFiles) {

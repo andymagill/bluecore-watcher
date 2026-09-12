@@ -12,7 +12,11 @@ function formatAnchor(anchor: string | string[]): string {
   return Array.isArray(anchor) ? anchor.join(", ") : anchor;
 }
 
-export function ProvenancePopover({ provenance }: { provenance: ScalarProvenance | ListProvenance }) {
+export function ProvenancePopover({
+  provenance,
+}: {
+  provenance: ScalarProvenance | ListProvenance;
+}) {
   const extractedAt = new Date(provenance.extractedAt);
 
   return (
@@ -35,7 +39,12 @@ export function ProvenancePopover({ provenance }: { provenance: ScalarProvenance
             <div>
               <dt className="text-neutral-500">Source</dt>
               <dd>
-                <a href={provenance.sourceUrl} target="_blank" rel="noopener" className="text-blue-400 hover:underline">
+                <a
+                  href={provenance.sourceUrl}
+                  target="_blank"
+                  rel="noopener"
+                  className="text-blue-400 hover:underline"
+                >
                   {provenance.sourceUrl}
                 </a>
               </dd>

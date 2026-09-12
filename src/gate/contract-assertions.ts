@@ -46,11 +46,22 @@ export function checkContractInvariants(
       // provenance ... [is] null").
       if (block.status !== "missing") {
         if (!block.provenance) {
-          violations.push({ invariant: "2 (complete provenance)", targetId: tf.targetId, extractorKey: block.key, message: `status "${block.status}" but provenance is null` });
+          violations.push({
+            invariant: "2 (complete provenance)",
+            targetId: tf.targetId,
+            extractorKey: block.key,
+            message: `status "${block.status}" but provenance is null`,
+          });
         } else {
           const p = block.provenance;
           const rawTextEmpty = Array.isArray(p.rawText) ? p.rawText.length === 0 : p.rawText === "";
-          if (!p.sourceUrl || !p.anchor || (Array.isArray(p.anchor) && p.anchor.length === 0) || !p.extractedAt || rawTextEmpty) {
+          if (
+            !p.sourceUrl ||
+            !p.anchor ||
+            (Array.isArray(p.anchor) && p.anchor.length === 0) ||
+            !p.extractedAt ||
+            rawTextEmpty
+          ) {
             violations.push({
               invariant: "2 (complete provenance)",
               targetId: tf.targetId,
@@ -66,7 +77,12 @@ export function checkContractInvariants(
       // the written artifact independently: an "ok" block's validation must
       // report passed: true.
       if (block.status === "ok" && !block.validation.passed) {
-        violations.push({ invariant: "6 (no failed-assertion publish)", targetId: tf.targetId, extractorKey: block.key, message: `status "ok" but validation.passed is false` });
+        violations.push({
+          invariant: "6 (no failed-assertion publish)",
+          targetId: tf.targetId,
+          extractorKey: block.key,
+          message: `status "ok" but validation.passed is false`,
+        });
       }
     }
   }

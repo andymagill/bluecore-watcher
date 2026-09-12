@@ -25,15 +25,24 @@ export class ErrorBoundary extends Component<Props, State> {
   }
 
   componentDidCatch(error: Error, info: ErrorInfo): void {
-    console.error(`[${this.props.sectionLabel}] section failed to render:`, error, info.componentStack);
+    console.error(
+      `[${this.props.sectionLabel}] section failed to render:`,
+      error,
+      info.componentStack,
+    );
   }
 
   render() {
     if (this.state.error) {
       return (
-        <div data-error-boundary-tripped="true" className="rounded border border-red-800 bg-red-950/40 p-4 text-sm text-red-200">
+        <div
+          data-error-boundary-tripped="true"
+          className="rounded border border-red-800 bg-red-950/40 p-4 text-sm text-red-200"
+        >
           <p className="font-medium">{this.props.sectionLabel} failed to render.</p>
-          <p className="mt-1 text-red-300/80">This section is broken, not the whole dashboard. Check the Health modal.</p>
+          <p className="mt-1 text-red-300/80">
+            This section is broken, not the whole dashboard. Check the Health modal.
+          </p>
         </div>
       );
     }

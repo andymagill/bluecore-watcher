@@ -9,7 +9,17 @@ import { DeltaChip } from "./DeltaChip.js";
 import { ProvenancePopover } from "./ProvenancePopover.js";
 import { ZeroState } from "./ZeroState.js";
 
-export function MetricBlock({ targetId, block, ttlHours, now }: { targetId: string; block: ScalarBlock; ttlHours: number; now?: Date }) {
+export function MetricBlock({
+  targetId,
+  block,
+  ttlHours,
+  now,
+}: {
+  targetId: string;
+  block: ScalarBlock;
+  ttlHours: number;
+  now?: Date;
+}) {
   const state = useFreshness(block, ttlHours, now);
 
   if (block.status === "missing" || !block.provenance) {
@@ -28,10 +38,14 @@ export function MetricBlock({ targetId, block, ttlHours, now }: { targetId: stri
       <p className="text-xs text-neutral-500">{block.label}</p>
       {suppressed ? (
         <details>
-          <summary className="cursor-pointer text-sm text-neutral-500">Last known value from an earlier check</summary>
+          <summary className="cursor-pointer text-sm text-neutral-500">
+            Last known value from an earlier check
+          </summary>
           <p className="mt-1 text-2xl font-semibold tabular-nums text-neutral-300">
             {block.displayValue}
-            {block.unit ? <span className="ml-1 text-sm text-neutral-500">{block.unit}</span> : null}
+            {block.unit ? (
+              <span className="ml-1 text-sm text-neutral-500">{block.unit}</span>
+            ) : null}
           </p>
         </details>
       ) : (

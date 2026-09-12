@@ -11,7 +11,13 @@ import type { Fetcher, RunContext } from "./fetch/types.js";
 import { getHandler } from "./extract/registry.js";
 import { processExtractor, type HealthEntryDraft } from "./process-extractor.js";
 import { AcknowledgementStore } from "./acknowledgements.js";
-import { buildHealth, buildManifest, computeFingerprint, loadPreviousState, writeAll } from "./persist.js";
+import {
+  buildHealth,
+  buildManifest,
+  computeFingerprint,
+  loadPreviousState,
+  writeAll,
+} from "./persist.js";
 import { collectActiveSecretValues } from "./scrub.js";
 import type { Manifest } from "../contract/manifest.js";
 import type { Health } from "../contract/health.js";
@@ -47,7 +53,9 @@ async function runOneTarget(
   acknowledgements: AcknowledgementStore,
 ): Promise<{ targetFile: TargetFile; healthDrafts: HealthEntryDraft[]; consumedCount: number }> {
   const nowIso = ctx.now().toISOString();
-  const previousBlocks = new Map<string, Block>((previousTargetFile?.blocks ?? []).map((b) => [b.key, b]));
+  const previousBlocks = new Map<string, Block>(
+    (previousTargetFile?.blocks ?? []).map((b) => [b.key, b]),
+  );
   const handler = getHandler(target.kind);
 
   let doc: unknown;
@@ -78,7 +86,19 @@ async function runOneTarget(
       blocks.push(
         prev
           ? { ...prev, status: "cached" }
-          : ({ key: extractor.key, label: extractor.label, type: extractor.type, presenter: extractor.presenter, unit: extractor.unit, status: "missing", value: null, displayValue: null, provenance: null, delta: null, validation: { passed: false, warnings: [] } } as Block),
+          : ({
+              key: extractor.key,
+              label: extractor.label,
+              type: extractor.type,
+              presenter: extractor.presenter,
+              unit: extractor.unit,
+              status: "missing",
+              value: null,
+              displayValue: null,
+              provenance: null,
+              delta: null,
+              validation: { passed: false, warnings: [] },
+            } as Block),
       );
       healthDrafts.push({
         targetId: target.id,
@@ -108,7 +128,8 @@ async function runOneTarget(
       if (result.healthEntryDraft) {
         healthDrafts.push(result.healthEntryDraft);
         anyFailed = true;
-        if (extractor.required && result.healthEntryDraft.status === "failed") anyRequiredFailed = true;
+        if (extractor.required && result.healthEntryDraft.status === "failed")
+          anyRequiredFailed = true;
       }
       if (result.consumedAcknowledgement) {
         acknowledgements.consume(result.consumedAcknowledgement);
@@ -124,7 +145,8 @@ async function runOneTarget(
   // (01-DATA-CONTRACT.md §3) — a required extractor's failure must not let
   // a *different*, successfully re-extracted block overwrite good data with
   // a value the run as a whole didn't earn.
-  const finalBlocks = status === "failed_cached" && previousTargetFile ? previousTargetFile.blocks : blocks;
+  const finalBlocks =
+    status === "failed_cached" && previousTargetFile ? previousTargetFile.blocks : blocks;
 
   const targetFile: TargetFile = {
     schemaVersion: 1,
@@ -160,7 +182,11 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
   let consumedCount = 0;
 
   for (const target of opts.config.targets) {
-    const { targetFile, healthDrafts, consumedCount: c } = await runOneTarget(
+    const {
+      targetFile,
+      healthDrafts,
+      consumedCount: c,
+    } = await runOneTarget(
       target,
       fetcher,
       ctx,
@@ -173,8 +199,21 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
   }
 
   const nowIso = ctx.now().toISOString();
-  const manifest = buildManifest(opts.config, targetFiles, opts.runId, nowIso, opts.commit ?? "dry-run");
-  const health = buildHealth(previous.health, allHealthDrafts, targetFiles, opts.runId, nowIso, collectActiveSecretValues(opts.config));
+  const manifest = buildManifest(
+    opts.config,
+    targetFiles,
+    opts.runId,
+    nowIso,
+    opts.commit ?? "dry-run",
+  );
+  const health = buildHealth(
+    previous.health,
+    allHealthDrafts,
+    targetFiles,
+    opts.runId,
+    nowIso,
+    collectActiveSecretValues(opts.config),
+  );
 
   const newFingerprint = computeFingerprint(manifest, targetFiles, health);
   const oldFingerprint =
@@ -204,7 +243,11 @@ export interface RunAndPersistResult extends RunResult {
 // — a failing gate leaves public/data untouched, same as a failed merge
 // leaves `main` untouched. M1 moves the gate to run against the real
 // branch/preview per doc 03 §3's staged plan.
-export async function runAndPersist(opts: RunOptions, dryRun: boolean, schemasDir: string): Promise<RunAndPersistResult> {
+export async function runAndPersist(
+  opts: RunOptions,
+  dryRun: boolean,
+  schemasDir: string,
+): Promise<RunAndPersistResult> {
   const result = await runIngestion(opts);
   if (dryRun || !result.changed) return { ...result, gate: null };
 

@@ -94,7 +94,9 @@ export function buildHealth(
 
   const entries: HealthEntry[] = drafts.map((d) => {
     const compositeKey = `${d.targetId}::${d.extractorKey}`;
-    const prior = previousHealth?.entries.find((e) => e.targetId === d.targetId && e.extractorKey === d.extractorKey);
+    const prior = previousHealth?.entries.find(
+      (e) => e.targetId === d.targetId && e.extractorKey === d.extractorKey,
+    );
     const block = blockByKey.get(compositeKey);
     return {
       targetId: d.targetId,
@@ -114,7 +116,10 @@ export function buildHealth(
   const oldestAgeHours = targetFiles.length
     ? Math.max(
         0,
-        ...targetFiles.map((tf) => (new Date(generatedAt).getTime() - new Date(tf.run.completedAt).getTime()) / 3_600_000),
+        ...targetFiles.map(
+          (tf) =>
+            (new Date(generatedAt).getTime() - new Date(tf.run.completedAt).getTime()) / 3_600_000,
+        ),
       )
     : 0;
 
@@ -136,7 +141,11 @@ export function buildHealth(
 
 // ---- Semantic fingerprint (ADR-011) ----
 
-export function computeFingerprint(manifest: Manifest, targetFiles: TargetFile[], health: Health): string {
+export function computeFingerprint(
+  manifest: Manifest,
+  targetFiles: TargetFile[],
+  health: Health,
+): string {
   const targetFp = targetFiles
     .map((tf) => ({
       targetId: tf.targetId,
@@ -144,12 +153,23 @@ export function computeFingerprint(manifest: Manifest, targetFiles: TargetFile[]
       sourceUrl: tf.sourceUrl,
       ttlHours: tf.ttlHours,
       runStatus: tf.run.status,
-      blocks: tf.blocks.map((b) => ({ key: b.key, status: b.status, contentHash: b.provenance?.contentHash ?? null, value: b.value })),
+      blocks: tf.blocks.map((b) => ({
+        key: b.key,
+        status: b.status,
+        contentHash: b.provenance?.contentHash ?? null,
+        value: b.value,
+      })),
     }))
     .sort((a, b) => a.targetId.localeCompare(b.targetId));
 
   const healthFp = health.entries
-    .map((e) => ({ targetId: e.targetId, extractorKey: e.extractorKey, status: e.status, errorClass: e.errorClass, consecutiveFailures: e.consecutiveFailures }))
+    .map((e) => ({
+      targetId: e.targetId,
+      extractorKey: e.extractorKey,
+      status: e.status,
+      errorClass: e.errorClass,
+      consecutiveFailures: e.consecutiveFailures,
+    }))
     .sort((a, b) => (a.targetId + a.extractorKey).localeCompare(b.targetId + b.extractorKey));
 
   return stableStringify({
@@ -161,9 +181,11 @@ export function computeFingerprint(manifest: Manifest, targetFiles: TargetFile[]
 
 // ---- Loading previous state, for diffing against ----
 
-export async function loadPreviousState(
-  dataDir: string,
-): Promise<{ manifest: Manifest | null; health: Health | null; targetFiles: Map<string, TargetFile> }> {
+export async function loadPreviousState(dataDir: string): Promise<{
+  manifest: Manifest | null;
+  health: Health | null;
+  targetFiles: Map<string, TargetFile>;
+}> {
   const manifest = await readJsonOrNull(join(dataDir, "manifest.json"), Manifest);
   const health = await readJsonOrNull(join(dataDir, "health.json"), Health);
   const targetFiles = new Map<string, TargetFile>();
@@ -176,7 +198,10 @@ export async function loadPreviousState(
   return { manifest, health, targetFiles };
 }
 
-async function readJsonOrNull<T>(path: string, schema: { parse: (v: unknown) => T }): Promise<T | null> {
+async function readJsonOrNull<T>(
+  path: string,
+  schema: { parse: (v: unknown) => T },
+): Promise<T | null> {
   try {
     return schema.parse(JSON.parse(await readFile(path, "utf-8")));
   } catch (err) {
@@ -187,7 +212,12 @@ async function readJsonOrNull<T>(path: string, schema: { parse: (v: unknown) => 
 
 // ---- Writing ----
 
-export async function writeAll(dataDir: string, manifest: Manifest, health: Health, targetFiles: TargetFile[]): Promise<void> {
+export async function writeAll(
+  dataDir: string,
+  manifest: Manifest,
+  health: Health,
+  targetFiles: TargetFile[],
+): Promise<void> {
   await mkdir(dataDir, { recursive: true });
   await writeJson(join(dataDir, "manifest.json"), manifest);
   await writeJson(join(dataDir, "health.json"), health);

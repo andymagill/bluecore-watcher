@@ -89,7 +89,7 @@ Compute a **semantic fingerprint** for the run (ADR-011): per block, `key` + `st
 - **No fingerprint changed** → write nothing, exit 0, no branch (§2 step 4). This is the common case on a slow-moving source set.
 - **Something changed** → write `manifest.json`, `health.json`, and each changed `sections/<sectionId>/<targetId>.json`. Serialization is stable: sorted keys, 2-space indent, trailing newline. `firstSeenAt`/`consecutiveFailures` in the new `health.json` are computed from the **previous committed** health plus this run's artifact, so a run that never reaches `main` (gate failure) cannot erase the backlog it was reporting.
 
-Per invariant 7 (`01-DATA-CONTRACT.md` §8, restated under ADR-011), determinism means *no semantic change → no commit* — not that timestamps never move within a commit that does happen. `provenance.extractedAt` on every fetched target advances honestly; that is expected content in a run that does write.
+Per invariant 7 (`01-DATA-CONTRACT.md` §8, restated under ADR-011), determinism means _no semantic change → no commit_ — not that timestamps never move within a commit that does happen. `provenance.extractedAt` on every fetched target advances honestly; that is expected content in a run that does write.
 
 Targets not in this run's queue are left byte-identical.
 
@@ -127,10 +127,11 @@ A preview deploy that nothing checks is ceremony. Three checks, all blocking —
 **2. Contract assertions (offline).** The invariants from `01-DATA-CONTRACT.md` §8 as executable tests. Chiefly: no previously-good value was blanked, and every published block has complete provenance.
 
 **3. Smoke render (against the preview URL).** Load the preview in headless Chromium. Assert:
+
 - `manifest.json` returns 200 and validates.
 - Every `target.path` in the manifest returns 200.
 - The dashboard mounts without hitting an error boundary.
-- The count of rendered blocks matches the count of published blocks. *This catches the failure where data is schema-valid but the UI silently drops it.*
+- The count of rendered blocks matches the count of published blocks. _This catches the failure where data is schema-valid but the UI silently drops it._
 - No console errors.
 
 Check 3 is the one worth the complexity. It is a real integration test of the exact artifact, for free, on every run.
@@ -146,9 +147,10 @@ v1 channel is `github-issue` (ADR-004, Q5): zero cost, zero new infrastructure, 
 Operator-only in v1. Client-facing alerting waits on auth, because an alert containing a value is a data disclosure through an unauthenticated channel.
 
 Noise controls, in order of importance:
+
 - `alert.on` defaults to `never`. Alerting is opt-in per extractor. This is the main control and it should stay conservative.
 - `quietHours` suppresses repeats for the same key.
-- Health-derived alerts fire on the *transition* to failing and again at 3 and 7 consecutive failures — not every run. A source that fails 30 times should generate 3 notifications, not 30.
+- Health-derived alerts fire on the _transition_ to failing and again at 3 and 7 consecutive failures — not every run. A source that fails 30 times should generate 3 notifications, not 30.
 
 ---
 
@@ -156,13 +158,13 @@ Noise controls, in order of importance:
 
 Scrapers cannot be tested against live sites — it's slow, rude, and non-deterministic.
 
-**Fixtures.** Every target keeps a captured response under `fixtures/<targetId>/`. Extractor unit tests run against fixtures, offline, in milliseconds. A repaired selector must pass against a *newly captured* fixture, and the old one is kept — that pair is the regression test.
+**Fixtures.** Every target keeps a captured response under `fixtures/<targetId>/`. Extractor unit tests run against fixtures, offline, in milliseconds. A repaired selector must pass against a _newly captured_ fixture, and the old one is kept — that pair is the regression test.
 
 **Golden files.** Each fixture has an expected output file. Extraction changes show as a reviewable diff.
 
 **Contract tests.** The invariants in §8 of the data contract, run in the gate.
 
-**Weekly drift check.** A scheduled job fetches each source and compares the live response against the stored fixture, warning when a page has changed structurally — even if extraction still succeeds. This is the early-warning system for silent-wrong: it catches the redesign *before* the selector starts matching the wrong node.
+**Weekly drift check.** A scheduled job fetches each source and compares the live response against the stored fixture, warning when a page has changed structurally — even if extraction still succeeds. This is the early-warning system for silent-wrong: it catches the redesign _before_ the selector starts matching the wrong node.
 
 The drift check is the highest-leverage test in this list and the one easiest to skip. Don't.
 
@@ -179,11 +181,11 @@ The drift check is the highest-leverage test in this list and the one easiest to
 
 ## 7. Cost and scale
 
-| Dimension | Estimate | Pressure point |
-|---|---|---|
-| CI minutes | ~2 min/run static-only; +40s per browser target | GitHub free tier is 2,000 min/month — one daily run with a few browser targets is comfortable |
-| Commits | 1 squashed commit per run with changes | ~365/year daily; revisit at ~2,000 (Q7) |
-| Repo size | JSON only, kilobytes per run | Fixtures dominate — keep them trimmed, not whole-page dumps |
-| Preview deploys | 1 per run with changes | Within Cloudflare Workers free-tier limits at daily cadence |
+| Dimension       | Estimate                                        | Pressure point                                                                                |
+| --------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| CI minutes      | ~2 min/run static-only; +40s per browser target | GitHub free tier is 2,000 min/month — one daily run with a few browser targets is comfortable |
+| Commits         | 1 squashed commit per run with changes          | ~365/year daily; revisit at ~2,000 (Q7)                                                       |
+| Repo size       | JSON only, kilobytes per run                    | Fixtures dominate — keep them trimmed, not whole-page dumps                                   |
+| Preview deploys | 1 per run with changes                          | Within Cloudflare Workers free-tier limits at daily cadence                                   |
 
 Hourly cadence changes this picture materially — ~8,760 commits/year and 8,760 preview builds. If a source genuinely needs hourly polling, that is the moment to reconsider whether the gate should run on every cycle or on a batched one.

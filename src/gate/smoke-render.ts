@@ -22,7 +22,11 @@ function publishedBlockCount(targetFiles: readonly TargetFile[]): number {
   return targetFiles.reduce((sum, tf) => sum + tf.blocks.length, 0);
 }
 
-export async function runSmokeRender(previewUrl: string, manifest: Manifest, targetFiles: readonly TargetFile[]): Promise<SmokeRenderResult> {
+export async function runSmokeRender(
+  previewUrl: string,
+  manifest: Manifest,
+  targetFiles: readonly TargetFile[],
+): Promise<SmokeRenderResult> {
   const errors: string[] = [];
   const base = previewUrl.replace(/\/$/, "");
 
@@ -45,7 +49,9 @@ export async function runSmokeRender(previewUrl: string, manifest: Manifest, tar
     } else {
       const served = await manifestResp.json();
       if (served.runId !== manifest.runId) {
-        errors.push(`manifest.json runId mismatch: served "${served.runId}", expected "${manifest.runId}" (stale cache?)`);
+        errors.push(
+          `manifest.json runId mismatch: served "${served.runId}", expected "${manifest.runId}" (stale cache?)`,
+        );
       }
     }
 
@@ -66,7 +72,9 @@ export async function runSmokeRender(previewUrl: string, manifest: Manifest, tar
     const renderedCount = await page.locator("[data-block-key]").count();
     const expectedCount = publishedBlockCount(targetFiles);
     if (renderedCount !== expectedCount) {
-      errors.push(`rendered block count ${renderedCount} disagrees with published block count ${expectedCount}`);
+      errors.push(
+        `rendered block count ${renderedCount} disagrees with published block count ${expectedCount}`,
+      );
     }
 
     // "No console errors."

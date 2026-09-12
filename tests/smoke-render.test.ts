@@ -49,7 +49,15 @@ function makeTargetFile(blockCount: number): TargetFile {
     label: "T1",
     sourceUrl: "https://example.test/page",
     ttlHours: 168,
-    run: { runId: RUN_ID, startedAt: "2026-09-12T00:00:00Z", completedAt: "2026-09-12T00:00:00Z", durationMs: 100, status: "ok", renderer: "static", httpStatus: 200 },
+    run: {
+      runId: RUN_ID,
+      startedAt: "2026-09-12T00:00:00Z",
+      completedAt: "2026-09-12T00:00:00Z",
+      durationMs: 100,
+      status: "ok",
+      renderer: "static",
+      httpStatus: 200,
+    },
     blocks: Array.from({ length: blockCount }, (_, i) => ({
       key: `block_${i}`,
       label: `Block ${i}`,
@@ -58,7 +66,13 @@ function makeTargetFile(blockCount: number): TargetFile {
       status: "ok",
       value: "hello",
       displayValue: "hello",
-      provenance: { sourceUrl: "https://example.test/page", anchor: "p", extractedAt: "2026-09-12T00:00:00Z", rawText: "hello", contentHash: "sha256:aabbcc" },
+      provenance: {
+        sourceUrl: "https://example.test/page",
+        anchor: "p",
+        extractedAt: "2026-09-12T00:00:00Z",
+        rawText: "hello",
+        contentHash: "sha256:aabbcc",
+      },
       delta: null,
       validation: { passed: true, warnings: [] },
     })),
@@ -94,9 +108,17 @@ async function startSite(site: Site): Promise<{ url: string; server: Server }> {
   return { url: `http://127.0.0.1:${port}`, server };
 }
 
-function pageWithBlocks(count: number, opts: { errorBoundaryTripped?: boolean; consoleError?: boolean } = {}): string {
-  const blocks = Array.from({ length: count }, (_, i) => `<div data-block-key="t1.block_${i}">hello</div>`).join("\n");
-  const boundaryMarker = opts.errorBoundaryTripped ? `<div data-error-boundary-tripped="true"></div>` : "";
+function pageWithBlocks(
+  count: number,
+  opts: { errorBoundaryTripped?: boolean; consoleError?: boolean } = {},
+): string {
+  const blocks = Array.from(
+    { length: count },
+    (_, i) => `<div data-block-key="t1.block_${i}">hello</div>`,
+  ).join("\n");
+  const boundaryMarker = opts.errorBoundaryTripped
+    ? `<div data-error-boundary-tripped="true"></div>`
+    : "";
   const script = opts.consoleError ? `<script>console.error("boom");</script>` : "";
   return `<!doctype html><html><body>${boundaryMarker}${blocks}${script}</body></html>`;
 }
@@ -127,7 +149,11 @@ describe("runSmokeRender", () => {
 
     const result = await runSmokeRender(url, manifest, [targetFile]);
     expect(result.passed).toBe(false);
-    expect(result.errors.some((e) => e.includes("rendered block count 2 disagrees with published block count 3"))).toBe(true);
+    expect(
+      result.errors.some((e) =>
+        e.includes("rendered block count 2 disagrees with published block count 3"),
+      ),
+    ).toBe(true);
   });
 
   it("fails when a target.path 404s", async () => {
@@ -159,13 +185,19 @@ describe("runSmokeRender", () => {
 
     const result = await runSmokeRender(`http://127.0.0.1:${port}`, manifest, [targetFile]);
     expect(result.passed).toBe(false);
-    expect(result.errors.some((e) => e.includes("sections/target/t1.json returned 404"))).toBe(true);
+    expect(result.errors.some((e) => e.includes("sections/target/t1.json returned 404"))).toBe(
+      true,
+    );
   });
 
   it("fails when an ErrorBoundary has tripped", async () => {
     const manifest = makeManifest();
     const targetFile = makeTargetFile(1);
-    const { url, server } = await startSite({ html: pageWithBlocks(1, { errorBoundaryTripped: true }), manifest, targetFile });
+    const { url, server } = await startSite({
+      html: pageWithBlocks(1, { errorBoundaryTripped: true }),
+      manifest,
+      targetFile,
+    });
     openServer = server;
 
     const result = await runSmokeRender(url, manifest, [targetFile]);
@@ -176,7 +208,11 @@ describe("runSmokeRender", () => {
   it("fails on a console error", async () => {
     const manifest = makeManifest();
     const targetFile = makeTargetFile(1);
-    const { url, server } = await startSite({ html: pageWithBlocks(1, { consoleError: true }), manifest, targetFile });
+    const { url, server } = await startSite({
+      html: pageWithBlocks(1, { consoleError: true }),
+      manifest,
+      targetFile,
+    });
     openServer = server;
 
     const result = await runSmokeRender(url, manifest, [targetFile]);

@@ -23,6 +23,7 @@ Populate `05-SOURCES.md`. Name the target. Pick the three facts that matter most
 **Owned by the implementer, runs concurrently with M0.** Everything that has no dependency on a real source: doc consistency, the contract layer (Zod schemas, generated JSON Schema, Ajv-validated), the config validator, the `html`/`api` handler registry (ADR-010), the semantic-diff persist layer (ADR-011), and the offline half of the gate (schema validation + contract assertions). Proven against a synthetic, non-Bluecore config and fixtures — no cron, no Cloudflare deploy, no real target.
 
 **Exit criteria:**
+
 - `npm run validate:config` rejects a config violating each documented rule.
 - A `--dry` ingestion run over the synthetic config extracts every block with full provenance and writes nothing.
 - A second identical `--dry` run reports no semantic change (ADR-011 / Invariant 7).
@@ -45,11 +46,12 @@ Config → fetch → extract → validate → diff → commit → branch → pre
 **Scope discipline:** one target, two or three extractors, one section. The other three sections render as zero-states — which also proves the zero-state path.
 
 **Exit criteria:**
+
 - A cron run updates a value in production with no human involvement.
 - A deliberately broken selector produces a health entry, retains the cached value, and does **not** reach production.
 - The freshness badge changes state as the clock advances (test with a fake clock).
 - A value change produces a correct delta chip, including the unchanged case ("unchanged for N days") per `01-DATA-CONTRACT.md` §4.
-- Re-running with unchanged source data produces no commit. *(ADR-011 / Invariant 7 — already verified offline in M0.5; this criterion re-proves it against the real deployed pipeline.)*
+- Re-running with unchanged source data produces no commit. _(ADR-011 / Invariant 7 — already verified offline in M0.5; this criterion re-proves it against the real deployed pipeline.)_
 - The Cloudflare-Workers-preview smoke render (doc 03 §3 check 3) catches a case where data is schema-valid but the block count the UI renders disagrees with the block count published.
 
 **Why this set:** each criterion exercises a decision made in the docs. If one can't be met, a doc is wrong, and it's better to learn that now.
@@ -97,15 +99,15 @@ Near-zero cost points to edge middleware plus signed cookies rather than a hoste
 
 ## Deferred
 
-| Item | Trigger |
-|---|---|
-| Second environment | A second client — and it is the real ADR-001 test |
-| PDF extraction | A triaged source (M0) is actually a PDF — write the handler per `02-CONFIG-SCHEMA.md` §7. No longer a stack question (ADR-010). |
-| Edge relay validation | A source actually returns `BLOCKED` (ADR-006) |
-| Time-series charts | A client asks; the data model already supports it |
-| Client-facing alerts | After M4 — an alert carrying a value is a disclosure |
-| Git retention policy | ~2,000 commits (Q7) |
-| robots.txt / ToS enforcement (Q6) | Before any client deliverable, deferred to M3/M4 by decision |
+| Item                              | Trigger                                                                                                                         |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| Second environment                | A second client — and it is the real ADR-001 test                                                                               |
+| PDF extraction                    | A triaged source (M0) is actually a PDF — write the handler per `02-CONFIG-SCHEMA.md` §7. No longer a stack question (ADR-010). |
+| Edge relay validation             | A source actually returns `BLOCKED` (ADR-006)                                                                                   |
+| Time-series charts                | A client asks; the data model already supports it                                                                               |
+| Client-facing alerts              | After M4 — an alert carrying a value is a disclosure                                                                            |
+| Git retention policy              | ~2,000 commits (Q7)                                                                                                             |
+| robots.txt / ToS enforcement (Q6) | Before any client deliverable, deferred to M3/M4 by decision                                                                    |
 
 ---
 

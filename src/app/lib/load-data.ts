@@ -13,7 +13,12 @@ export interface LoadedData {
   targetFiles: Map<string, TargetFile>;
 }
 
-async function fetchTargetFile(baseUrl: string, path: string, runId: string, id: string): Promise<readonly [string, TargetFile] | null> {
+async function fetchTargetFile(
+  baseUrl: string,
+  path: string,
+  runId: string,
+  id: string,
+): Promise<readonly [string, TargetFile] | null> {
   try {
     const res = await fetch(`${baseUrl}/data/${path}?r=${runId}`);
     if (!res.ok) return null;
@@ -40,7 +45,9 @@ export async function loadDashboardData(baseUrl = ""): Promise<LoadedData> {
 
   const [health, targetEntries] = await Promise.all([
     fetchHealth(baseUrl, manifest.runId),
-    Promise.all(manifest.targets.map((t) => fetchTargetFile(baseUrl, t.path, manifest.runId, t.id))),
+    Promise.all(
+      manifest.targets.map((t) => fetchTargetFile(baseUrl, t.path, manifest.runId, t.id)),
+    ),
   ]);
 
   const targetFiles = new Map<string, TargetFile>();

@@ -32,7 +32,10 @@ const root = join(__dirname, "..");
 // doesn't exist yet when this script runs (git commit happens after).
 function getBaseCommitSha(): string {
   try {
-    return execFileSync("git", ["rev-parse", "--short", "HEAD"], { cwd: root, encoding: "utf-8" }).trim();
+    return execFileSync("git", ["rev-parse", "--short", "HEAD"], {
+      cwd: root,
+      encoding: "utf-8",
+    }).trim();
   } catch {
     return "unknown";
   }
@@ -42,7 +45,9 @@ function getEnvArg(): string {
   const idx = process.argv.indexOf("--env");
   const env = idx !== -1 ? process.argv[idx + 1] : undefined;
   if (!env) {
-    console.error("Usage: npm run ingest -- --env <environmentId> [--dry] [--live] [--only <id[,id...]>]");
+    console.error(
+      "Usage: npm run ingest -- --env <environmentId> [--dry] [--live] [--only <id[,id...]>]",
+    );
     process.exit(2);
   }
   return env;
@@ -52,7 +57,10 @@ function getOnlyArg(): string[] | null {
   const idx = process.argv.indexOf("--only");
   const value = idx !== -1 ? process.argv[idx + 1] : undefined;
   if (!value) return null;
-  return value.split(",").map((s) => s.trim()).filter(Boolean);
+  return value
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }
 
 async function main() {
@@ -90,9 +98,12 @@ async function main() {
   );
 
   const totalBlocks = result.targetFiles.reduce((n, t) => n + t.blocks.length, 0);
-  console.log(`\n${dryRun ? "[dry run] " : ""}${result.targetFiles.length} target(s), ${totalBlocks} block(s).`);
+  console.log(
+    `\n${dryRun ? "[dry run] " : ""}${result.targetFiles.length} target(s), ${totalBlocks} block(s).`,
+  );
   console.log(`Semantic change vs. previous state: ${result.changed}`);
-  if (result.consumedAcknowledgements > 0) console.log(`Consumed ${result.consumedAcknowledgements} acknowledgement(s).`);
+  if (result.consumedAcknowledgements > 0)
+    console.log(`Consumed ${result.consumedAcknowledgements} acknowledgement(s).`);
 
   for (const tf of result.targetFiles) {
     console.log(`  ${tf.targetId}: run.status=${tf.run.status}`);
@@ -104,7 +115,8 @@ async function main() {
   if (result.gate) {
     console.log(`\nGate: ${result.gate.passed ? "PASSED" : "FAILED"}`);
     for (const e of result.gate.schemaErrors) console.log(`  schema: ${e}`);
-    for (const v of result.gate.contractViolations) console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
+    for (const v of result.gate.contractViolations)
+      console.log(`  invariant ${v.invariant} [${v.targetId}.${v.extractorKey}]: ${v.message}`);
     for (const e of result.gate.smokeRenderErrors) console.log(`  smoke render: ${e}`);
     if (!result.gate.passed) process.exit(1);
   } else if (!dryRun && !result.changed) {
