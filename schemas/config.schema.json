@@ -1,0 +1,725 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "environment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "pattern": "^[a-z0-9][a-z0-9-]*$"
+        },
+        "displayName": {
+          "type": "string",
+          "minLength": 1
+        },
+        "entities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string",
+                "minLength": 1
+              },
+              "role": {
+                "type": "string",
+                "enum": [
+                  "primary",
+                  "competitor",
+                  "parent",
+                  "counterparty",
+                  "regulator"
+                ]
+              },
+              "aliases": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "required": [
+              "id",
+              "name",
+              "role"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "staleCeilingMultiplier": {
+          "default": 3,
+          "type": "number",
+          "exclusiveMinimum": 0
+        }
+      },
+      "required": [
+        "id",
+        "displayName",
+        "entities",
+        "staleCeilingMultiplier"
+      ],
+      "additionalProperties": false
+    },
+    "sections": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "minLength": 1
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "order": {
+            "type": "integer",
+            "minimum": -9007199254740991,
+            "maximum": 9007199254740991
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "order"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^[a-z0-9][a-z0-9-]*$"
+          },
+          "label": {
+            "type": "string",
+            "minLength": 1
+          },
+          "entityId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sectionId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "html",
+              "api"
+            ]
+          },
+          "url": {
+            "type": "string",
+            "format": "uri"
+          },
+          "renderer": {
+            "default": "static",
+            "type": "string",
+            "enum": [
+              "static",
+              "browser"
+            ]
+          },
+          "method": {
+            "default": "GET",
+            "type": "string",
+            "enum": [
+              "GET",
+              "POST"
+            ]
+          },
+          "headers": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "body": {
+            "type": "string"
+          },
+          "auth": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "bearer",
+                  "header",
+                  "query"
+                ]
+              },
+              "secretEnv": {
+                "type": "string",
+                "minLength": 1
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "type",
+              "secretEnv"
+            ],
+            "additionalProperties": false
+          },
+          "proxy": {
+            "default": "none",
+            "type": "string",
+            "enum": [
+              "none",
+              "edge"
+            ]
+          },
+          "schedule": {
+            "type": "object",
+            "properties": {
+              "cron": {
+                "type": "string",
+                "minLength": 1
+              },
+              "ttlHours": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "jitterSeconds": {
+                "default": 0,
+                "type": "number",
+                "minimum": 0,
+                "maximum": 120
+              },
+              "staleCeilingHours": {
+                "type": "number",
+                "exclusiveMinimum": 0
+              },
+              "ttlOverrideReason": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "required": [
+              "cron",
+              "ttlHours",
+              "jitterSeconds"
+            ],
+            "additionalProperties": false
+          },
+          "politeness": {
+            "type": "object",
+            "properties": {
+              "minIntervalMs": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 9007199254740991
+              },
+              "userAgent": {
+                "type": "string"
+              },
+              "respectRobotsTxt": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "respectRobotsTxt"
+            ],
+            "additionalProperties": false
+          },
+          "extractors": {
+            "minItems": 1,
+            "type": "array",
+            "items": {
+              "oneOf": [
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "presenter": {
+                      "type": "string",
+                      "enum": [
+                        "metric",
+                        "markdown",
+                        "list",
+                        "status"
+                      ]
+                    },
+                    "required": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "regex": {
+                      "type": "string"
+                    },
+                    "regexGroup": {
+                      "default": 1,
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "trim": {
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "number",
+                        "currency",
+                        "percent",
+                        "date",
+                        "string",
+                        "markdown",
+                        "enum"
+                      ]
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "minLength": 3,
+                      "maxLength": 3
+                    },
+                    "locale": {
+                      "default": "en-US",
+                      "type": "string"
+                    },
+                    "dateFormat": {
+                      "type": "string"
+                    },
+                    "enumValues": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "assert": {
+                      "type": "object",
+                      "properties": {
+                        "notEmpty": {
+                          "type": "boolean"
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "pattern": {
+                          "type": "string"
+                        },
+                        "maxLength": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "minItems": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "maxItems": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "maxChangePct": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "maxChangeAbs": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "expectMonotonic": {
+                          "type": "string",
+                          "enum": [
+                            "increasing",
+                            "decreasing"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "alert": {
+                      "type": "object",
+                      "properties": {
+                        "on": {
+                          "default": "never",
+                          "type": "string",
+                          "enum": [
+                            "any-change",
+                            "threshold",
+                            "never"
+                          ]
+                        },
+                        "thresholdPct": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "quietHours": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "info",
+                            "warn",
+                            "critical"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "on"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "html"
+                    },
+                    "selector": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "attr": {
+                      "type": "string"
+                    },
+                    "multiple": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "label",
+                    "presenter",
+                    "required",
+                    "regexGroup",
+                    "trim",
+                    "type",
+                    "locale",
+                    "kind",
+                    "selector"
+                  ],
+                  "additionalProperties": false
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "key": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1
+                    },
+                    "presenter": {
+                      "type": "string",
+                      "enum": [
+                        "metric",
+                        "markdown",
+                        "list",
+                        "status"
+                      ]
+                    },
+                    "required": {
+                      "default": false,
+                      "type": "boolean"
+                    },
+                    "regex": {
+                      "type": "string"
+                    },
+                    "regexGroup": {
+                      "default": 1,
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
+                    "trim": {
+                      "default": true,
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "type": "string",
+                      "enum": [
+                        "number",
+                        "currency",
+                        "percent",
+                        "date",
+                        "string",
+                        "markdown",
+                        "enum"
+                      ]
+                    },
+                    "unit": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string",
+                      "minLength": 3,
+                      "maxLength": 3
+                    },
+                    "locale": {
+                      "default": "en-US",
+                      "type": "string"
+                    },
+                    "dateFormat": {
+                      "type": "string"
+                    },
+                    "enumValues": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    "assert": {
+                      "type": "object",
+                      "properties": {
+                        "notEmpty": {
+                          "type": "boolean"
+                        },
+                        "min": {
+                          "type": "number"
+                        },
+                        "max": {
+                          "type": "number"
+                        },
+                        "pattern": {
+                          "type": "string"
+                        },
+                        "maxLength": {
+                          "type": "integer",
+                          "exclusiveMinimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "minItems": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "maxItems": {
+                          "type": "integer",
+                          "minimum": 0,
+                          "maximum": 9007199254740991
+                        },
+                        "maxChangePct": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "maxChangeAbs": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "expectMonotonic": {
+                          "type": "string",
+                          "enum": [
+                            "increasing",
+                            "decreasing"
+                          ]
+                        }
+                      },
+                      "additionalProperties": false
+                    },
+                    "alert": {
+                      "type": "object",
+                      "properties": {
+                        "on": {
+                          "default": "never",
+                          "type": "string",
+                          "enum": [
+                            "any-change",
+                            "threshold",
+                            "never"
+                          ]
+                        },
+                        "thresholdPct": {
+                          "type": "number",
+                          "exclusiveMinimum": 0
+                        },
+                        "quietHours": {
+                          "type": "number",
+                          "minimum": 0
+                        },
+                        "severity": {
+                          "type": "string",
+                          "enum": [
+                            "info",
+                            "warn",
+                            "critical"
+                          ]
+                        }
+                      },
+                      "required": [
+                        "on"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "kind": {
+                      "type": "string",
+                      "const": "api"
+                    },
+                    "jsonPath": {
+                      "type": "string",
+                      "minLength": 1
+                    }
+                  },
+                  "required": [
+                    "key",
+                    "label",
+                    "presenter",
+                    "required",
+                    "regexGroup",
+                    "trim",
+                    "type",
+                    "locale",
+                    "kind",
+                    "jsonPath"
+                  ],
+                  "additionalProperties": false
+                }
+              ]
+            }
+          },
+          "notes": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "label",
+          "entityId",
+          "sectionId",
+          "kind",
+          "url",
+          "renderer",
+          "method",
+          "proxy",
+          "schedule",
+          "extractors"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "defaults": {
+      "type": "object",
+      "properties": {
+        "renderer": {
+          "type": "string",
+          "enum": [
+            "static",
+            "browser"
+          ]
+        },
+        "proxy": {
+          "type": "string",
+          "enum": [
+            "none",
+            "edge"
+          ]
+        },
+        "politeness": {
+          "type": "object",
+          "properties": {
+            "minIntervalMs": {
+              "type": "integer",
+              "minimum": 0,
+              "maximum": 9007199254740991
+            },
+            "userAgent": {
+              "type": "string"
+            },
+            "respectRobotsTxt": {
+              "default": true,
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "respectRobotsTxt"
+          ],
+          "additionalProperties": false
+        },
+        "timeoutMs": {
+          "type": "integer",
+          "exclusiveMinimum": 0,
+          "maximum": 9007199254740991
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "additionalProperties": false
+    },
+    "alerting": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": [
+            "github-issue",
+            "webhook",
+            "email"
+          ]
+        },
+        "webhookUrlEnv": {
+          "type": "string"
+        },
+        "emailToEnv": {
+          "type": "string"
+        },
+        "minSeverity": {
+          "default": "warn",
+          "type": "string",
+          "enum": [
+            "info",
+            "warn",
+            "critical"
+          ]
+        }
+      },
+      "required": [
+        "channel",
+        "minSeverity"
+      ],
+      "additionalProperties": false
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "environment",
+    "sections",
+    "targets"
+  ],
+  "additionalProperties": false
+}
