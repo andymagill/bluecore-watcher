@@ -2,7 +2,7 @@
 
 Per ADR-001, config is the entire surface on which a new environment is stood up. If adding a client requires a code change, that is a defect in this schema.
 
-Authored as TypeScript (`config/<environmentId>.config.ts`), type-checked at author time, and validated against a generated JSON Schema in CI. The TypeScript is the source of truth; the JSON Schema is derived from it.
+Authored as TypeScript (`config/<environmentId>.config.ts`), type-checked at author time, and validated against a generated JSON Schema in CI. The types below are defined as Zod schemas in `src/config/schema.ts`; TypeScript types are inferred from them (`z.infer`), and the JSON Schema is generated from the same schemas (`scripts/schema-gen.ts`) — one definition, two derived artifacts, never hand-maintained in parallel.
 
 ---
 
@@ -55,7 +55,7 @@ export interface TargetDef {
   entityId: string;           // → EntityDef.id
   sectionId: string;          // → SectionDef.id
 
-  kind: "html" | "api" | "pdf";
+  kind: "html" | "api";        // v1 handlers (ADR-010); a new kind adds a member here — see §7
   url: string;
   renderer?: "static" | "browser";   // cheerio | playwright. Default "static"
   method?: "GET" | "POST";
@@ -82,6 +82,7 @@ export interface ScheduleDef {
   ttlHours: number;           // age past which the UI calls it stale
   jitterSeconds?: number;     // default 0–120, avoids thundering herd
   staleCeilingHours?: number; // overrides environment multiplier
+  ttlOverrideReason?: string; // required when ttlHours < 2× the cron interval — see rule 5
 }
 
 export interface PolitenessDef {
@@ -110,22 +111,18 @@ Prose, mandatory in practice. "Table is server-rendered but the header row count
 
 ## 3. Extractor
 
+Per ADR-010, location is a **discriminated union keyed on `kind`** — the target's `kind`, not a per-extractor field — so a config for an `html` target cannot accidentally carry `jsonPath`, and adding a new kind adds a union member rather than widening a flat bag of optional fields. Narrowing, typing, and validation are kind-agnostic and shared across every member.
+
 ```ts
-export interface ExtractorDef {
+export type ExtractorDef = ExtractorBase & LocationDef;
+
+interface ExtractorBase {
   key: string;                // stable, unique within target; becomes block.key
   label: string;              // human-facing
   presenter: "metric" | "markdown" | "list" | "status";
   required?: boolean;         // default false; true → failure fails the target
 
-  // ---- Location (one family per `kind`) ----
-  selector?: string;          // CSS, kind: "html"
-  attr?: string;              // default: text content
-  multiple?: boolean;         // declares intent; absent + >1 match = AMBIGUOUS
-  jsonPath?: string;          // kind: "api"
-  pageRange?: string;         // kind: "pdf", e.g. "1-3"
-  textAnchor?: string;        // kind: "pdf", literal text preceding the value
-
-  // ---- Narrowing ----
+  // ---- Narrowing (applied after location resolves rawText) ----
   regex?: string;
   regexGroup?: number;        // default 1
   trim?: boolean;             // default true
@@ -143,17 +140,34 @@ export interface ExtractorDef {
   alert?: AlertDef;
 }
 
+// One member per handler. v1 ships exactly these two.
+type LocationDef =
+  | { kind: "html"; selector: string; attr?: string; multiple?: boolean }
+  | { kind: "api"; jsonPath: string };
+```
+
+`kind` here mirrors `TargetDef.kind` (§2) — a config validation rule (see §5) requires them to match, since one target's extractors all share its fetch/parse family. `multiple` declares intent for `html`; a selector matching more than one node without it is `SELECTOR_AMBIGUOUS`, not a silent first match. `api` extractors are inherently single-valued per `jsonPath`; a `list` presenter over an `api` target maps a `jsonPath` that resolves to an array.
+
+**Adding a source kind is additive, not a schema rewrite.** See §7.
+
+```ts
 export interface AssertDef {
   notEmpty?: boolean;
   min?: number;
   max?: number;
   pattern?: string;           // regex the final value must satisfy
   maxLength?: number;
-  maxChangePct?: number;      // vs previous committed value
+  minItems?: number;          // presenter: "list" only — bounds array length
+  maxItems?: number;          // presenter: "list" only
+  maxChangePct?: number;      // vs previous committed value; for "list", vs item count
   maxChangeAbs?: number;
   expectMonotonic?: "increasing" | "decreasing";
 }
+```
 
+For `multiple: true` / `presenter: "list"` extractors: `notEmpty`, `pattern`, and `maxLength` apply **per item** in the resulting array. `minItems`/`maxItems` bound the array itself. `maxChangePct`/`maxChangeAbs` compare item **count** against the previous committed count — see `01-DATA-CONTRACT.md` §4.1.
+
+```ts
 export interface AlertDef {
   on: "any-change" | "threshold" | "never";   // default "never"
   thresholdPct?: number;
@@ -210,11 +224,11 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 2. Every `target.entityId` and `target.sectionId` resolves.
 3. `target.id` is unique and filename-safe (`^[a-z0-9][a-z0-9-]*$`).
 4. `extractor.key` is unique within its target.
-5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, or the target carries an explicit `// eslint-disable`-style override with a reason.
-6. Location fields match `kind`: `selector`/`attr` require `html`; `jsonPath` requires `api`; `pageRange`/`textAnchor` require `pdf`.
+5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, **or** `schedule.ttlOverrideReason` is a non-empty string. *(Corrected 2026-09-12 — the original override mechanism was a `// eslint-disable`-style comment, which a JSON Schema / Zod validator cannot see. `ttlOverrideReason` is a real schema field so the override is machine-checkable and self-documenting.)*
+6. Location fields match `kind` per the discriminated union in §3: `{ kind: "html", selector, ... }` requires the target's `kind` to be `"html"`; `{ kind: "api", jsonPath }` requires `"api"`. Mismatch is a type error at author time (the union makes it unrepresentable), and a defence-in-depth runtime check for anything hand-constructed.
 7. `type` and `presenter` are compatible per the table in §3.
-8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`.
-9. Every `secretEnv` and `*Env` name is present in the environment at run time, or the target is skipped with `AUTH_ERROR` rather than failing the whole run.
+8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`. `minItems`/`maxItems` set ⟹ `presenter: "list"`.
+9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the *name*, not the *value*, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. *(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)*
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
 
@@ -225,9 +239,12 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 Illustrative shapes only — real URLs and selectors are blocked on open question Q1.
 
 ```ts
-import type { CmieConfig } from "../src/types/config";
+// CmieConfigInput is the pre-defaults authoring type (z.input) — fields like
+// renderer, proxy, jitterSeconds, regexGroup, trim, and locale are optional
+// here and filled in by the schema at validation time.
+import type { CmieConfigInput } from "../src/config/schema";
 
-export const config: CmieConfig = {
+export const config: CmieConfigInput = {
   schemaVersion: 1,
 
   environment: {
@@ -343,10 +360,13 @@ export const config: CmieConfig = {
 
 ---
 
-## 7. Known gap: PDF sources
+## 7. Adding a source kind
 
-The `pdf` kind is sketched (`pageRange`, `textAnchor`) but **not designed**. It is a genuinely different extraction model — text position rather than DOM structure, no stable anchors, and scanned documents need OCR, which pulls in a dependency and an accuracy question that sits uncomfortably beside a determinism guarantee.
+Per ADR-010, `kind` is a registry, not a closed switch statement. Adding one — `pdf` included — is a fixed recipe, and none of it touches an existing handler:
 
-Per open question Q2, this is deliberately deferred until the real source list exists. If PDFs turn out to be a large share of the Bluecore sources, the `pdf` kind needs its own design pass and the Cheerio-first stack constraint in SPEC Part 2 §1 is wrong as written.
+1. **Add a `LocationDef` union member** in §3, e.g. `{ kind: "pdf"; pageRange: string; textAnchor: string }`. The union makes an extractor's location fields exhaustively kind-correct at the type level — rule 6 becomes close to unnecessary rather than the primary defence.
+2. **Implement the handler** — `parse(fetchResult) → Document` and `locate(doc, extractor) → { rawText, resolvedAnchor, matchCount }`. This is the only kind-specific code. Regex narrowing, `type` coercion, `displayValue` formatting, provenance, and `contentHash` are shared pipeline code (`03-INGESTION.md` §1 "extract") and need no changes.
+3. **Register the handler** against `kind` in the handler map (`src/ingest/extract/`).
+4. **Add a fixture and a unit test.** No config, no live target, no ADR required to ship the module — only to point a real target at it.
 
-Do not build PDF extraction speculatively.
+**PDF specifically remains unbuilt** until a triaged source is one — see `05-SOURCES.md` §1. The reasons it's a genuinely different extraction model still apply and belong in its handler's design, not in this schema: text position rather than DOM structure, no stable anchors, and a scanned document needs OCR, which pulls in a dependency and an accuracy question that sits uncomfortably beside a determinism guarantee — likely a labelled, lower-confidence result class rather than a normal one. None of that is a reason to delay building the *other* v1 handlers, which is the mistake the original framing invited.

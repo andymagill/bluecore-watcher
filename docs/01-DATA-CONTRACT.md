@@ -62,7 +62,7 @@ Fetched first. Everything else is discovered from it.
       "entityId": "bluecore-energy",
       "label": "Port of Albany — Berth Capacity",
       "path": "sections/target/port-albany-capacity.json",
-      "ttlHours": 24,
+      "ttlHours": 72,
       "lastRunStatus": "ok",
       "lastSuccessAt": "2026-09-11T06:00:09Z"
     }
@@ -78,6 +78,8 @@ Fetched first. Everything else is discovered from it.
 
 `runId` doubles as the cache-buster: the SPA appends `?r=<runId>` to every data fetch, so a fresh `main` build never serves stale JSON from a CDN edge.
 
+**`manifest.targets[].lastSuccessAt` and `.lastRunStatus` are the scheduling source of truth.** The ingestion `plan` step (`03-INGESTION.md` §1) reads this array to compute `dueAt` per target. `health.json` records failures and their history; it has no entry for a target that has only ever succeeded, so it cannot answer "when did this last run."
+
 ---
 
 ## 3. Target file
@@ -90,7 +92,7 @@ Fetched first. Everything else is discovered from it.
   "sectionId": "target",
   "label": "Port of Albany — Berth Capacity",
   "sourceUrl": "https://example.gov/port/capacity",
-  "ttlHours": 24,
+  "ttlHours": 72,
   "run": {
     "runId": "2026-09-11T06-00-00Z-a1b2c3d",
     "startedAt": "2026-09-11T06:00:04Z",
@@ -138,6 +140,7 @@ A block is one rendered fact. Every block carries its own provenance — not inh
     "contentHash": "sha256:9f2a…"
   },
   "delta": {
+    "kind": "scalar",
     "previousValue": 46800,
     "previousExtractedAt": "2026-09-04T06:00:07Z",
     "changedAt": "2026-09-11T06:00:08Z",
@@ -162,7 +165,7 @@ A block is one rendered fact. Every block carries its own provenance — not inh
 
 **`provenance.anchor`** is the resolved selector path, not the configured one. If config says `.capacity-table td` and it matched, the anchor records which node — so a future ambiguity failure is diagnosable.
 
-**`delta`** is `null` on first extraction and when `contentHash` is unchanged. `changedAt` is the extraction time at which the value *became* this value, and it survives runs where nothing changed — this is what powers "unchanged for 34 days."
+**`delta`** is `null` only on first extraction. On every subsequent run it is present: when `contentHash` changed, it is recomputed against the previous value; when `contentHash` is unchanged, the entire object — including `changedAt` — is **carried forward untouched** from the prior committed file. `changedAt` is the extraction time at which the value *became* its current value, and because it survives unchanged runs, it is what powers "unchanged for 34 days" (see `04-FRONTEND.md` §4). *(Corrected 2026-09-12 — this file previously said `delta` is null when `contentHash` is unchanged, which is incompatible with `changedAt` surviving unchanged runs, since `changedAt` lives inside `delta`. `03-INGESTION.md` §1 "diff" was already correct; this file was the bug.)*
 
 **`validation.warnings`** is non-empty when a change guard quarantined a candidate value. Each warning records the rejected candidate, the guard that rejected it, and the retained value — everything a human needs to adjudicate without re-fetching. See §6.
 
@@ -174,6 +177,53 @@ A block is one rendered fact. Every block carries its own provenance — not inh
 | `cached` | This run failed; value is from a prior successful run. | Value + failure marker |
 | `flagged` | A new value was extracted but quarantined by a change guard. **The displayed value is the prior one**; the candidate is recorded in `validation.warnings` and in the health log for adjudication. | Prior value + caution marker |
 | `missing` | Configured but never successfully extracted. | Zero-state |
+
+**`missing` is the one status where `provenance` and `delta` are `null`** rather than the object shapes in §4/§4.1 — there is no prior value to attribute or diff against. Every other status carries full, non-null provenance, consistent with Invariant 2 ("every *rendered* value has a sourceUrl, anchor, extractedAt, and rawText") — `missing` renders nothing.
+
+---
+
+## 4.1 Multi-value blocks (`presenter: "list"`)
+
+The block envelope in §4 assumes a scalar `value`. The `list` presenter (`multiple: true`) is v1 scope per `02-CONFIG-SCHEMA.md` §3, and needs its own shape — added here because it was undefined in the original contract.
+
+```json
+{
+  "key": "active_dockets",
+  "label": "Active Dockets",
+  "presenter": "list",
+  "type": "string",
+  "status": "ok",
+  "value": ["Docket 2024-113: Filed", "Docket 2024-098: Under Review"],
+  "displayValue": ["Docket 2024-113: Filed", "Docket 2024-098: Under Review"],
+  "provenance": {
+    "sourceUrl": "https://example.gov/puc/dockets",
+    "anchor": [".docket-list li:nth-child(1)", ".docket-list li:nth-child(2)"],
+    "extractedAt": "2026-09-11T06:00:08Z",
+    "rawText": ["Docket 2024-113: Filed", "Docket 2024-098: Under Review"],
+    "contentHash": "sha256:7c1e…"
+  },
+  "delta": {
+    "kind": "set",
+    "added": ["Docket 2024-098: Under Review"],
+    "removed": [],
+    "count": 2,
+    "previousCount": 1,
+    "changedAt": "2026-09-11T06:00:08Z"
+  },
+  "validation": { "passed": true, "warnings": [] }
+}
+```
+
+**Differences from a scalar block:**
+
+- `value`, `displayValue`, `provenance.rawText`, `provenance.anchor` are all arrays, one entry per matched item, in matched order.
+- `provenance.contentHash` hashes the normalized item array (joined, stable order) — not any single item.
+- `delta` is a **union**, discriminated by `kind`:
+  - `ScalarDelta` — `{ kind: "scalar", previousValue, previousExtractedAt, changedAt, direction, absolute, percent }`, used by every non-list presenter.
+  - `SetDelta` — `{ kind: "set", added: string[], removed: string[], count, previousCount, changedAt }`, used by `list`. **`direction` does not apply to a set and must be absent, not zero** — a set has no single direction of movement.
+- `delta` is still `null` only on first extraction, and still carried forward untouched (per §4) when `contentHash` is unchanged.
+
+**Validation semantics for `multiple: true`:** shape assertions (`notEmpty`, `pattern`, `maxLength`) apply **per item** — each string in the array must individually satisfy them. `assert.minItems` / `assert.maxItems` (see `02-CONFIG-SCHEMA.md` §3) bound the array length. Change-magnitude guards (`maxChangePct`, `maxChangeAbs`) apply to **item count**, comparing `count` against `previousCount` — there is no meaningful "percent change" of a set of strings.
 
 ---
 
@@ -284,6 +334,7 @@ Non-negotiable properties. Each should have a test.
 4. Data files validate against their JSON Schema before merge, and an invalid file blocks the merge.
 5. `main` only ever contains data that has been proven to render.
 6. No block is published with a value that failed a hard assertion.
-7. Every file is deterministic given the same input: key order stable, timestamps the only expected churn. A run that changes nothing produces a zero-line diff.
+7. **Serialization is deterministic, and a semantically-unchanged run produces no commit at all** (ADR-011). Key order is stable and byte-for-byte reproducible for the same logical content. This is *not* "timestamps never move" — `provenance.extractedAt` must advance on every successful re-verification, or the freshness state machine in §5 cannot distinguish a value checked an hour ago from one checked 90 days ago and never touched since. Instead, `persist` computes a semantic fingerprint per run (block `key` + `status` + `contentHash` + typed `value`, target metadata, and the health entry set — explicitly excluding `runId` and all timestamps) and skips the commit entirely when every fingerprint matches the previous one. *(Restated 2026-09-12 — the original wording paired "timestamps are the only expected churn" with "an unchanged run produces a zero-line diff," which are incompatible: timestamp movement is itself diff content. See ADR-011.)*
+8. `firstSeenAt` and `consecutiveFailures` in `health.json` are computed from the previous **committed** health plus the current run's artifact — never reset by a run whose gate fails. A run that never reaches `main` must not erase the maintenance backlog it was trying to report.
 
 Invariant 7 matters more than it looks. Non-deterministic serialization produces noisy diffs, noisy diffs make ingestion PRs unreviewable, and unreviewable PRs quietly become auto-merged — at which point the audit trail is decorative.

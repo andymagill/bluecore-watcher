@@ -79,6 +79,8 @@ Section identifiers are configuration, not framework constants. Another environm
 
 **[Amended]** The maintenance row previously read "Low." Rigid DOM selectors across ~20 sources break on a predictable cadence, and because the dashboards are operated as a service, that cost falls on the operator rather than the client. The honest claim is that maintenance is low *relative to running database and pipeline infrastructure*, not that it is negligible. Current working estimate and its basis are in `docs/06-OPS-RUNBOOK.md` §7.
 
+**[Amended 2026-09-12 — ADR-013.]** Host is Cloudflare (Pages + Workers), not Vercel — Vercel was never an accepted decision, despite appearing throughout this document and the decision log until this correction. "Near-Zero" infrastructure cost is comparative, not literal: it holds through M1–M3 on free tiers (GitHub Actions, Cloudflare Pages, a Git repo). Whether the first client deliverable (M4) forces a paid Cloudflare tier is unverified as of this writing — the earlier version of this note asserted a specific Vercel Hobby restriction that does not simply carry over to a different vendor. Still near-zero next to the $5k–$25k/seat/year rows beside it either way.
+
 ## **Part 2: Technology Stack & Configuration Schema**
 
 ### **1. Technology Stack Constraints**
@@ -89,13 +91,13 @@ Section identifiers are configuration, not framework constants. Another environm
   * **Cheerio:** Primary lightweight HTML parser for static pages and fast execution.
   * **Playwright:** Strictly reserved as an optional fallback for complex, client-side rendered (SPA) targets requiring JavaScript execution.
 
-> **Unvalidated.** This constraint assumes the source set is predominantly HTML. If PDFs or session-state web applications are a meaningful share, it is wrong as written. Resolution depends on the source triage in `docs/05-SOURCES.md` (open question Q2).
+> **[Amended 2026-09-12 — ADR-010.]** Extraction is a handler registry keyed on `kind`, not a hard commitment to two libraries. Cheerio and Playwright are the v1 handlers because the anticipated source set is predominantly HTML; a PDF or other non-HTML share no longer invalidates the architecture — it's an additional handler module (`docs/02-CONFIG-SCHEMA.md` §7). Q2 is downgraded to informational: it affects build order, not this constraint.
 
 ### **2. Configuration Schema Contract**
 
 Full schema in `docs/02-CONFIG-SCHEMA.md`.
 
-The configuration defines environment metadata, entity definitions, section definitions, and an array of target extraction sources. Each target specifies its entity, section mapping, extraction kind (`html`, `api`, `pdf`), source URL, renderer, execution schedule, TTL threshold, optional authentication environment variable keys, politeness controls, and a collection of extractors defining keys, labels, presenters, value types, selectors, regex patterns, validation assertions, and alert rules.
+The configuration defines environment metadata, entity definitions, section definitions, and an array of target extraction sources. Each target specifies its entity, section mapping, extraction kind (`html` or `api` in v1 — a registry per ADR-010, not a closed set), source URL, renderer, execution schedule, TTL threshold, optional authentication environment variable keys, politeness controls, and a collection of extractors defining keys, labels, presenters, value types, selectors, regex patterns, validation assertions, and alert rules.
 
 Per ADR-001, configuration is the entire surface on which a new environment is stood up. If adding a client requires an application code change, that is a defect in the schema.
 
@@ -154,7 +156,7 @@ Data files are part of the production build output and are served from the produ
 
 Cache correctness is handled by the manifest: `manifest.json` is served short-cache, and its `runId` query-busts every section file, so long-lived CDN caching of data files cannot serve a stale snapshot.
 
-*The original design mapped a long-lived `data` branch to the production domain root. Vercel maps one branch per project to production, so that approach assumed a capability that does not exist natively.*
+*The original design mapped a long-lived `data` branch to the production domain root. The static host (Cloudflare Pages, per ADR-013) maps one branch per project to production, so that approach assumed a capability that does not exist natively.*
 
 ## **Part 6: Known Gaps**
 
@@ -163,10 +165,14 @@ Cache correctness is handled by the manifest: `manifest.json` is served short-ca
 * **Access control.** The specification defined no authentication. v1 ships without it, which means the deployment is public and nothing damaging-if-crawled may be ingested until whole-site auth lands (ADR-004).
 * **Legal posture.** robots.txt stance, target-site terms of service, and rate-limiting policy are unwritten. Required before any client deliverable (open question Q6).
 * **Source inventory.** The engine is specified; its fuel is not. `docs/05-SOURCES.md` is empty and blocks all extraction work (open question Q1).
-* **PDF extraction.** Sketched, not designed. Deliberately deferred until the source triage says whether it matters (open question Q2).
+* **PDF extraction.** Unbuilt, not undesigned — ADR-010 made source kinds additive, so this is a handler module to write once a triaged source needs it, not an architectural risk.
 
 ---
 
 ## Amendment Log
 
 **2026-09-11** — Amended following an architecture review. Changes: Current-State Snapshot principle now includes deltas (ADR-002); Extraction Integrity added as a principle; GitOps principle and Part 3 §5 rewritten for the validated-preview-merge model (ADR-005); Part 5 rewritten, long-lived `data/latest` branch retired; Zero-LLM Runtime scoped to the data path (ADR-003); maintenance claim in the positioning table softened to "Low–Moderate" with rationale; list/status presenters, delta indicators and provenance disclosure added to Part 4; freshness state machine made explicit; Part 6 added for known gaps. Architecture diagram re-rendered as a code block (the original had been mangled by Markdown escaping) and updated to match the new pipeline. Decision record: `docs/00-DECISIONS.md`.
+
+**2026-09-12** — Amended following an implementation-readiness review. The Part 2 §1 stack constraint is no longer "unvalidated pending Q2" — ADR-010 made extraction a handler registry, so a source-kind mix can no longer invalidate the architecture, only the build order. Part 6's PDF gap reworded on the same basis. Four internal contradictions closed in `docs/00-DECISIONS.md` through `docs/06-OPS-RUNBOOK.md` (ADR-008 through ADR-012); see that log for detail. `docs/07-ROADMAP.md` corrected: the engine core (M0.5) does not block on source triage (Q1/M0) — it runs concurrently, per ADR-001's own premise that the engine is source-independent. A later pass the same day fixed two remaining staleness bugs: Part 2 §2 still listed `pdf` as a v1 extraction kind after ADR-010 removed it (`docs/02-CONFIG-SCHEMA.md` §2 had the same bug, fixed there too); and the positioning table's "Near-Zero" infrastructure cost row hadn't picked up ADR-007's Vercel-Hobby-excludes-commercial-use caveat, added the same day to `docs/06-OPS-RUNBOOK.md` and `README.md` but missed here.
+
+**2026-09-12 (later same day)** — Corrected under ADR-013: **Vercel was never an accepted decision.** Every reference to it in this document, `docs/00-DECISIONS.md`, `docs/03-INGESTION.md`, `docs/06-OPS-RUNBOOK.md`, `docs/07-ROADMAP.md`, and `README.md` is fixed to Cloudflare (Pages for the SPA and its preview deploys, Workers for the edge relay). ADR-005's branch/preview/gate mechanics are unchanged — Cloudflare Pages' branch-to-deployment model matches closely enough that only the vendor name and specific tokens/secrets moved. The Vercel-Hobby-excludes-commercial-use cost-floor finding from the previous entry does **not** carry over automatically; ADR-007's note now says so explicitly rather than restating an unverified number for a different vendor.

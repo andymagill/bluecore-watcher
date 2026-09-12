@@ -1,0 +1,39 @@
+{
+  "name": "bluecore-watcher",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint . --max-warnings 0",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "schema:gen": "tsx scripts/schema-gen.ts",
+    "schema:check": "tsx scripts/schema-gen.ts --check",
+    "validate:config": "tsx scripts/validate-config.ts",
+    "ingest": "tsx scripts/ingest.ts",
+    "gate": "tsx scripts/gate.ts"
+  },
+  "dependencies": {
+    "ajv-formats": "^3.0.1",
+    "cheerio": "^1.0.0",
+    "date-fns": "^4.1.0",
+    "domhandler": "5.0.3",
+    "jsonpath-plus": "^10.3.0",
+    "undici": "^7.4.0",
+    "zod": "^4.0.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.19.0",
+    "@types/node": "^22.14.0",
+    "ajv": "^8.17.1",
+    "eslint": "^9.19.0",
+    "tsx": "^4.21.0",
+    "typescript": "~5.8.2",
+    "typescript-eslint": "^8.22.0",
+    "vitest": "^3.0.4"
+  }
+}

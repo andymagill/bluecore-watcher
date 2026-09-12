@@ -15,7 +15,7 @@ The central property: **`main` only ever contains data that has been proven to r
                                                       branch + push
                                                                  │
                                                                  ▼
-                                                    Vercel preview deploy
+                                              Cloudflare Pages preview deploy
                                                                  │
                                                                  ▼
                                           ┌──────── GATE ────────┐
@@ -33,7 +33,7 @@ The central property: **`main` only ever contains data that has been proven to r
 
 ### plan
 
-Read config. For each target compute `dueAt` from `schedule.cron` and the last run recorded in `health.json`. Build the queue from targets that are due, plus any whose data age exceeds `ttlHours` regardless of cron — a target that has been failing should be retried even between scheduled slots.
+Read config. For each target compute `dueAt` from `schedule.cron` and `manifest.targets[].lastSuccessAt` / `.lastRunStatus` — **not** `health.json`, which has no entry for a target that has only ever succeeded and so cannot answer "when did this last run" (see `01-DATA-CONTRACT.md` §2). Build the queue from targets that are due, plus any whose data age exceeds `ttlHours` regardless of cron — a target that has been failing should be retried even between scheduled slots.
 
 Apply `jitterSeconds`. Group by host so `politeness.minIntervalMs` can be enforced per host rather than globally.
 
@@ -67,10 +67,10 @@ Extractor failures are isolated. One broken extractor among ten produces `run.st
 
 Per `01-DATA-CONTRACT.md` §6:
 
-- Shape assertions (`min`, `max`, `pattern`, `maxLength`, `notEmpty`, `enumValues`). Failure → `ASSERTION_FAILED`, retain cached value, block `status: cached`.
-- Change-magnitude guards (`maxChangePct`, `maxChangeAbs`, `expectMonotonic`) against the previous committed value. Trip → `CHANGE_GUARD_TRIPPED`, **do not publish**, block `status: flagged`, health entry carries both figures for adjudication.
+- Shape assertions (`min`, `max`, `pattern`, `maxLength`, `notEmpty`, `enumValues`, `minItems`/`maxItems` for `list`). Failure → `ASSERTION_FAILED`, retain cached value, block `status: cached`.
+- Change-magnitude guards (`maxChangePct`, `maxChangeAbs`, `expectMonotonic`; for `list`, applied to item count per `01-DATA-CONTRACT.md` §4.1) against the previous committed value. Before quarantining, check the committed acknowledgements file (ADR-012) for an entry matching `targetId.extractorKey` + this candidate's `contentHash` — a match publishes the value and consumes the entry. Otherwise, trip → `CHANGE_GUARD_TRIPPED`, **do not publish**, block `status: flagged`, health entry carries both figures for adjudication.
 
-The asymmetry is deliberate: a hard assertion rejects, a change guard quarantines.
+The asymmetry is deliberate: a hard assertion rejects, a change guard quarantines (subject to acknowledgement).
 
 ### diff
 
@@ -84,9 +84,12 @@ Then evaluate `alert`. Alerts are computed here, written to a run artifact, and 
 
 ### persist
 
-Write `manifest.json`, `health.json`, and each `sections/<sectionId>/<targetId>.json`.
+Compute a **semantic fingerprint** for the run (ADR-011): per block, `key` + `status` + `contentHash` + typed `value`; per target, `label`/`sourceUrl`/`ttlHours`; plus the health entry set including `consecutiveFailures` — explicitly excluding `runId` and every timestamp. Compare against the fingerprint of the previous committed state.
 
-Serialization is stable: sorted keys, 2-space indent, trailing newline. Per invariant 7, a run that changes nothing must produce a zero-line diff. If ingestion PRs are noisy, nobody reads them, and the audit trail becomes decorative.
+- **No fingerprint changed** → write nothing, exit 0, no branch (§2 step 4). This is the common case on a slow-moving source set.
+- **Something changed** → write `manifest.json`, `health.json`, and each changed `sections/<sectionId>/<targetId>.json`. Serialization is stable: sorted keys, 2-space indent, trailing newline. `firstSeenAt`/`consecutiveFailures` in the new `health.json` are computed from the **previous committed** health plus this run's artifact, so a run that never reaches `main` (gate failure) cannot erase the backlog it was reporting.
+
+Per invariant 7 (`01-DATA-CONTRACT.md` §8, restated under ADR-011), determinism means *no semantic change → no commit* — not that timestamps never move within a commit that does happen. `provenance.extractedAt` on every fetched target advances honestly; that is expected content in a run that does write.
 
 Targets not in this run's queue are left byte-identical.
 
@@ -105,9 +108,9 @@ Serialized. Two overlapping runs both forking from `main` is a merge conflict in
 1. Checkout `main` (shallow, `--depth=1`).
 2. Create `ingest/<runId>`.
 3. Run the orchestrator.
-4. **If no files changed, exit 0 with no branch.** Most runs on a slow-moving source set should end here.
+4. **If no fingerprint changed (ADR-011), exit 0 with no branch.** Most runs on a slow-moving source set should end here.
 5. Commit with a message summarising the run: `data: 3 targets updated, 1 failed (runId)`.
-6. Push the branch. Vercel builds a preview.
+6. Push the branch. Cloudflare Pages builds a preview.
 7. Run the gate (§3).
 8. Pass → squash-merge into `main`, delete branch. Fail → leave the branch, open or update a GitHub issue with the health entries, exit non-zero.
 
@@ -117,7 +120,7 @@ A failed gate leaves production serving the last good data. That is the correct 
 
 ## 3. The gate
 
-A preview deploy that nothing checks is ceremony. Three checks, all blocking:
+A preview deploy that nothing checks is ceremony. Three checks, all blocking — **built in two stages** (amended ADR-005). Checks 1–2 are offline and ship with the engine spine, before any real target or Cloudflare Pages deployment exists. Check 3 needs an actual preview URL and a SPA to render, so it ships alongside the first real target. "`main` only contains data proven to render" holds at both stages; check 3 is what extends the proof to the real deployed artifact.
 
 **1. Schema validation (offline).** Every written file validates against the generated JSON Schema. A failure here is `SCHEMA_INVALID` and always an engine defect, never a source problem.
 
@@ -181,6 +184,6 @@ The drift check is the highest-leverage test in this list and the one easiest to
 | CI minutes | ~2 min/run static-only; +40s per browser target | GitHub free tier is 2,000 min/month — one daily run with a few browser targets is comfortable |
 | Commits | 1 squashed commit per run with changes | ~365/year daily; revisit at ~2,000 (Q7) |
 | Repo size | JSON only, kilobytes per run | Fixtures dominate — keep them trimmed, not whole-page dumps |
-| Preview deploys | 1 per run with changes | Within Vercel hobby limits at daily cadence |
+| Preview deploys | 1 per run with changes | Within Cloudflare Pages free-tier limits at daily cadence |
 
 Hourly cadence changes this picture materially — ~8,760 commits/year and 8,760 preview builds. If a source genuinely needs hourly polling, that is the moment to reconsider whether the gate should run on every cycle or on a batched one.
