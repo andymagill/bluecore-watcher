@@ -5,7 +5,10 @@
   // is Vite's build output (docs/07-ROADMAP.md M1, 04-FRONTEND.md).
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "bluecore-watcher",
-  "compatibility_date": "2026-09-12",
+  // NOT "today" -- Cloudflare rejects a compatibility_date set in the
+  // future relative to its own servers' clock, which this session's local
+  // "today" (2026) is. Pinned to a safely-past, well-supported date instead.
+  "compatibility_date": "2024-09-23",
   "assets": {
     "directory": "./dist"
   }
