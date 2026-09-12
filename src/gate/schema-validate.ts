@@ -20,7 +20,7 @@ export interface SchemaValidationResult {
   errors: string[]; // "SCHEMA_INVALID" per 01-DATA-CONTRACT.md §7 — always an engine defect
 }
 
-export async function loadSchema(schemasDir: string, filename: string): Promise<object> {
+async function loadSchema(schemasDir: string, filename: string): Promise<object> {
   return JSON.parse(await readFile(join(schemasDir, filename), "utf-8"));
 }
 

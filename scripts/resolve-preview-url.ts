@@ -23,10 +23,10 @@
 // Usage: tsx scripts/resolve-preview-url.ts --sha <commit-sha> [--timeout-ms 180000]
 // Prints the resolved URL to stdout on success; exits 1 with a message on
 // timeout or a failed/errored build.
+import { readFile } from "node:fs/promises";
 import { setTimeout as sleep } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 
-const WORKER_NAME = "bluecore-watcher";
 const POLL_INTERVAL_MS = 10_000;
 
 function requireEnv(name: string): string {
@@ -38,6 +38,23 @@ function requireEnv(name: string): string {
 function getArg(flag: string): string | undefined {
   const idx = process.argv.indexOf(flag);
   return idx !== -1 ? process.argv[idx + 1] : undefined;
+}
+
+// wrangler.jsonc's "name" is the deploy-time source of truth for the Worker
+// name -- read it rather than restating it here, so a rename can't silently
+// desync this script from the config that actually deploys it. wrangler.jsonc
+// is JSONC (line comments only, no "//" inside any string value), so a
+// line-level strip is sufficient without pulling in a JSONC parser.
+async function readWorkerName(): Promise<string> {
+  const path = fileURLToPath(new URL("../wrangler.jsonc", import.meta.url));
+  const raw = await readFile(path, "utf-8");
+  const stripped = raw
+    .split("\n")
+    .map((line) => line.replace(/\/\/.*$/, ""))
+    .join("\n");
+  const match = (JSON.parse(stripped) as { name?: string }).name;
+  if (!match) throw new Error(`wrangler.jsonc has no "name" field (resolved path: ${path})`);
+  return match;
 }
 
 async function githubJson<T>(path: string, token: string): Promise<T> {
@@ -72,8 +89,9 @@ async function waitForBuildCheck(
   sha: string,
   token: string,
   deadline: number,
+  workerName: string,
 ): Promise<CheckRun> {
-  const checkName = `Workers Builds: ${WORKER_NAME}`;
+  const checkName = `Workers Builds: ${workerName}`;
   for (;;) {
     const { check_runs } = await githubJson<{ check_runs: CheckRun[] }>(
       `/repos/${repo}/commits/${sha}/check-runs`,
@@ -109,11 +127,12 @@ async function main() {
   const sha = getArg("--sha");
   if (!sha) {
     console.error(
-      "Usage: tsx scripts/resolve-preview-url.ts --sha <commit-sha> [--timeout-ms 180000]",
+      "Usage: tsx scripts/resolve-preview-url.ts --sha <commit-sha> [--timeout-ms 180000] [--worker-name <name>]",
     );
     process.exit(2);
   }
   const timeoutMs = Number(getArg("--timeout-ms") ?? 180_000);
+  const workerName = getArg("--worker-name") ?? (await readWorkerName());
 
   const githubToken = requireEnv("GITHUB_TOKEN");
   const cfToken = requireEnv("CLOUDFLARE_API_TOKEN");
@@ -122,7 +141,7 @@ async function main() {
 
   const deadline = Date.now() + timeoutMs;
 
-  const check = await waitForBuildCheck(repo, sha, githubToken, deadline);
+  const check = await waitForBuildCheck(repo, sha, githubToken, deadline, workerName);
   if (check.conclusion !== "success") {
     throw new Error(
       `Workers Builds check concluded "${check.conclusion}" for ${sha} -- build failed, no preview to gate against`,
@@ -132,7 +151,7 @@ async function main() {
   const versionId = parseVersionId(check.output.summary);
 
   const version = await cloudflareJson<{ annotations?: Record<string, string> }>(
-    `/accounts/${cfAccount}/workers/scripts/${WORKER_NAME}/versions/${versionId}`,
+    `/accounts/${cfAccount}/workers/scripts/${workerName}/versions/${versionId}`,
     cfToken,
   );
   const alias = version.annotations?.["workers/alias"];
@@ -146,7 +165,7 @@ async function main() {
     cfToken,
   );
 
-  const previewUrl = buildPreviewUrl(alias, WORKER_NAME, subdomain);
+  const previewUrl = buildPreviewUrl(alias, workerName, subdomain);
   console.log(previewUrl);
 }
 

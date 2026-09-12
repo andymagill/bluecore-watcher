@@ -161,6 +161,10 @@ export async function processExtractor<TDoc>(
   if (unchanged && previousBlock && previousBlock.provenance) {
     // Re-verified, nothing moved: extractedAt advances honestly (ADR-011),
     // delta is carried forward untouched (01-DATA-CONTRACT.md §4, corrected).
+    // The two branches are identical in substance -- the split exists because
+    // TS can't narrow the Block union through an object spread, so a single
+    // branch produces a provenance type that's a union of both shapes rather
+    // than the one matching `presenter`.
     const block: Block =
       previousBlock.presenter === "list"
         ? {
