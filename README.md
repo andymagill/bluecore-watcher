@@ -4,7 +4,7 @@ A configurable market intelligence engine: a static dashboard that renders a ver
 
 No database. No LLM in the data path. No hallucination surface.
 
-**Status: pre-implementation.** The architecture is specified and the decisions are recorded. No code has been written. See [Current blockers](#current-blockers).
+**Status: implementation started.** The architecture is specified, the decisions are recorded, and the doc-level contradictions found in review are closed. M0.5 (the source-independent engine spine — contract layer, config validator, extraction handlers, offline gate) is underway on `feature/m0.5-engine-spine`, concurrently with source triage. See [Current blockers](#current-blockers).
 
 ---
 
@@ -58,14 +58,14 @@ These are load-bearing. Violating one is a defect, not a trade-off.
 - **Freshness is computed at render time**, never baked into a build.
 - **A failed run never destroys a good value.** It marks it cached and says why.
 - **No value publishes that failed a hard assertion**, and a value that moves beyond its configured tolerance is quarantined for a human rather than published.
-- **Deterministic serialization.** A run that changes nothing produces a zero-line diff.
-- **Near-zero infrastructure cost.** Static CDN, a Git repo, and free-tier CI.
+- **Deterministic serialization.** A run in which nothing changed semantically produces no commit at all (ADR-011).
+- **Near-zero infrastructure cost, relative to the alternatives.** Static CDN, a Git repo, and free-tier CI. Host is Cloudflare (ADR-013); the real cost floor at the first client deliverable (M4) is unverified against Cloudflare's current terms (ADR-007).
 
 ---
 
 ## Stack
 
-React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Vercel
+React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Cloudflare Pages + Workers
 
 ---
 
@@ -73,24 +73,23 @@ React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingest
 
 | # | Blocker | Impact |
 |---|---|---|
-| Q1 | The source inventory is empty | Blocks all extraction work — the engine is specified, its fuel is not |
-| Q2 | Unknown share of PDF / session-state sources | Could invalidate the Cheerio-first stack constraint |
-| Q6 | robots.txt and ToS posture unwritten | Needed before any client deliverable |
+| Q1 | The source inventory is empty | Blocks M0–M2 config work and the client deliverable. **Does not block the engine spine** (M0.5) — that runs concurrently against a synthetic config, per ADR-001. |
+| Q6 | robots.txt and ToS posture unwritten | Needed before any client deliverable. Deferred to M3/M4 by decision. |
 
-Full list in [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md#open).
+Q2 (PDF / session-state share) is resolved as informational, not blocking — ADR-010 made source kinds additive, so no share of PDFs can invalidate the stack. Full list in [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md#open).
 
 ---
 
 ## Known gaps
 
 - **No authentication.** v1 deploys public. Nothing damaging-if-crawled may be ingested until whole-site auth lands (ADR-004).
-- **PDF extraction is sketched, not designed.** Deliberately deferred until the source triage says whether it matters.
+- **PDF extraction is unbuilt, not undesigned.** The extraction layer is a handler registry (ADR-010); a `pdf` handler is additive whenever a triaged source needs one — see `02-CONFIG-SCHEMA.md` §7.
 - **The edge proxy is unvalidated.** It may not defeat the blocking it exists to prevent. Evidence is being gathered per-source (ADR-006).
 
 ---
 
 ## Getting started
 
-Nothing to run yet. The first milestone is a walking skeleton — one real source driven end to end, from config through to a rendered value with a freshness badge and a delta chip. See [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md).
+M0.5 (engine spine) is in progress — see [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md). It builds the contract layer, config validator, and `html`/`api` extraction handlers against a synthetic config, proven with an offline dry run. No cron, no real target, no deploy yet.
 
-It starts with filling in `docs/05-SOURCES.md`.
+The walking skeleton (M1) — one real Bluecore source driven end to end, with a freshness badge and a delta chip in production — starts once both M0.5 and `docs/05-SOURCES.md` are done. Filling in that source inventory is the other concurrent track.

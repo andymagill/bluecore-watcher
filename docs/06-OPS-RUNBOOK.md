@@ -8,11 +8,13 @@ Per ADR-001 the dashboards are operated as a service. This document is the opera
 
 | Piece | Where | Notes |
 |---|---|---|
-| App + data | One Vercel project, builds from `main` | Static Vite output; `public/data/**` ships with the build |
+| App + data | One Cloudflare Pages project, builds from `main` | Static Vite output; `public/data/**` ships with the build |
 | Ingestion | GitHub Actions, cron | Concurrency group `ingest`, serialized |
-| Preview gate | Vercel preview per `ingest/*` branch | Blocks the merge |
-| Edge relay | Vercel function, separate route | Optional per target; PSK header (ADR-006) |
+| Preview gate | Cloudflare Pages preview per `ingest/*` branch | Blocks the merge |
+| Edge relay | Cloudflare Worker, separate route | Optional per target; PSK header (ADR-006) |
 | Alerts | GitHub Issues | v1 channel |
+
+Host is Cloudflare per ADR-013 — this table previously named Vercel throughout, which was never an accepted decision.
 
 Same-origin is satisfied trivially: data files are part of the build output, served from the production domain. The SPEC's Part 5 branch-mapping problem does not arise under ADR-005.
 
@@ -22,7 +24,7 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 | Name | Purpose |
 |---|---|
-| `VERCEL_TOKEN` | Preview URL resolution in the gate |
+| `CLOUDFLARE_API_TOKEN` | Preview URL resolution in the gate |
 | `INGEST_PSK` | Edge relay authentication |
 | `<SOURCE>_API_KEY` | Per authenticated source, named in config |
 
@@ -57,10 +59,11 @@ The routine failure. Expect these weekly.
 This is the system working. A number moved more than its configured tolerance and is waiting for a human.
 
 1. Open the source page. Is the new value real?
-2. **Real** → widen `maxChangePct`, merge, re-run. The guard was tuned too tight.
-3. **Wrong** → you just caught a silent-wrong before it published. Repair the selector per §3.
+2. **Real, and a one-off** (ADR-012) → add an entry to the committed acknowledgements file, keyed by `targetId.extractorKey` and the candidate's `contentHash`. Merge; the next run publishes that exact candidate and consumes the entry. The guard's tolerance is untouched, so it still catches the *next* anomalous move at the same target.
+3. **Real, and the source's normal volatility has changed** → widen `maxChangePct`, merge, re-run. Reserve this for when the guard was tuned too tight for how this source actually behaves, not for a single legitimate spike — widening on every real move ratchets the guard toward meaningless over time.
+4. **Wrong** → you just caught a silent-wrong before it published. Repair the selector per §3.
 
-If a guard trips repeatedly on legitimate movement, retune it immediately. A guard people learn to dismiss is worse than no guard at all, because it launders real failures into routine noise.
+If a guard trips repeatedly on legitimate movement, retune it (step 3) immediately. A guard people learn to dismiss is worse than no guard at all, because it launders real failures into routine noise.
 
 ---
 
@@ -130,7 +133,8 @@ If any step requires touching application code, ADR-001 is violated and the sche
 | Risk | Status |
 |---|---|
 | No authentication — deployment is public (ADR-004) | **Open.** Do not ingest anything damaging if crawled, until auth ships. |
-| robots.txt / ToS posture unwritten (Q6) | **Open.** Needed before any client deliverable. |
+| robots.txt / ToS posture unwritten (Q6) | **Deferred to M3/M4 by decision.** `respectRobotsTxt` defaults to `true` until then. Needed before any client deliverable. |
 | Git retention past ~2,000 commits (Q7) | Deferred. |
 | Single operator — no coverage | Accepted for now. The `notes` field and this runbook are the mitigation. |
 | Edge relay unvalidated (ADR-006) | Gathering evidence via §5. |
+| Cloudflare's actual free-tier terms for this usage pattern haven't been re-verified since the host correction (ADR-013) | **Open.** The retired Vercel-specific finding (Hobby tier prohibits commercial use, forcing Pro at M4) does not necessarily transfer to Cloudflare Pages. Verify before treating M4 as cost-free. |
