@@ -93,3 +93,5 @@ Q2 (PDF / session-state share) is resolved as informational, not blocking — AD
 M0.5 (engine spine) is in progress — see [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md). It builds the contract layer, config validator, and `html`/`api` extraction handlers against a synthetic config, proven with an offline dry run. No cron, no real target, no deploy yet.
 
 The walking skeleton (M1) — one real Bluecore source driven end to end, with a freshness badge and a delta chip in production — starts once both M0.5 and `docs/05-SOURCES.md` are done. Filling in that source inventory is the other concurrent track.
+
+**Before committing:** `npm run format` (Prettier) and `npm run lint` (ESLint — also enforces the ADR-010 import boundaries). A pre-commit hook runs both, plus `validate:config`, on staged files automatically; `.github/workflows/ci.yml` runs the full set (including `typecheck`, `schema:check`, and `test`) on every PR.

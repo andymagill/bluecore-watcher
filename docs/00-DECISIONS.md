@@ -168,6 +168,19 @@ Last updated: 2026-09-12
 - The edge relay (ADR-006) may end up as a route on this same Worker or stay a separate one — undecided, out of scope for M1; revisit when a source actually needs the relay.
 - `06-OPS-RUNBOOK.md` §1's topology table and ADR-013's own consequences list are corrected alongside this entry, same pattern ADR-013 used for the Vercel→Cloudflare fix.
 
+### ADR-015 — Prettier for formatting, ESLint kept for lint (not Biome)
+
+**Decision.** Prettier owns formatting; ESLint (flat config, `eslint.config.js`) keeps owning lint, with `eslint-config-prettier` disabling the stylistic rules that would otherwise fight Prettier. Enforced via a husky pre-commit hook (`lint-staged` on staged files) and `.github/workflows/ci.yml` on every PR and push to `main`.
+
+**Rationale.** `eslint.config.js` isn't lint fluff — its `no-restricted-imports` blocks are the mechanical enforcement of the ADR-010 boundary (`src/contract` depends on nothing internal; `src/app` cannot import `ingest`/`gate`; `ingest`/`gate` cannot import `app`; see `01-DATA-CONTRACT.md` §0). Migrating to Biome would mean porting those per-directory boundaries to Biome's config and re-proving each still fails on violation — a rewrite of the file that encodes the architecture, to remove a dependency that wasn't causing any actual pain. Reconsider Biome only if lint/format speed becomes a real problem.
+
+**Consequences.**
+
+- `.prettierignore` excludes three directories whose exact bytes matter: `schemas/*.json` (compared byte-for-byte by `npm run schema:check` against `scripts/schema-gen.ts`'s output), `public/data/**` (written by the ingest persist layer; reformatting fights ADR-011's semantic-diff), and `fixtures/**` (captured HTML/JSON golden test input — extraction tests assert exact selector/whitespace behavior against the real bytes).
+- `.prettierrc.json` sets `endOfLine: "auto"` rather than Prettier's `"lf"` default: this repo has no `.gitattributes` pinning line endings, so on a checkout with `core.autocrlf=true`, `"lf"` would fight git's CRLF checkout and make `format:check` flap on every branch switch.
+- §5's "runs in CI and as a pre-commit hook" claim for `npm run validate:config` is now literally true (`.husky/pre-commit` via `scripts/validate-staged-config.ts`; `.github/workflows/ci.yml`).
+- `.github/workflows/ci.yml` is new — `.github/workflows/` previously contained only `ingest.yml` (the scheduled data pipeline), so no lint/typecheck/test/schema/config check ran on pull requests at all. The pre-commit hook is a bypassable convenience (`--no-verify`); CI is the actual gate.
+
 ---
 
 ## Open
