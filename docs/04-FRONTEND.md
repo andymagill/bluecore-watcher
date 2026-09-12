@@ -1,6 +1,6 @@
 # 04 — Frontend
 
-React + Vite + Tailwind + shadcn/ui, compiled to a static SPA. No runtime data fetching beyond same-origin JSON. No client-side routing in v1 — the dashboard is one view plus a modal.
+React + Vite + Tailwind + Radix UI primitives, compiled to a static SPA. No runtime data fetching beyond same-origin JSON. No client-side routing in v1 — the dashboard is one view plus a modal.
 
 ---
 

@@ -81,11 +81,13 @@ Section identifiers are configuration, not framework constants. Another environm
 
 **[Amended 2026-09-12 — ADR-013.]** Host is Cloudflare (Pages + Workers), not Vercel — Vercel was never an accepted decision, despite appearing throughout this document and the decision log until this correction. "Near-Zero" infrastructure cost is comparative, not literal: it holds through M1–M3 on free tiers (GitHub Actions, Cloudflare Pages, a Git repo). Whether the first client deliverable (M4) forces a paid Cloudflare tier is unverified as of this writing — the earlier version of this note asserted a specific Vercel Hobby restriction that does not simply carry over to a different vendor. Still near-zero next to the $5k–$25k/seat/year rows beside it either way.
 
+**[Amended 2026-09-12 — ADR-014.]** The SPA host above is now a Cloudflare Worker (Static Assets + Workers Builds), not Pages — Cloudflare is phasing Pages out. Same free-tier cost comparison as the ADR-013 note above; only the product name changed.
+
 ## **Part 2: Technology Stack & Configuration Schema**
 
 ### **1. Technology Stack Constraints**
 
-- **Frontend UI:** React + Vite + Tailwind CSS + shadcn/ui components (compiled as a static Single Page Application).
+- **Frontend UI:** React + Vite + Tailwind CSS + Radix UI primitives, used directly rather than through the shadcn CLI scaffold (compiled as a static Single Page Application).
 - **Ingestion Engine:** Node.js with TypeScript.
 - **Scraping Frameworks:**
   - **Cheerio:** Primary lightweight HTML parser for static pages and fast execution.

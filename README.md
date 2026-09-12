@@ -4,7 +4,7 @@ A configurable market intelligence engine: a static dashboard that renders a ver
 
 No database. No LLM in the data path. No hallucination surface.
 
-**Status: implementation started.** The architecture is specified, the decisions are recorded, and the doc-level contradictions found in review are closed. M0.5 (the source-independent engine spine — contract layer, config validator, extraction handlers, offline gate) is underway on `feature/m0.5-engine-spine`, concurrently with source triage. See [Current blockers](#current-blockers).
+**Status: M1 walking skeleton shipped.** The architecture is specified, the decisions are recorded, and the doc-level contradictions found in review are closed. M0.5 (the source-independent engine spine) and M0 (source triage, `docs/05-SOURCES.md`) are both done; M1 — one real source driven end to end, with a scheduled ingestion workflow, a live config, and a Cloudflare Workers deploy — is in production. See [Current blockers](#current-blockers).
 
 ---
 
@@ -42,7 +42,7 @@ Read in order. `docs/00-DECISIONS.md` is the status of record; where it and `SPE
 | [`docs/02-CONFIG-SCHEMA.md`](docs/02-CONFIG-SCHEMA.md) | TypeScript types, validation rules, annotated example                                                                    |
 | [`docs/03-INGESTION.md`](docs/03-INGESTION.md)         | Orchestrator lifecycle, Git write protocol, the validation gate, testing                                                 |
 | [`docs/04-FRONTEND.md`](docs/04-FRONTEND.md)           | Component inventory, block states, provenance UI                                                                         |
-| [`docs/05-SOURCES.md`](docs/05-SOURCES.md)             | Source inventory and triage method — **currently empty**                                                                 |
+| [`docs/05-SOURCES.md`](docs/05-SOURCES.md)             | Source inventory and triage method — seven sources triaged                                                               |
 | [`docs/06-OPS-RUNBOOK.md`](docs/06-OPS-RUNBOOK.md)     | Deploy topology, secrets, failure runbooks, maintenance cost                                                             |
 | [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md)             | Milestones M0–M4 with exit criteria                                                                                      |
 
@@ -65,18 +65,17 @@ These are load-bearing. Violating one is a defect, not a trade-off.
 
 ## Stack
 
-React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Cloudflare Workers + Workers
+React + Vite + Tailwind + Radix UI primitives (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Cloudflare Workers (Static Assets + Workers Builds)
 
 ---
 
 ## Current blockers
 
-| #   | Blocker                              | Impact                                                                                                                                                            |
-| --- | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Q1  | The source inventory is empty        | Blocks M0–M2 config work and the client deliverable. **Does not block the engine spine** (M0.5) — that runs concurrently against a synthetic config, per ADR-001. |
-| Q6  | robots.txt and ToS posture unwritten | Needed before any client deliverable. Deferred to M3/M4 by decision.                                                                                              |
+| #   | Blocker                              | Impact                                                               |
+| --- | ------------------------------------ | -------------------------------------------------------------------- |
+| Q6  | robots.txt and ToS posture unwritten | Needed before any client deliverable. Deferred to M3/M4 by decision. |
 
-Q2 (PDF / session-state share) is resolved as informational, not blocking — ADR-010 made source kinds additive, so no share of PDFs can invalidate the stack. Full list in [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md#open).
+Q1 (source inventory) resolved 2026-09-12 — see `docs/05-SOURCES.md`. Q2 (PDF / session-state share) is resolved as informational, not blocking — ADR-010 made source kinds additive, so no share of PDFs can invalidate the stack. Full list in [`docs/00-DECISIONS.md`](docs/00-DECISIONS.md#open).
 
 ---
 
@@ -90,8 +89,8 @@ Q2 (PDF / session-state share) is resolved as informational, not blocking — AD
 
 ## Getting started
 
-M0.5 (engine spine) is in progress — see [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md). It builds the contract layer, config validator, and `html`/`api` extraction handlers against a synthetic config, proven with an offline dry run. No cron, no real target, no deploy yet.
+M0.5 (engine spine) and M1 (walking skeleton) are both done — see [`docs/07-ROADMAP.md`](docs/07-ROADMAP.md). A scheduled GitHub Action ingests one real Bluecore Energy source (`config/bluecore.config.ts`), and the SPA renders it in production with a freshness badge, delta chips, and provenance popovers. `npm run ingest -- --env bluecore --dry` runs the pipeline locally without writing anything; `npm run dev` serves the SPA against whatever's currently committed under `public/data/` (the last verified ingest run).
 
-The walking skeleton (M1) — one real Bluecore source driven end to end, with a freshness badge and a delta chip in production — starts once both M0.5 and `docs/05-SOURCES.md` are done. Filling in that source inventory is the other concurrent track.
+M2 (breadth — every triaged source configured) is next; see `docs/05-SOURCES.md` for the remaining inventory.
 
 **Before committing:** `npm run format` (Prettier) and `npm run lint` (ESLint — also enforces the ADR-010 import boundaries). A pre-commit hook runs both, plus `validate:config`, on staged files automatically; `.github/workflows/ci.yml` runs the full set (including `typecheck`, `schema:check`, and `test`) on every PR.
