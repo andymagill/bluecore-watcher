@@ -1,0 +1,60 @@
+{
+  "commit": "dry-run",
+  "displayName": "Bluecore Watcher",
+  "entities": [
+    {
+      "id": "bluecore-energy",
+      "name": "BlueCore Energy, Inc.",
+      "role": "primary"
+    },
+    {
+      "id": "oklo-inc",
+      "name": "Oklo Inc.",
+      "role": "competitor"
+    }
+  ],
+  "environmentId": "bluecore",
+  "generatedAt": "2026-09-12T21:30:26.076Z",
+  "health": {
+    "degraded": 0,
+    "failed": 0,
+    "ok": 1,
+    "overall": "ok"
+  },
+  "runId": "2026-09-12T21-30-25-906Z-f2b8ec4",
+  "schemaVersion": 1,
+  "sections": [
+    {
+      "id": "target",
+      "label": "Target Company State",
+      "order": 1
+    },
+    {
+      "id": "segment",
+      "label": "Industry Segment",
+      "order": 2
+    },
+    {
+      "id": "regulatory",
+      "label": "Regulatory Landscape",
+      "order": 3
+    },
+    {
+      "id": "climate",
+      "label": "Market Climate",
+      "order": 4
+    }
+  ],
+  "targets": [
+    {
+      "entityId": "bluecore-energy",
+      "id": "bluecore-newsroom",
+      "label": "BlueCore Energy — Latest News",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-12T21:30:25.922Z",
+      "path": "sections/target/bluecore-newsroom.json",
+      "sectionId": "target",
+      "ttlHours": 168
+    }
+  ]
+}
