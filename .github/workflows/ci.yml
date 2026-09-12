@@ -1,9 +1,9 @@
 # PR/main gate: format, lint, typecheck, schema drift, config validity, and
 # tests. Pre-commit (.husky/pre-commit) runs a subset of this on staged
 # files as a convenience; it's bypassable with --no-verify, so this workflow
-# is the real gate. No Chromium install here (unlike ingest.yml) -- tests/
-# run under jsdom/vitest; Playwright is only needed by the gate's live
-# preview check (docs/03-INGESTION.md), which this workflow doesn't run.
+# is the real gate. Chromium is installed because tests/smoke-render.test.ts
+# exercises src/gate/smoke-render.ts's real chromium.launch() (gate check 3,
+# docs/03-INGESTION.md), same as ingest.yml.
 name: CI
 
 on:
@@ -33,6 +33,9 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Install Chromium (for smoke-render tests)
+        run: npx playwright install --with-deps chromium
 
       - name: Formatting
         run: npm run format:check
