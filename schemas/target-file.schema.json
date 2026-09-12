@@ -1,0 +1,580 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "targetId": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*$"
+    },
+    "entityId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sectionId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "label": {
+      "type": "string",
+      "minLength": 1
+    },
+    "sourceUrl": {
+      "type": "string",
+      "format": "uri"
+    },
+    "ttlHours": {
+      "type": "number",
+      "exclusiveMinimum": 0
+    },
+    "run": {
+      "type": "object",
+      "properties": {
+        "runId": {
+          "type": "string",
+          "minLength": 1
+        },
+        "startedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time",
+          "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+        },
+        "durationMs": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "ok",
+            "partial",
+            "failed_cached"
+          ]
+        },
+        "renderer": {
+          "type": "string",
+          "enum": [
+            "static",
+            "browser"
+          ]
+        },
+        "httpStatus": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": -9007199254740991,
+              "maximum": 9007199254740991
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "runId",
+        "startedAt",
+        "completedAt",
+        "durationMs",
+        "status",
+        "renderer",
+        "httpStatus"
+      ],
+      "additionalProperties": false
+    },
+    "blocks": {
+      "type": "array",
+      "items": {
+        "anyOf": [
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent",
+                  "date",
+                  "string",
+                  "markdown",
+                  "enum"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "cached",
+                  "flagged",
+                  "missing"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "validation": {
+                "type": "object",
+                "properties": {
+                  "passed": {
+                    "type": "boolean"
+                  },
+                  "warnings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "guard": {
+                          "type": "string"
+                        },
+                        "rejectedCandidate": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        },
+                        "retainedValue": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "guard",
+                        "rejectedCandidate",
+                        "retainedValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "passed",
+                  "warnings"
+                ],
+                "additionalProperties": false
+              },
+              "presenter": {
+                "type": "string",
+                "enum": [
+                  "metric",
+                  "markdown",
+                  "status"
+                ]
+              },
+              "value": {
+                "type": [
+                  "number",
+                  "string",
+                  "null"
+                ]
+              },
+              "displayValue": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "provenance": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sourceUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "extractedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "contentHash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{6,64}(?:…)?$"
+                      },
+                      "anchor": {
+                        "type": "string"
+                      },
+                      "rawText": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "sourceUrl",
+                      "extractedAt",
+                      "contentHash",
+                      "anchor",
+                      "rawText"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "delta": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "scalar"
+                      },
+                      "previousValue": {
+                        "type": [
+                          "number",
+                          "string"
+                        ]
+                      },
+                      "previousExtractedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "changedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "enum": [
+                          "up",
+                          "down"
+                        ]
+                      },
+                      "absolute": {
+                        "type": "number"
+                      },
+                      "percent": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "previousValue",
+                      "previousExtractedAt",
+                      "changedAt",
+                      "direction",
+                      "absolute",
+                      "percent"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "label",
+              "type",
+              "status",
+              "validation",
+              "presenter",
+              "value",
+              "displayValue",
+              "provenance",
+              "delta"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string",
+                "minLength": 1
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1
+              },
+              "type": {
+                "type": "string",
+                "enum": [
+                  "number",
+                  "currency",
+                  "percent",
+                  "date",
+                  "string",
+                  "markdown",
+                  "enum"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "ok",
+                  "cached",
+                  "flagged",
+                  "missing"
+                ]
+              },
+              "unit": {
+                "type": "string"
+              },
+              "validation": {
+                "type": "object",
+                "properties": {
+                  "passed": {
+                    "type": "boolean"
+                  },
+                  "warnings": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "guard": {
+                          "type": "string"
+                        },
+                        "rejectedCandidate": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        },
+                        "retainedValue": {
+                          "anyOf": [
+                            {
+                              "type": "string"
+                            },
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "string"
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "guard",
+                        "rejectedCandidate",
+                        "retainedValue"
+                      ],
+                      "additionalProperties": false
+                    }
+                  }
+                },
+                "required": [
+                  "passed",
+                  "warnings"
+                ],
+                "additionalProperties": false
+              },
+              "presenter": {
+                "type": "string",
+                "const": "list"
+              },
+              "value": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "displayValue": {
+                "anyOf": [
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "provenance": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "sourceUrl": {
+                        "type": "string",
+                        "format": "uri"
+                      },
+                      "extractedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      },
+                      "contentHash": {
+                        "type": "string",
+                        "pattern": "^sha256:[0-9a-f]{6,64}(?:…)?$"
+                      },
+                      "anchor": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "rawText": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    },
+                    "required": [
+                      "sourceUrl",
+                      "extractedAt",
+                      "contentHash",
+                      "anchor",
+                      "rawText"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "delta": {
+                "anyOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "kind": {
+                        "type": "string",
+                        "const": "set"
+                      },
+                      "added": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "removed": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      },
+                      "count": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "previousCount": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "maximum": 9007199254740991
+                      },
+                      "changedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "added",
+                      "removed",
+                      "count",
+                      "previousCount",
+                      "changedAt"
+                    ],
+                    "additionalProperties": false
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            },
+            "required": [
+              "key",
+              "label",
+              "type",
+              "status",
+              "validation",
+              "presenter",
+              "value",
+              "displayValue",
+              "provenance",
+              "delta"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "targetId",
+    "entityId",
+    "sectionId",
+    "label",
+    "sourceUrl",
+    "ttlHours",
+    "run",
+    "blocks"
+  ],
+  "additionalProperties": false
+}

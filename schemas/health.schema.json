@@ -1,0 +1,174 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "schemaVersion": {
+      "type": "number",
+      "const": 1
+    },
+    "generatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "targets": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "ok": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "degraded": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "failed": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        },
+        "oldestDataAgeHours": {
+          "type": "number",
+          "minimum": 0
+        },
+        "targetsPastCeiling": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 9007199254740991
+        }
+      },
+      "required": [
+        "targets",
+        "ok",
+        "degraded",
+        "failed",
+        "oldestDataAgeHours",
+        "targetsPastCeiling"
+      ],
+      "additionalProperties": false
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "targetId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "extractorKey": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "failed",
+              "flagged"
+            ]
+          },
+          "errorClass": {
+            "type": "string",
+            "enum": [
+              "NETWORK_ERROR",
+              "TIMEOUT",
+              "HTTP_ERROR",
+              "BLOCKED",
+              "AUTH_ERROR",
+              "SELECTOR_NO_MATCH",
+              "SELECTOR_AMBIGUOUS",
+              "PARSE_ERROR",
+              "ASSERTION_FAILED",
+              "CHANGE_GUARD_TRIPPED",
+              "SCHEMA_INVALID",
+              "UNKNOWN"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1
+          },
+          "failingSelector": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "httpStatus": {
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "firstSeenAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "consecutiveFailures": {
+            "type": "integer",
+            "exclusiveMinimum": 0,
+            "maximum": 9007199254740991
+          },
+          "servingCachedFrom": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time",
+                "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "stack": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "targetId",
+          "extractorKey",
+          "status",
+          "errorClass",
+          "message",
+          "failingSelector",
+          "httpStatus",
+          "firstSeenAt",
+          "consecutiveFailures",
+          "servingCachedFrom",
+          "stack"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schemaVersion",
+    "generatedAt",
+    "runId",
+    "summary",
+    "entries"
+  ],
+  "additionalProperties": false
+}
