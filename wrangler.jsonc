@@ -1,0 +1,12 @@
+{
+  // Cloudflare Worker config for the static SPA (ADR-014: Worker + Static
+  // Assets + Workers Builds, not Pages -- Cloudflare is phasing Pages out).
+  // No `main` entry script: this is a pure static-asset Worker. `assets.directory`
+  // is Vite's build output (docs/07-ROADMAP.md M1, 04-FRONTEND.md).
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "bluecore-watcher",
+  "compatibility_date": "2026-09-12",
+  "assets": {
+    "directory": "./dist"
+  }
+}
