@@ -65,7 +65,7 @@ These are load-bearing. Violating one is a defect, not a trade-off.
 
 ## Stack
 
-React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Cloudflare Pages + Workers
+React + Vite + Tailwind + shadcn/ui (static SPA) · Node.js + TypeScript (ingestion) · Cheerio primary, Playwright fallback · GitHub Actions · Cloudflare Workers + Workers
 
 ---
 

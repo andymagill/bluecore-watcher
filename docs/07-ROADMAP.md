@@ -38,7 +38,7 @@ Populate `05-SOURCES.md`. Name the target. Pick the three facts that matter most
 
 ## M1 — Walking skeleton
 
-One real source, end to end, nothing mocked. Builds on M0.5's engine spine — this milestone is config, selectors, the frontend, and the two pieces the spine deliberately deferred: the SPA to render against, and the Cloudflare-Pages-preview stage of the gate (amended ADR-005).
+One real source, end to end, nothing mocked. Builds on M0.5's engine spine — this milestone is config, selectors, the frontend, and the two pieces the spine deliberately deferred: the SPA to render against, and the Cloudflare-Workers-preview stage of the gate (amended ADR-005).
 
 Config → fetch → extract → validate → diff → commit → branch → preview → gate → merge → deploy → render → freshness badge → delta chip → provenance popover → health entry.
 
@@ -50,7 +50,7 @@ Config → fetch → extract → validate → diff → commit → branch → pre
 - The freshness badge changes state as the clock advances (test with a fake clock).
 - A value change produces a correct delta chip, including the unchanged case ("unchanged for N days") per `01-DATA-CONTRACT.md` §4.
 - Re-running with unchanged source data produces no commit. *(ADR-011 / Invariant 7 — already verified offline in M0.5; this criterion re-proves it against the real deployed pipeline.)*
-- The Cloudflare-Pages-preview smoke render (doc 03 §3 check 3) catches a case where data is schema-valid but the block count the UI renders disagrees with the block count published.
+- The Cloudflare-Workers-preview smoke render (doc 03 §3 check 3) catches a case where data is schema-valid but the block count the UI renders disagrees with the block count published.
 
 **Why this set:** each criterion exercises a decision made in the docs. If one can't be met, a doc is wrong, and it's better to learn that now.
 

@@ -144,6 +144,19 @@ Last updated: 2026-09-12
 - The cost-floor claim in ADR-007 needs re-deriving against Cloudflare's actual terms, not assumed to carry over from the Vercel-specific finding it replaces — see that ADR's corrected note.
 - Every doc that named Vercel (`03-INGESTION.md`, `06-OPS-RUNBOOK.md`, `07-ROADMAP.md`, `SPEC.md`, `README.md`) is corrected alongside this entry. If a future doc edit reintroduces "Vercel," that's the bug this ADR exists to prevent.
 
+### ADR-014 — SPA host is a Cloudflare Worker (Static Assets + Workers Builds), not Pages
+
+**Decision.** The static SPA is served from a Cloudflare Worker using the Workers Static Assets feature, deployed via Workers Builds' git integration — the Workers analog of Pages' git-integrated preview deployments. This supersedes ADR-013's assignment of "Cloudflare Pages for the static SPA."
+
+**Rationale.** Cloudflare is phasing out Pages in favor of Workers as its unified platform for static and dynamic content. Workers Static Assets now covers what Pages did for a static build, and Workers Builds provides the same push → automatic build → per-branch preview-URL mechanic that ADR-005 depends on. Building the M1 deploy plumbing on Pages now would mean building on a path Cloudflare itself is retiring.
+
+**Consequences.**
+- ADR-005's mechanics are unchanged in substance — a branch push still produces a preview URL, one branch (production) serves the live site, other branches get their own preview — only the Cloudflare product providing it changes from Pages to Workers Builds.
+- The repo needs a `wrangler.jsonc` (Workers require one; Pages' git integration didn't): `assets.directory` pointing at the Vite build output (`dist/`), a `compatibility_date`, and no `main` entry script needed for a pure static site.
+- Preview-URL resolution in the gate (`03-INGESTION.md` §3 check 3) queries the Cloudflare API for the Workers Builds deployment tied to a given branch, not the Pages deployments endpoint ADR-013 implied.
+- The edge relay (ADR-006) may end up as a route on this same Worker or stay a separate one — undecided, out of scope for M1; revisit when a source actually needs the relay.
+- `06-OPS-RUNBOOK.md` §1's topology table and ADR-013's own consequences list are corrected alongside this entry, same pattern ADR-013 used for the Vercel→Cloudflare fix.
+
 ---
 
 ## Open

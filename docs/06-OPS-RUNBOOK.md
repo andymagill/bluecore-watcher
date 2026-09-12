@@ -8,13 +8,13 @@ Per ADR-001 the dashboards are operated as a service. This document is the opera
 
 | Piece | Where | Notes |
 |---|---|---|
-| App + data | One Cloudflare Pages project, builds from `main` | Static Vite output; `public/data/**` ships with the build |
+| App + data | One Cloudflare Worker (Static Assets), builds from `main` via Workers Builds | Static Vite output; `public/data/**` ships with the build |
 | Ingestion | GitHub Actions, cron | Concurrency group `ingest`, serialized |
-| Preview gate | Cloudflare Pages preview per `ingest/*` branch | Blocks the merge |
-| Edge relay | Cloudflare Worker, separate route | Optional per target; PSK header (ADR-006) |
+| Preview gate | Workers Builds preview per `ingest/*` branch | Blocks the merge |
+| Edge relay | Cloudflare Worker, separate route (or route on the same Worker — undecided, see ADR-014) | Optional per target; PSK header (ADR-006) |
 | Alerts | GitHub Issues | v1 channel |
 
-Host is Cloudflare per ADR-013 — this table previously named Vercel throughout, which was never an accepted decision.
+Host is Cloudflare per ADR-013 — this table previously named Vercel throughout, which was never an accepted decision. The SPA-hosting row is corrected again per **ADR-014**: Pages is being phased out in favor of Workers, so the static SPA and its preview deployments live on a Worker (Static Assets + Workers Builds), not Pages.
 
 Same-origin is satisfied trivially: data files are part of the build output, served from the production domain. The SPEC's Part 5 branch-mapping problem does not arise under ADR-005.
 
