@@ -15,7 +15,7 @@ The central property: **`main` only ever contains data that has been proven to r
                                                       branch + push
                                                                  │
                                                                  ▼
-                                              Cloudflare Pages preview deploy
+                                              Cloudflare Workers preview deploy
                                                                  │
                                                                  ▼
                                           ┌──────── GATE ────────┐
@@ -110,7 +110,7 @@ Serialized. Two overlapping runs both forking from `main` is a merge conflict in
 3. Run the orchestrator.
 4. **If no fingerprint changed (ADR-011), exit 0 with no branch.** Most runs on a slow-moving source set should end here.
 5. Commit with a message summarising the run: `data: 3 targets updated, 1 failed (runId)`.
-6. Push the branch. Cloudflare Pages builds a preview.
+6. Push the branch. Cloudflare Workers builds a preview.
 7. Run the gate (§3).
 8. Pass → squash-merge into `main`, delete branch. Fail → leave the branch, open or update a GitHub issue with the health entries, exit non-zero.
 
@@ -120,7 +120,7 @@ A failed gate leaves production serving the last good data. That is the correct 
 
 ## 3. The gate
 
-A preview deploy that nothing checks is ceremony. Three checks, all blocking — **built in two stages** (amended ADR-005). Checks 1–2 are offline and ship with the engine spine, before any real target or Cloudflare Pages deployment exists. Check 3 needs an actual preview URL and a SPA to render, so it ships alongside the first real target. "`main` only contains data proven to render" holds at both stages; check 3 is what extends the proof to the real deployed artifact.
+A preview deploy that nothing checks is ceremony. Three checks, all blocking — **built in two stages** (amended ADR-005). Checks 1–2 are offline and ship with the engine spine, before any real target or Cloudflare Workers deployment exists. Check 3 needs an actual preview URL and a SPA to render, so it ships alongside the first real target. "`main` only contains data proven to render" holds at both stages; check 3 is what extends the proof to the real deployed artifact.
 
 **1. Schema validation (offline).** Every written file validates against the generated JSON Schema. A failure here is `SCHEMA_INVALID` and always an engine defect, never a source problem.
 
@@ -184,6 +184,6 @@ The drift check is the highest-leverage test in this list and the one easiest to
 | CI minutes | ~2 min/run static-only; +40s per browser target | GitHub free tier is 2,000 min/month — one daily run with a few browser targets is comfortable |
 | Commits | 1 squashed commit per run with changes | ~365/year daily; revisit at ~2,000 (Q7) |
 | Repo size | JSON only, kilobytes per run | Fixtures dominate — keep them trimmed, not whole-page dumps |
-| Preview deploys | 1 per run with changes | Within Cloudflare Pages free-tier limits at daily cadence |
+| Preview deploys | 1 per run with changes | Within Cloudflare Workers free-tier limits at daily cadence |
 
 Hourly cadence changes this picture materially — ~8,760 commits/year and 8,760 preview builds. If a source genuinely needs hourly polling, that is the moment to reconsider whether the gate should run on every cycle or on a batched one.

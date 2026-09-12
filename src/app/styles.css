@@ -1,0 +1,21 @@
+@import "tailwindcss";
+
+/* 04-FRONTEND.md §7: numbers get a tabular-figures font so columns align. */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+body {
+  background-color: #0b0d10;
+  color: #e6e6e6;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+@media print {
+  /* §7: this will be screenshotted into diligence memos -- provenance
+     visible, badges legible in greyscale. */
+  body {
+    background: white;
+    color: black;
+  }
+}

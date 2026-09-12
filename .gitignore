@@ -11,10 +11,11 @@ build/
 # Environment & secrets
 .env
 .env.*
+env.local
 !.env.example
 
 # Deployment
-.vercel/
+.wrangler/
 
 # Ingestion run artifacts (raw responses, logs — not committed by design)
 .runs/

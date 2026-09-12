@@ -11,6 +11,7 @@ import { Manifest, type ManifestTarget } from "../contract/manifest.js";
 import { TargetFile } from "../contract/target-file.js";
 import type { CmieConfig } from "../config/schema.js";
 import type { HealthEntryDraft } from "./process-extractor.js";
+import { scrubSecrets } from "./scrub.js";
 
 // ---- Stable serialization — sorted keys, 2-space indent, trailing newline
 // (03-INGESTION.md §1 persist; Invariant 7). Array order is preserved:
@@ -84,6 +85,7 @@ export function buildHealth(
   targetFiles: TargetFile[],
   runId: string,
   generatedAt: string,
+  activeSecretValues: readonly string[] = [],
 ): Health {
   const blockByKey = new Map<string, Block>();
   for (const tf of targetFiles) {
@@ -99,7 +101,7 @@ export function buildHealth(
       extractorKey: d.extractorKey,
       status: d.status,
       errorClass: d.errorClass,
-      message: d.message,
+      message: scrubSecrets(d.message, activeSecretValues),
       failingSelector: d.failingSelector,
       httpStatus: d.httpStatus,
       firstSeenAt: prior?.firstSeenAt ?? generatedAt,

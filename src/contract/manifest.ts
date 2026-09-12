@@ -12,12 +12,14 @@ export const ManifestEntity = z.object({
   name: z.string().min(1),
   role: EntityRole,
 });
+export type ManifestEntity = z.infer<typeof ManifestEntity>;
 
 export const ManifestSection = z.object({
   id: z.string().min(1),
   label: z.string().min(1),
   order: z.int(),
 });
+export type ManifestSection = z.infer<typeof ManifestSection>;
 
 export const ManifestTarget = z.object({
   id: z.string().regex(/^[a-z0-9][a-z0-9-]*$/),
