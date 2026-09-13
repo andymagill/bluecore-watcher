@@ -43,15 +43,23 @@ function getArg(flag: string): string | undefined {
 // wrangler.jsonc's "name" is the deploy-time source of truth for the Worker
 // name -- read it rather than restating it here, so a rename can't silently
 // desync this script from the config that actually deploys it. wrangler.jsonc
-// is JSONC (line comments only, no "//" inside any string value), so a
-// line-level strip is sufficient without pulling in a JSONC parser.
-async function readWorkerName(): Promise<string> {
+// is JSONC (line comments, no "//" inside any string value, AND trailing
+// commas -- confirmed live 2026-09-13: .prettierrc's trailingComma: "all"
+// keeps adding one after "assets.directory" on every format pass, since
+// wrangler.jsonc isn't in .prettierignore, so this can't be "fixed" by
+// editing the file once). A regex strip for both is sufficient without
+// pulling in a JSONC parser.
+//
+// This operates on the raw string directly with `[^\r\n]*` rather than
+// split("\n") + a per-line `//.*$` strip: the split/per-line version works
+// on an LF checkout (the CI runner) but silently strips nothing at all on a
+// CRLF checkout -- `.` never matches `\r`, so `.*` can't reach `$` past the
+// trailing `\r` left on every line -- confirmed locally on this Windows
+// checkout. `[^\r\n]*` has no line-ending assumption to get wrong.
+export async function readWorkerName(): Promise<string> {
   const path = fileURLToPath(new URL("../wrangler.jsonc", import.meta.url));
   const raw = await readFile(path, "utf-8");
-  const stripped = raw
-    .split("\n")
-    .map((line) => line.replace(/\/\/.*$/, ""))
-    .join("\n");
+  const stripped = raw.replace(/\/\/[^\r\n]*/g, "").replace(/,(\s*[}\]])/g, "$1");
   const match = (JSON.parse(stripped) as { name?: string }).name;
   if (!match) throw new Error(`wrangler.jsonc has no "name" field (resolved path: ${path})`);
   return match;

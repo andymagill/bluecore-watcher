@@ -5,7 +5,7 @@
 // the recipe. These tests cover the parsing/construction logic in isolation
 // rather than mocking three chained network calls.
 import { describe, expect, it } from "vitest";
-import { buildPreviewUrl, parseVersionId } from "../scripts/resolve-preview-url.js";
+import { buildPreviewUrl, parseVersionId, readWorkerName } from "../scripts/resolve-preview-url.js";
 
 describe("parseVersionId", () => {
   it("extracts the Version ID from a real Workers Builds check summary", () => {
@@ -26,6 +26,20 @@ describe("parseVersionId", () => {
 
   it("throws when the summary is null", () => {
     expect(() => parseVersionId(null)).toThrow(/Could not find a Version ID/);
+  });
+});
+
+describe("readWorkerName", () => {
+  // Regression test: wrangler.jsonc's trailing comma after "assets.directory"
+  // (added by .prettierrc's trailingComma: "all" on every format pass, since
+  // wrangler.jsonc isn't in .prettierignore) broke this in production
+  // 2026-09-13 -- the naive comment-stripping JSON.parse choked on it,
+  // failing "Resolve the Workers Builds preview URL" before the gate ever
+  // ran. This reads the REAL committed wrangler.jsonc, not a synthetic
+  // fixture, so a reintroduced trailing comma (or any other JSONC feature
+  // this parser doesn't yet handle) fails CI immediately.
+  it("parses the real committed wrangler.jsonc despite its comments and trailing commas", async () => {
+    await expect(readWorkerName()).resolves.toBe("bluecore-watcher");
   });
 });
 
