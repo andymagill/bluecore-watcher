@@ -6,81 +6,82 @@
 /* tweakcn export. Colour decisions live here so components reference
    semantic tokens instead of hardcoding Tailwind palette classes. */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.2097 0.0468 314.3101);
+  --background: oklch(0.9962 0.0039 106.4708);
+  --foreground: oklch(0.2186 0.0483 332.2951);
   --card: oklch(1 0 0);
-  --card-foreground: oklch(0.2097 0.0468 314.3101);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.2097 0.0468 314.3101);
-  --primary: oklch(0.787 0.1597 159.2392);
+  --card-foreground: oklch(0.2186 0.0483 332.2951);
+  --popover: oklch(0.9962 0.0039 106.4708);
+  --popover-foreground: oklch(0.2186 0.0483 332.2951);
+  --primary: oklch(0.762 0.1922 147.0186);
   --primary-foreground: oklch(1 0 0);
-  --muted: oklch(0.9665 0.0045 314.8046);
-  --muted-foreground: oklch(0.5482 0.0362 314.5072);
+  --muted: oklch(0.9673 0.0051 325.616);
+  --muted-foreground: oklch(0.5539 0.0375 330.83);
   --accent: oklch(0.9491 0 0);
-  --accent-foreground: oklch(0.2097 0.0468 314.3101);
-  --border: oklch(0.9267 0.0091 314.7793);
-  --ring: oklch(0.787 0.1597 159.2392);
-  --chart-1: oklch(0.5019 0.0633 283.8863);
-  --chart-2: oklch(0.787 0.1597 159.2392);
-  --chart-3: oklch(0.9296 0.1387 131.0471);
+  --accent-foreground: oklch(0.2186 0.0483 332.2951);
+  --border: oklch(0.928 0.0093 330.9559);
+  --ring: oklch(0.762 0.1922 147.0186);
+  --chart-1: oklch(0.4556 0.1017 333.9782);
+  --chart-2: oklch(0.762 0.1922 147.0186);
+  --chart-3: oklch(0.9034 0.1634 143.8664);
   --chart-4: oklch(0.6268 0 0);
   --chart-5: oklch(0.683 0 0);
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
-  --radius: 0.05rem;
-  --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
-  --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
-  --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-  --shadow: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-  --shadow-md: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
-  --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
-  --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
-  --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.13);
-  --tracking-normal: 0rem;
+  --font-serif: "Source Serif 4", ui-serif, serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --radius: 0.1rem;
+  --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.25);
+  --tracking-normal: 0em;
   --spacing: 0.25rem;
 }
 
 .dark {
-  --background: oklch(0.2133 0.0061 337.8278);
+  --background: oklch(0.2125 0.0048 17.5334);
   --foreground: oklch(0.8109 0 0);
   --card: oklch(0.1822 0 0);
   --card-foreground: oklch(0.8109 0 0);
-  --popover: oklch(0.2133 0.0061 337.8278);
+  --popover: oklch(0.2125 0.0048 17.5334);
   --popover-foreground: oklch(0.8109 0 0);
-  --primary: oklch(0.787 0.1597 159.2392);
-  --primary-foreground: oklch(0.2133 0.0061 337.8278);
+  --primary: oklch(0.762 0.1922 147.0186);
+  --primary-foreground: oklch(0.2125 0.0048 17.5334);
   --muted: oklch(0.252 0 0);
   --muted-foreground: oklch(0.6268 0 0);
   --accent: oklch(0.3211 0 0);
   --accent-foreground: oklch(0.8109 0 0);
   --border: oklch(0.252 0 0);
-  --ring: oklch(0.787 0.1597 159.2392);
-  --chart-1: oklch(0.5019 0.0633 283.8863);
-  --chart-2: oklch(0.787 0.1597 159.2392);
-  --chart-3: oklch(0.9296 0.1387 131.0471);
+  --ring: oklch(0.762 0.1922 147.0186);
+  --chart-1: oklch(0.4616 0.0914 326.9294);
+  --chart-2: oklch(0.762 0.1922 147.0186);
+  --chart-3: oklch(0.9034 0.1634 143.8664);
   --chart-4: oklch(0.6268 0 0);
   --chart-5: oklch(0.683 0 0);
   --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-serif: serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
-  --radius: 0.05rem;
-  --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
-  --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.03);
-  --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-  --shadow: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 1px 2px -1px hsl(0 0% 0% / 0.05);
-  --shadow-md: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 2px 4px -1px hsl(0 0% 0% / 0.05);
-  --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 4px 6px -1px hsl(0 0% 0% / 0.05);
-  --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.05), 0px 8px 10px -1px hsl(0 0% 0% / 0.05);
-  --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.13);
+  --font-serif: "Source Serif 4", ui-serif, serif;
+  --font-mono: "Space Mono", ui-monospace, monospace;
+  --radius: 0.1rem;
+  --shadow-2xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.05);
+  --shadow-xs: 0px 1px 4px 0px hsl(0 0% 0% / 0.05);
+  --shadow-sm: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 1px 2px -1px hsl(0 0% 0% / 0.1);
+  --shadow-md: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 2px 4px -1px hsl(0 0% 0% / 0.1);
+  --shadow-lg: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 4px 6px -1px hsl(0 0% 0% / 0.1);
+  --shadow-xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.1), 0px 8px 10px -1px hsl(0 0% 0% / 0.1);
+  --shadow-2xl: 0px 1px 4px 0px hsl(0 0% 0% / 0.25);
 }
 
 /* ===== LOCAL DEVIATIONS FROM THE TWEAKCN EXPORT — see ADR-016 =====
-   The exported --destructive is oklch(0.9237 0.1811 109.4770) in light
-   mode (a bright yellow-green) and identical to the export's
-   --secondary in dark mode. Neither reads as an error and the light
-   pair fails the 4.5:1 contrast bar in 04-FRONTEND.md §7. Replaced
-   with an actual red.
+   tweakcn's exported --destructive has been unusable both times this
+   theme was regenerated -- first a yellow-green with near-white text
+   that failed the 4.5:1 contrast bar in 04-FRONTEND.md §7, then a
+   value identical to --primary. Don't trust the export's destructive;
+   keep our own red in both themes regardless of what a future
+   regeneration hands back.
 
    shadcn's token set has no success/warning. FreshnessBadge needs five
    states and HealthPill needs three; foregrounds are picked per theme

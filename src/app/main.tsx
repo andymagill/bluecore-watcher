@@ -6,7 +6,7 @@ import { AppShell } from "./components/AppShell.js";
 // console error, so a third-party font request is an avoidable extra
 // failure mode. Cloudflare Static Assets serves these same-origin.
 import "@fontsource-variable/geist";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource/space-mono";
 import "./styles.css";
 
 const rootEl = document.getElementById("root");
