@@ -9,7 +9,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#$.count",
         "contentHash": "sha256:031b4af5197ec30a926f48cf40e11a7dbc470048a21e4003b7a3c07c5dab1baa",
-        "extractedAt": "2026-09-13T15:35:34.247Z",
+        "extractedAt": "2026-09-13T20:57:06.187Z",
         "rawText": "51",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
       },
@@ -26,12 +26,12 @@
   "entityId": "bluecore-energy",
   "label": "Federal Register — DOE Advanced Nuclear Documents",
   "run": {
-    "completedAt": "2026-09-13T15:35:34.248Z",
-    "durationMs": 968,
+    "completedAt": "2026-09-13T20:57:06.187Z",
+    "durationMs": 1066,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-13T15-35-27-115Z-9ac2084",
-    "startedAt": "2026-09-13T15:35:33.280Z",
+    "runId": "2026-09-13T20-56-59-853Z-670fb31",
+    "startedAt": "2026-09-13T20:57:05.121Z",
     "status": "ok"
   },
   "schemaVersion": 1,

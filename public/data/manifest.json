@@ -1,5 +1,5 @@
 {
-  "commit": "73e8f42",
+  "commit": "577ad98",
   "displayName": "Bluecore Watcher",
   "entities": [
     {
@@ -19,14 +19,14 @@
     }
   ],
   "environmentId": "bluecore",
-  "generatedAt": "2026-09-13T15:35:34.907Z",
+  "generatedAt": "2026-09-13T20:57:06.961Z",
   "health": {
     "degraded": 0,
     "failed": 0,
-    "ok": 9,
+    "ok": 10,
     "overall": "ok"
   },
-  "runId": "2026-09-13T15-35-27-115Z-9ac2084",
+  "runId": "2026-09-13T20-56-59-853Z-670fb31",
   "schemaVersion": 1,
   "sections": [
     {
@@ -56,17 +56,27 @@
       "id": "bluecore-form-d",
       "label": "BlueCore Energy — SEC Form D (Seed, Sept 2026)",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:27.493Z",
+      "lastSuccessAt": "2026-09-13T20:57:00.085Z",
       "path": "sections/company/bluecore-form-d.json",
       "sectionId": "company",
       "ttlHours": 2160
     },
     {
       "entityId": "bluecore-energy",
+      "id": "bluecore-sec-filings",
+      "label": "BlueCore Energy — Latest SEC Filing",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T20:57:00.348Z",
+      "path": "sections/company/bluecore-sec-filings.json",
+      "sectionId": "company",
+      "ttlHours": 48
+    },
+    {
+      "entityId": "bluecore-energy",
       "id": "bluecore-newsroom",
       "label": "BlueCore Energy — Latest News",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:27.743Z",
+      "lastSuccessAt": "2026-09-13T20:57:00.634Z",
       "path": "sections/company/bluecore-newsroom.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -76,7 +86,7 @@
       "id": "bluecore-careers",
       "label": "BlueCore Energy — Open Roles",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:30.096Z",
+      "lastSuccessAt": "2026-09-13T20:57:01.649Z",
       "path": "sections/company/bluecore-careers.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -86,7 +96,7 @@
       "id": "oklo-sec-filings",
       "label": "Oklo Inc. — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:30.473Z",
+      "lastSuccessAt": "2026-09-13T20:57:02.107Z",
       "path": "sections/competitive/oklo-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -96,7 +106,7 @@
       "id": "nuscale-sec-filings",
       "label": "NuScale Power — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:32.157Z",
+      "lastSuccessAt": "2026-09-13T20:57:04.107Z",
       "path": "sections/competitive/nuscale-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -106,7 +116,7 @@
       "id": "fr-smr-mentions",
       "label": "Federal Register — SMR Mentions (All Agencies)",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:32.650Z",
+      "lastSuccessAt": "2026-09-13T20:57:04.310Z",
       "path": "sections/competitive/fr-smr-mentions.json",
       "sectionId": "competitive",
       "ttlHours": 168
@@ -116,7 +126,7 @@
       "id": "fr-nrc-smr",
       "label": "Federal Register — NRC SMR Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:33.279Z",
+      "lastSuccessAt": "2026-09-13T20:57:05.121Z",
       "path": "sections/regulatory/fr-nrc-smr.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -126,7 +136,7 @@
       "id": "fr-doe-nuclear",
       "label": "Federal Register — DOE Advanced Nuclear Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:34.248Z",
+      "lastSuccessAt": "2026-09-13T20:57:06.187Z",
       "path": "sections/regulatory/fr-doe-nuclear.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -136,7 +146,7 @@
       "id": "eia-ca-industrial-price",
       "label": "EIA — CA Industrial Retail Electricity Price",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T15:35:34.907Z",
+      "lastSuccessAt": "2026-09-13T20:57:06.960Z",
       "path": "sections/market/eia-ca-industrial-price.json",
       "sectionId": "market",
       "ttlHours": 1440

@@ -9,7 +9,7 @@
       "provenance": {
         "anchor": "https://api.lever.co/v0/postings/bluecore-energy?mode=json#$.length",
         "contentHash": "sha256:19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
-        "extractedAt": "2026-09-13T15:35:30.094Z",
+        "extractedAt": "2026-09-13T20:57:01.648Z",
         "rawText": "9",
         "sourceUrl": "https://api.lever.co/v0/postings/bluecore-energy?mode=json"
       },
@@ -26,12 +26,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Open Roles",
   "run": {
-    "completedAt": "2026-09-13T15:35:30.096Z",
-    "durationMs": 2353,
+    "completedAt": "2026-09-13T20:57:01.649Z",
+    "durationMs": 1015,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-13T15-35-27-115Z-9ac2084",
-    "startedAt": "2026-09-13T15:35:27.743Z",
+    "runId": "2026-09-13T20-56-59-853Z-670fb31",
+    "startedAt": "2026-09-13T20:57:00.634Z",
     "status": "ok"
   },
   "schemaVersion": 1,
