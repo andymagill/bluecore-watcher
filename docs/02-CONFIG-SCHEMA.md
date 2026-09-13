@@ -34,7 +34,7 @@ export interface EntityDef {
 
 export interface SectionDef {
   id: string; // "regulatory"
-  label: string; // "Regulatory Landscape"
+  label: string; // "Regulatory & Policy"
   order: number;
   description?: string; // rendered as section subhead
 }
@@ -254,10 +254,10 @@ export const config: CmieConfigInput = {
   },
 
   sections: [
-    { id: "target", label: "Target Company State", order: 1 },
-    { id: "segment", label: "Industry Segment", order: 2 },
-    { id: "regulatory", label: "Regulatory Landscape", order: 3 },
-    { id: "climate", label: "Market Climate", order: 4 },
+    { id: "company", label: "Company Performance", order: 1 },
+    { id: "competitive", label: "Competitive Landscape", order: 2 },
+    { id: "regulatory", label: "Regulatory & Policy", order: 3 },
+    { id: "market", label: "Market Conditions", order: 4 },
   ],
 
   defaults: {
@@ -272,7 +272,7 @@ export const config: CmieConfigInput = {
       id: "port-albany-capacity",
       label: "Port of Albany — Berth Capacity",
       entityId: "bluecore-energy",
-      sectionId: "target",
+      sectionId: "company",
       kind: "html",
       url: "https://example.gov/port/capacity",
       schedule: { cron: "0 6 * * *", ttlHours: 72 },
@@ -300,7 +300,7 @@ export const config: CmieConfigInput = {
       id: "eia-regional-price",
       label: "Regional Spot Price",
       entityId: "bluecore-energy",
-      sectionId: "climate",
+      sectionId: "market",
       kind: "api",
       url: "https://api.example.gov/v2/series?series_id=XYZ",
       auth: { type: "query", secretEnv: "EIA_API_KEY", name: "api_key" },

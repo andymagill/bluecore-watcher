@@ -1,6 +1,6 @@
 # Bluecore Watcher
 
-A configurable market intelligence engine: a static dashboard that renders a verified, current-state operational snapshot of a target company, its segment, its regulatory landscape, and its market climate — with every number traceable to the exact page and DOM node it came from.
+A configurable market intelligence engine: a static dashboard that renders a verified, current-state operational snapshot of a target company, its competitive landscape, its regulatory and policy exposure, and market conditions — with every number traceable to the exact page and DOM node it came from.
 
 No database. No LLM in the data path. No hallucination surface.
 

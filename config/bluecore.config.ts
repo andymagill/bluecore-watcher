@@ -1,7 +1,7 @@
 // Real Bluecore Watcher config — triaged 2026-09-12, see docs/05-SOURCES.md
 // for the full method/notes behind each target. Seven targets across all
 // four sections; no auth/secrets required for this pass (EIA's key-gated
-// API was deferred to M2 — see docs/05-SOURCES.md §3 Market Climate notes).
+// API was deferred to M2 — see docs/05-SOURCES.md §3 Market Conditions notes).
 //
 // Paired fixtures live under fixtures/<targetId>/ — captured once, politely,
 // per docs/06-OPS-RUNBOOK.md §8 step 2 (see git history for capture notes).
@@ -23,10 +23,10 @@ export const config: CmieConfigInput = {
   },
 
   sections: [
-    { id: "target", label: "Target Company State", order: 1 },
-    { id: "segment", label: "Industry Segment", order: 2 },
-    { id: "regulatory", label: "Regulatory Landscape", order: 3 },
-    { id: "climate", label: "Market Climate", order: 4 },
+    { id: "company", label: "Company Performance", order: 1 },
+    { id: "competitive", label: "Competitive Landscape", order: 2 },
+    { id: "regulatory", label: "Regulatory & Policy", order: 3 },
+    { id: "market", label: "Market Conditions", order: 4 },
   ],
 
   defaults: {
@@ -36,7 +36,7 @@ export const config: CmieConfigInput = {
   },
 
   targets: [
-    // --- Target Company State ---------------------------------------
+    // --- Company Performance ---------------------------------------
 
     // Official SEC Form D, not press coverage — ground truth for financial
     // milestones. Deliberately disagrees with the widely-reported "$50M
@@ -45,7 +45,7 @@ export const config: CmieConfigInput = {
       id: "bluecore-form-d",
       label: "BlueCore Energy — SEC Form D (Seed, Sept 2026)",
       entityId: "bluecore-energy",
-      sectionId: "target",
+      sectionId: "company",
       kind: "html",
       url: "https://www.sec.gov/Archives/edgar/data/2125928/000212592826000003/primary_doc.xml",
       schedule: { cron: "0 6 * * *", ttlHours: 2160 },
@@ -89,7 +89,7 @@ export const config: CmieConfigInput = {
       id: "bluecore-newsroom",
       label: "BlueCore Energy — Latest News",
       entityId: "bluecore-energy",
-      sectionId: "target",
+      sectionId: "company",
       kind: "html",
       url: "https://www.bluecore.energy/news-insights",
       schedule: { cron: "0 13 * * *", ttlHours: 168 },
@@ -141,7 +141,7 @@ export const config: CmieConfigInput = {
       id: "bluecore-careers",
       label: "BlueCore Energy — Open Roles",
       entityId: "bluecore-energy",
-      sectionId: "target",
+      sectionId: "company",
       kind: "api",
       url: "https://api.lever.co/v0/postings/bluecore-energy?mode=json",
       schedule: { cron: "0 14 * * *", ttlHours: 168 },
@@ -167,7 +167,7 @@ export const config: CmieConfigInput = {
       ],
     },
 
-    // --- Industry Segment ---------------------------------------------
+    // --- Competitive Landscape ---------------------------------------------
 
     // "Competitor activity" per SPEC.md §3's own definition of this
     // section — Oklo (NYSE: OKLO) is the closest publicly-traded peer at a
@@ -176,7 +176,7 @@ export const config: CmieConfigInput = {
       id: "oklo-sec-filings",
       label: "Oklo Inc. — Latest SEC Filing",
       entityId: "oklo-inc",
-      sectionId: "segment",
+      sectionId: "competitive",
       kind: "api",
       url: "https://data.sec.gov/submissions/CIK0001849056.json",
       schedule: { cron: "0 12 * * 1-5", ttlHours: 48 },
@@ -213,10 +213,10 @@ export const config: CmieConfigInput = {
     // Sector-wide document volume — a "sector capacity metrics" proxy,
     // distinct from the NRC-specific regulatory count below.
     {
-      id: "fr-segment-smr-mentions",
+      id: "fr-smr-mentions",
       label: "Federal Register — SMR Mentions (All Agencies)",
       entityId: "bluecore-energy",
-      sectionId: "segment",
+      sectionId: "competitive",
       kind: "api",
       url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest",
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
@@ -237,13 +237,13 @@ export const config: CmieConfigInput = {
       ],
     },
 
-    // --- Regulatory Landscape -------------------------------------------
+    // --- Regulatory & Policy -------------------------------------------
 
     // Bluecore itself has no NRC docket yet (the Long Beach barge holds no
-    // fuel and is pre-certification) — this is a segment-level regulatory-
+    // fuel and is pre-certification) — this is a sector-level regulatory-
     // attention signal, not a Bluecore-specific docket.
     {
-      id: "fr-regulatory-nrc-smr",
+      id: "fr-nrc-smr",
       label: "Federal Register — NRC SMR Documents",
       entityId: "bluecore-energy",
       sectionId: "regulatory",
@@ -266,20 +266,19 @@ export const config: CmieConfigInput = {
       ],
     },
 
-    // --- Market Climate ---------------------------------------------
-
-    // DOE policy-attention proxy — "policy incentives" per SPEC.md §3's
-    // Market Climate definition.
+    // DOE policy-attention proxy — "policy incentives" is regulatory
+    // attention, not a macro indicator, so this target lives here rather
+    // than under Market Conditions.
     {
-      id: "fr-climate-doe-nuclear",
+      id: "fr-doe-nuclear",
       label: "Federal Register — DOE Advanced Nuclear Documents",
       entityId: "bluecore-energy",
-      sectionId: "climate",
+      sectionId: "regulatory",
       kind: "api",
       url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest",
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
       notes:
-        "EIA's regional price-index APIs (the shape example.config.ts's synthetic climate target " +
+        "EIA's regional price-index APIs (the shape example.config.ts's synthetic market target " +
         "mimics) require a free api_key (confirmed: api.eia.gov 403s without one) — deferred to M2 " +
         "rather than adding a secret for this pass.",
       extractors: [
@@ -295,6 +294,11 @@ export const config: CmieConfigInput = {
         },
       ],
     },
+
+    // --- Market Conditions -----------------------------------------
+    // No live source yet: EIA's regional price/capacity indices are the
+    // intended fit but are key-gated (api.eia.gov 403s without one) —
+    // deferred to M2. This section renders a zero-state until then.
   ],
 
   alerting: { channel: "github-issue", minSeverity: "warn" },

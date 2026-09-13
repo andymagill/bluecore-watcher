@@ -1,5 +1,5 @@
 {
-  "commit": "dry-run",
+  "commit": "f23f1fc",
   "displayName": "Bluecore Watcher",
   "entities": [
     {
@@ -14,34 +14,34 @@
     }
   ],
   "environmentId": "bluecore",
-  "generatedAt": "2026-09-12T21:30:26.076Z",
+  "generatedAt": "2026-09-13T12:34:40.732Z",
   "health": {
     "degraded": 0,
     "failed": 0,
     "ok": 1,
     "overall": "ok"
   },
-  "runId": "2026-09-12T21-30-25-906Z-f2b8ec4",
+  "runId": "2026-09-13T12-34-40-667Z-rename",
   "schemaVersion": 1,
   "sections": [
     {
-      "id": "target",
-      "label": "Target Company State",
+      "id": "company",
+      "label": "Company Performance",
       "order": 1
     },
     {
-      "id": "segment",
-      "label": "Industry Segment",
+      "id": "competitive",
+      "label": "Competitive Landscape",
       "order": 2
     },
     {
       "id": "regulatory",
-      "label": "Regulatory Landscape",
+      "label": "Regulatory & Policy",
       "order": 3
     },
     {
-      "id": "climate",
-      "label": "Market Climate",
+      "id": "market",
+      "label": "Market Conditions",
       "order": 4
     }
   ],
@@ -51,9 +51,9 @@
       "id": "bluecore-newsroom",
       "label": "BlueCore Energy — Latest News",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-12T21:30:25.922Z",
-      "path": "sections/target/bluecore-newsroom.json",
-      "sectionId": "target",
+      "lastSuccessAt": "2026-09-13T12:34:40.732Z",
+      "path": "sections/company/bluecore-newsroom.json",
+      "sectionId": "company",
       "ttlHours": 168
     }
   ]
