@@ -20,10 +20,10 @@ export const config: CmieConfigInput = {
   },
 
   sections: [
-    { id: "target", label: "Target Company State", order: 1 },
-    { id: "segment", label: "Industry Segment", order: 2 },
-    { id: "regulatory", label: "Regulatory Landscape", order: 3 },
-    { id: "climate", label: "Market Climate", order: 4 },
+    { id: "company", label: "Company Performance", order: 1 },
+    { id: "competitive", label: "Competitive Landscape", order: 2 },
+    { id: "regulatory", label: "Regulatory & Policy", order: 3 },
+    { id: "market", label: "Market Conditions", order: 4 },
   ],
 
   defaults: {
@@ -38,7 +38,7 @@ export const config: CmieConfigInput = {
       id: "example-capacity",
       label: "Example Co — Facility Capacity",
       entityId: "example-co",
-      sectionId: "target",
+      sectionId: "company",
       kind: "html",
       url: "https://example.test/facility/capacity",
       schedule: { cron: "0 6 * * *", ttlHours: 72 },
@@ -110,7 +110,7 @@ export const config: CmieConfigInput = {
       id: "example-price-index",
       label: "Example Regional Price Index",
       entityId: "example-co",
-      sectionId: "climate",
+      sectionId: "market",
       kind: "api",
       url: "https://api.example.test/v1/series?series_id=EXAMPLE",
       schedule: { cron: "0 7 * * 1-5", ttlHours: 48 },

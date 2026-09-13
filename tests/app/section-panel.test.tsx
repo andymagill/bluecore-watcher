@@ -22,7 +22,7 @@ function makeTargetFile(): TargetFile {
     schemaVersion: 1,
     targetId: "bluecore-newsroom",
     entityId: "bluecore-energy",
-    sectionId: "target",
+    sectionId: "company",
     label: "BlueCore Energy - Latest News",
     sourceUrl: "https://www.bluecore.energy/news-insights",
     ttlHours: 168,
@@ -63,14 +63,14 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
     const tf = makeTargetFile();
     render(
       <SectionPanel
-        section={{ id: "target", label: "Target Company State", order: 1 }}
+        section={{ id: "company", label: "Company Performance", order: 1 }}
         manifestTargets={[
           {
             id: "bluecore-newsroom",
-            sectionId: "target",
+            sectionId: "company",
             entityId: "bluecore-energy",
             label: tf.label,
-            path: "sections/target/bluecore-newsroom.json",
+            path: "sections/company/bluecore-newsroom.json",
             ttlHours: 168,
             lastRunStatus: "ok",
             lastSuccessAt: "2026-09-12T00:00:00Z",
@@ -80,23 +80,23 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
         now={NOW}
       />,
     );
-    expect(screen.getByText("Target Company State")).toBeInTheDocument();
+    expect(screen.getByText("Company Performance")).toBeInTheDocument();
     expect(screen.getByText(tf.label)).toBeInTheDocument();
     expect(
       document.querySelector('[data-block-key="bluecore-newsroom.latest_headline"]'),
     ).not.toBeNull();
   });
 
-  it("renders an explicit zero-state when the section has no targets (segment/regulatory/climate in M1)", () => {
+  it("renders an explicit zero-state when the section has no targets (competitive/regulatory/market in M1)", () => {
     render(
       <SectionPanel
-        section={{ id: "segment", label: "Industry Segment", order: 2 }}
+        section={{ id: "competitive", label: "Competitive Landscape", order: 2 }}
         manifestTargets={[]}
         targetFiles={new Map()}
         now={NOW}
       />,
     );
-    expect(screen.getByRole("heading", { name: "Industry Segment" })).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Competitive Landscape" })).toBeInTheDocument();
     expect(screen.getByText(/No targets configured for this section yet/)).toBeInTheDocument();
     // No block-bearing node should be counted for an empty section.
     expect(document.querySelectorAll("[data-block-key]").length).toBe(0);

@@ -120,7 +120,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // production" is about the *broken* value, not about withholding the
       // failure record itself (which is exactly what the health entry is for).
       const onDisk = JSON.parse(
-        await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"),
+        await readFile(join(dataDir, "sections", "company", "bluecore-newsroom.json"), "utf-8"),
       );
       expect(onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline").value).toBe(
         REAL_HEADLINE,
@@ -194,7 +194,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // Confirm what's actually committed on disk still reflects run 2's
       // changedAt -- this is exactly what powers "unchanged for N days".
       const onDisk = JSON.parse(
-        await readFile(join(dataDir, "sections", "target", "bluecore-newsroom.json"), "utf-8"),
+        await readFile(join(dataDir, "sections", "company", "bluecore-newsroom.json"), "utf-8"),
       );
       const onDiskBlock = onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline");
       expect(onDiskBlock.delta.changedAt).toBe("2026-09-11T13:00:00.000Z");

@@ -23,14 +23,14 @@ function makeManifest(): Manifest {
     runId: RUN_ID,
     commit: "abc1234",
     entities: [{ id: "p", name: "P", role: "primary" }],
-    sections: [{ id: "target", label: "Target", order: 1 }],
+    sections: [{ id: "company", label: "Company", order: 1 }],
     targets: [
       {
         id: "t1",
-        sectionId: "target",
+        sectionId: "company",
         entityId: "p",
         label: "T1",
-        path: "sections/target/t1.json",
+        path: "sections/company/t1.json",
         ttlHours: 168,
         lastRunStatus: "ok",
         lastSuccessAt: "2026-09-12T00:00:00Z",
@@ -45,7 +45,7 @@ function makeTargetFile(blockCount: number): TargetFile {
     schemaVersion: 1,
     targetId: "t1",
     entityId: "p",
-    sectionId: "target",
+    sectionId: "company",
     label: "T1",
     sourceUrl: "https://example.test/page",
     ttlHours: 168,
@@ -95,7 +95,7 @@ async function startSite(site: Site): Promise<{ url: string; server: Server }> {
     } else if (path === "/data/manifest.json") {
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify(site.manifest));
-    } else if (path === "/data/sections/target/t1.json") {
+    } else if (path === "/data/sections/company/t1.json") {
       res.writeHead(200, { "content-type": "application/json" });
       res.end(JSON.stringify(site.targetFile));
     } else {
@@ -185,7 +185,7 @@ describe("runSmokeRender", () => {
 
     const result = await runSmokeRender(`http://127.0.0.1:${port}`, manifest, [targetFile]);
     expect(result.passed).toBe(false);
-    expect(result.errors.some((e) => e.includes("sections/target/t1.json returned 404"))).toBe(
+    expect(result.errors.some((e) => e.includes("sections/company/t1.json returned 404"))).toBe(
       true,
     );
   });

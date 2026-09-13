@@ -11,13 +11,13 @@ function baseConfig(): CmieConfigInput {
       displayName: "Test Env",
       entities: [{ id: "primary-co", name: "Primary Co", role: "primary" as const }],
     },
-    sections: [{ id: "target", label: "Target", order: 1 }],
+    sections: [{ id: "company", label: "Company", order: 1 }],
     targets: [
       {
         id: "t1",
         label: "Target One",
         entityId: "primary-co",
-        sectionId: "target",
+        sectionId: "company",
         kind: "html" as const,
         url: "https://example.test/page",
         schedule: { cron: "0 6 * * *", ttlHours: 72 },
