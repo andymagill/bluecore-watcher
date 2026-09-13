@@ -478,12 +478,15 @@ export const config: CmieConfigInput = {
           // M2b: min/max tightened from a bare non-negative check to a real
           // sanity band for a US industrial retail rate in ¢/kWh (EIA's
           // national range across all states/sectors runs roughly 5-40;
-          // California industrial has run ~18-21 through 2026). maxChangePct
-          // is deliberately not set yet — EIA_API_KEY is a GitHub Actions
-          // secret only, not available to derive a real month-over-month
-          // tolerance from 36mo of history locally; tracked to add once that
-          // backfill runs (see the M2b PR description).
-          assert: { min: 5, max: 60, notEmpty: true },
+          // California industrial has run 17.7-25.53 over the 3yr backfill
+          // below). maxChangePct backfilled against 36mo of this series'
+          // real history (api.eia.gov, 2023-07 through 2026-06): prices
+          // trace a seasonal summer-peak/winter-trough pattern, and the
+          // largest observed single-month move in that window was 16.31%
+          // (2025-10: 23.05 -> 2025-11: 19.29). 25 is ~1.5x that ceiling —
+          // real seasonal swings publish, a decimal-place/unit error (a 10x
+          // jump) doesn't.
+          assert: { min: 5, max: 60, maxChangePct: 25, notEmpty: true },
         },
         {
           key: "price_period",
