@@ -1,5 +1,5 @@
 {
-  "commit": "f23f1fc",
+  "commit": "73e8f42",
   "displayName": "Bluecore Watcher",
   "entities": [
     {
@@ -11,17 +11,22 @@
       "id": "oklo-inc",
       "name": "Oklo Inc.",
       "role": "competitor"
+    },
+    {
+      "id": "nuscale-power",
+      "name": "NuScale Power Corporation",
+      "role": "competitor"
     }
   ],
   "environmentId": "bluecore",
-  "generatedAt": "2026-09-13T12:34:40.732Z",
+  "generatedAt": "2026-09-13T15:35:34.907Z",
   "health": {
     "degraded": 0,
     "failed": 0,
-    "ok": 1,
+    "ok": 9,
     "overall": "ok"
   },
-  "runId": "2026-09-13T12-34-40-667Z-rename",
+  "runId": "2026-09-13T15-35-27-115Z-9ac2084",
   "schemaVersion": 1,
   "sections": [
     {
@@ -48,13 +53,93 @@
   "targets": [
     {
       "entityId": "bluecore-energy",
+      "id": "bluecore-form-d",
+      "label": "BlueCore Energy — SEC Form D (Seed, Sept 2026)",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:27.493Z",
+      "path": "sections/company/bluecore-form-d.json",
+      "sectionId": "company",
+      "ttlHours": 2160
+    },
+    {
+      "entityId": "bluecore-energy",
       "id": "bluecore-newsroom",
       "label": "BlueCore Energy — Latest News",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-13T12:34:40.732Z",
+      "lastSuccessAt": "2026-09-13T15:35:27.743Z",
       "path": "sections/company/bluecore-newsroom.json",
       "sectionId": "company",
       "ttlHours": 168
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "bluecore-careers",
+      "label": "BlueCore Energy — Open Roles",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:30.096Z",
+      "path": "sections/company/bluecore-careers.json",
+      "sectionId": "company",
+      "ttlHours": 168
+    },
+    {
+      "entityId": "oklo-inc",
+      "id": "oklo-sec-filings",
+      "label": "Oklo Inc. — Latest SEC Filing",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:30.473Z",
+      "path": "sections/competitive/oklo-sec-filings.json",
+      "sectionId": "competitive",
+      "ttlHours": 48
+    },
+    {
+      "entityId": "nuscale-power",
+      "id": "nuscale-sec-filings",
+      "label": "NuScale Power — Latest SEC Filing",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:32.157Z",
+      "path": "sections/competitive/nuscale-sec-filings.json",
+      "sectionId": "competitive",
+      "ttlHours": 48
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "fr-smr-mentions",
+      "label": "Federal Register — SMR Mentions (All Agencies)",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:32.650Z",
+      "path": "sections/competitive/fr-smr-mentions.json",
+      "sectionId": "competitive",
+      "ttlHours": 168
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "fr-nrc-smr",
+      "label": "Federal Register — NRC SMR Documents",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:33.279Z",
+      "path": "sections/regulatory/fr-nrc-smr.json",
+      "sectionId": "regulatory",
+      "ttlHours": 168
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "fr-doe-nuclear",
+      "label": "Federal Register — DOE Advanced Nuclear Documents",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:34.248Z",
+      "path": "sections/regulatory/fr-doe-nuclear.json",
+      "sectionId": "regulatory",
+      "ttlHours": 168
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "eia-ca-industrial-price",
+      "label": "EIA — CA Industrial Retail Electricity Price",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-13T15:35:34.907Z",
+      "path": "sections/market/eia-ca-industrial-price.json",
+      "sectionId": "market",
+      "ttlHours": 1440
     }
   ]
 }

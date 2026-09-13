@@ -1,0 +1,62 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": "4/A",
+      "key": "latest_filing_form",
+      "label": "Latest Filing Type",
+      "presenter": "markdown",
+      "provenance": {
+        "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
+        "contentHash": "sha256:498a5992a45cccadc5248e2877cd367d7a457e547d0d0658f58b558705f0b070",
+        "extractedAt": "2026-09-13T15:35:32.156Z",
+        "rawText": "4/A",
+        "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
+      },
+      "status": "ok",
+      "type": "string",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "4/A"
+    },
+    {
+      "delta": null,
+      "displayValue": "11 Sep 2026",
+      "key": "latest_filing_date",
+      "label": "Latest Filing Date",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
+        "contentHash": "sha256:d31fac478f875d3f8fa95a8a9a30f31d7f5d90946da706c50a45be42524934ba",
+        "extractedAt": "2026-09-13T15:35:32.156Z",
+        "rawText": "2026-09-11",
+        "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
+      },
+      "status": "ok",
+      "type": "date",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "2026-09-11T00:00:00.000Z"
+    }
+  ],
+  "entityId": "nuscale-power",
+  "label": "NuScale Power — Latest SEC Filing",
+  "run": {
+    "completedAt": "2026-09-13T15:35:32.157Z",
+    "durationMs": 1684,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-13T15-35-27-115Z-9ac2084",
+    "startedAt": "2026-09-13T15:35:30.473Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "competitive",
+  "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json",
+  "targetId": "nuscale-sec-filings",
+  "ttlHours": 48
+}
