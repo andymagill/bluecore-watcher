@@ -22,13 +22,16 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 ## 2. Secrets
 
-| Name                   | Purpose                                   |
-| ---------------------- | ----------------------------------------- |
-| `CLOUDFLARE_API_TOKEN` | Preview URL resolution in the gate        |
-| `INGEST_PSK`           | Edge relay authentication                 |
-| `<SOURCE>_API_KEY`     | Per authenticated source, named in config |
+| Name                   | Purpose                                                                       |
+| ---------------------- | ----------------------------------------------------------------------------- |
+| `CLOUDFLARE_API_TOKEN` | Preview URL resolution in the gate                                            |
+| `INGEST_PSK`           | Edge relay authentication                                                     |
+| `EIA_API_KEY`          | `eia-ca-industrial-price` target (`auth.type: "query"`) — first real use, M2a |
+| `<SOURCE>_API_KEY`     | Per additional authenticated source, named in config                          |
 
 All GitHub Actions repository secrets. Never in config — config is committed, and a literal-secret pattern scan runs in CI (validation rule 11).
+
+A captured fixture is not automatically safe from this either: an authenticated source can echo its own key back in the response body (confirmed live against EIA's v2 API, which returns `request.params.api_key` verbatim). `npm run fixture:capture` scrubs the captured body against every active `secretEnv` value before writing to disk (the same `src/ingest/scrub.ts` functions the persist layer uses) — but a fixture captured by any other means (hand-copied via `curl`, a browser devtools export) is not, so scrub it yourself before committing.
 
 Error text and `rawText` are scrubbed against active secret values before being written to any committed file (`health.json` or a target file). A token echoed in a 401 body would otherwise land permanently in the Git history that serves as the audit trail.
 
@@ -42,10 +45,10 @@ The routine failure. Expect these weekly.
 
 1. **Triage by age.** `consecutiveFailures` ≤ 2 on a flaky source may self-resolve. Above 3, fix it.
 2. **Read `notes`** on the target config. Past-you may have already predicted this.
-3. **Capture a fresh fixture.** `npm run fixture:capture <targetId>` — do not fix a selector against the live page.
+3. **Capture a fresh fixture.** `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page. If the broken-selector case is itself worth keeping as a regression fixture, copy the old file aside under a different target id before capturing (no automated old/new fixture pairing exists yet).
 4. **Diff old fixture against new.** This shows what actually changed.
 5. **Repair.** Hand-write the selector, or run the LLM repair tool (ADR-003) to propose candidates. Either way it arrives as a PR.
-6. **Test.** Unit test against both fixtures — the new one must pass, the old one is kept as a regression case.
+6. **Test.** Re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `tests/targets.baseline.test.ts` (M2a) then enforces it stays that way.
 7. **Merge.** The next scheduled run picks it up; force one with `workflow_dispatch` if it matters.
 
 **Prefer resilient selectors.** Match on a label cell, a `data-` attribute, or text content rather than `nth-child`. Positional selectors are the ones that break.
@@ -117,7 +120,7 @@ The drift check (`03-INGESTION.md` §5) is what keeps this number from growing: 
 The ADR-001 test. Target: one afternoon (open question Q8).
 
 1. `config/<envId>.config.ts` — entities, sections, targets, extractors.
-2. Capture a fixture per target; write extractor unit tests.
+2. Capture a fixture per target (`npm run fixture:capture -- --env <envId> <targetId>`), then bless its golden file (`npm run fixture:bless -- --env <envId> <targetId>`). `tests/targets.baseline.test.ts` is currently hardcoded to `config/bluecore.config.ts` (M2a scope — one environment), so it picks up every _new target added to that file_ automatically with no per-target test needed; a genuinely new environment (a second client, the real ADR-001 test per `07-ROADMAP.md`'s Deferred table) needs its own equivalent baseline test importing its own config.
 3. Set secrets for authenticated sources.
 4. `npm run validate:config`.
 5. Dry run: `npm run ingest -- --env <envId> --dry` — writes nothing, prints what it would extract.
