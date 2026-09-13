@@ -1,0 +1,42 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": "51 documents",
+      "key": "doe_nuclear_policy_count",
+      "label": "DOE Advanced Nuclear Document Count",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#$.count",
+        "contentHash": "sha256:031b4af5197ec30a926f48cf40e11a7dbc470048a21e4003b7a3c07c5dab1baa",
+        "extractedAt": "2026-09-13T15:26:55.730Z",
+        "rawText": "51",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "number",
+      "unit": "documents",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": 51
+    }
+  ],
+  "entityId": "bluecore-energy",
+  "label": "Federal Register — DOE Advanced Nuclear Documents",
+  "run": {
+    "completedAt": "2026-09-13T15:26:55.731Z",
+    "durationMs": 966,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-13T15-26-47-889Z-bc49277",
+    "startedAt": "2026-09-13T15:26:54.765Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "regulatory",
+  "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest",
+  "targetId": "fr-doe-nuclear",
+  "ttlHours": 168
+}

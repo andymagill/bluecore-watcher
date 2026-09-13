@@ -1,0 +1,42 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": "55 documents",
+      "key": "nrc_smr_document_count",
+      "label": "NRC SMR Document Count",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
+        "contentHash": "sha256:02d20bbd7e394ad5999a4cebabac9619732c343a4cac99470c03e23ba2bdc2bc",
+        "extractedAt": "2026-09-13T15:26:54.765Z",
+        "rawText": "55",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "number",
+      "unit": "documents",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": 55
+    }
+  ],
+  "entityId": "bluecore-energy",
+  "label": "Federal Register — NRC SMR Documents",
+  "run": {
+    "completedAt": "2026-09-13T15:26:54.765Z",
+    "durationMs": 897,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-13T15-26-47-889Z-bc49277",
+    "startedAt": "2026-09-13T15:26:53.868Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "regulatory",
+  "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest",
+  "targetId": "fr-nrc-smr",
+  "ttlHours": 168
+}

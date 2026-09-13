@@ -1,0 +1,63 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": "20.74 ¢/kWh",
+      "key": "retail_price_industrial",
+      "label": "CA Industrial Retail Price",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
+        "contentHash": "sha256:a1188ae4ce3c918f1081e2c6924346d88cd0614f0ddb281286935b4ec56dedfc",
+        "extractedAt": "2026-09-13T15:26:56.717Z",
+        "rawText": "20.74",
+        "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
+      },
+      "status": "ok",
+      "type": "number",
+      "unit": "¢/kWh",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": 20.74
+    },
+    {
+      "delta": null,
+      "displayValue": "2026-06",
+      "key": "price_period",
+      "label": "Price Period",
+      "presenter": "markdown",
+      "provenance": {
+        "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
+        "contentHash": "sha256:383eb859abccbfc4f33ef694d899c53e722bde6b6c54e6ffc3ca171476672f15",
+        "extractedAt": "2026-09-13T15:26:56.718Z",
+        "rawText": "2026-06",
+        "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
+      },
+      "status": "ok",
+      "type": "string",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "2026-06"
+    }
+  ],
+  "entityId": "bluecore-energy",
+  "label": "EIA — CA Industrial Retail Electricity Price",
+  "run": {
+    "completedAt": "2026-09-13T15:26:56.718Z",
+    "durationMs": 987,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-13T15-26-47-889Z-bc49277",
+    "startedAt": "2026-09-13T15:26:55.731Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "market",
+  "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1",
+  "targetId": "eia-ca-industrial-price",
+  "ttlHours": 1440
+}

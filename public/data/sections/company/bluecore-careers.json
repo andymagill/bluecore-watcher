@@ -1,0 +1,42 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": "9 roles",
+      "key": "open_roles_count",
+      "label": "Open Roles",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://api.lever.co/v0/postings/bluecore-energy?mode=json#$.length",
+        "contentHash": "sha256:19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7",
+        "extractedAt": "2026-09-13T15:26:51.645Z",
+        "rawText": "9",
+        "sourceUrl": "https://api.lever.co/v0/postings/bluecore-energy?mode=json"
+      },
+      "status": "ok",
+      "type": "number",
+      "unit": "roles",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": 9
+    }
+  ],
+  "entityId": "bluecore-energy",
+  "label": "BlueCore Energy — Open Roles",
+  "run": {
+    "completedAt": "2026-09-13T15:26:51.647Z",
+    "durationMs": 3284,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-13T15-26-47-889Z-bc49277",
+    "startedAt": "2026-09-13T15:26:48.363Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "company",
+  "sourceUrl": "https://api.lever.co/v0/postings/bluecore-energy?mode=json",
+  "targetId": "bluecore-careers",
+  "ttlHours": 168
+}

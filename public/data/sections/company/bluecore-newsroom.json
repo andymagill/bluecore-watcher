@@ -9,7 +9,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(2)",
         "contentHash": "sha256:2bb00c8ddb95e10ee5e09632a01b459f1a885f3627e7748fea27d76ac623fa48",
-        "extractedAt": "2026-09-13T12:34:40.728Z",
+        "extractedAt": "2026-09-13T15:26:48.356Z",
         "rawText": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -30,7 +30,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86",
-        "extractedAt": "2026-09-13T12:34:40.731Z",
+        "extractedAt": "2026-09-13T15:26:48.358Z",
         "rawText": "September 8, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -51,7 +51,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(1)",
         "contentHash": "sha256:180c9abd7392671b20a7438ab3b9fe55dfbe981f3f783de7757dd0b203894e2c",
-        "extractedAt": "2026-09-13T12:34:40.732Z",
+        "extractedAt": "2026-09-13T15:26:48.362Z",
         "rawText": "Press Release",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -67,12 +67,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-09-13T12:34:40.732Z",
-    "durationMs": 19,
+    "completedAt": "2026-09-13T15:26:48.363Z",
+    "durationMs": 284,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-13T12-34-40-667Z-rename",
-    "startedAt": "2026-09-13T12:34:40.713Z",
+    "runId": "2026-09-13T15-26-47-889Z-bc49277",
+    "startedAt": "2026-09-13T15:26:48.079Z",
     "status": "ok"
   },
   "schemaVersion": 1,
