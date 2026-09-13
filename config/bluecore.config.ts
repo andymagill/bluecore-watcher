@@ -19,6 +19,7 @@ export const config: CmieConfigInput = {
     entities: [
       { id: "bluecore-energy", name: "BlueCore Energy, Inc.", role: "primary" },
       { id: "oklo-inc", name: "Oklo Inc.", role: "competitor" },
+      { id: "nuscale-power", name: "NuScale Power Corporation", role: "competitor" },
     ],
   },
 
@@ -184,8 +185,51 @@ export const config: CmieConfigInput = {
       notes:
         "data.sec.gov has no robots.txt (404 = unrestricted) but SEC's documented Fair Access policy " +
         "requires a declared UA with contact info and caps at 10 req/sec — a weekday-daily cron is " +
-        "far under that. NuScale (CIK 0001822966) is an equally-viable second competitor, deferred " +
-        "to M2 breadth.",
+        "far under that. NuScale (CIK 0001822966) is an equally-viable second competitor — see " +
+        "nuscale-sec-filings below, added M2a.",
+      extractors: [
+        {
+          key: "latest_filing_form",
+          label: "Latest Filing Type",
+          presenter: "markdown",
+          kind: "api",
+          jsonPath: "$.filings.recent.form[0]",
+          type: "string",
+          required: true,
+          assert: { notEmpty: true, maxLength: 20 },
+        },
+        {
+          key: "latest_filing_date",
+          label: "Latest Filing Date",
+          presenter: "metric",
+          kind: "api",
+          jsonPath: "$.filings.recent.filingDate[0]",
+          type: "date",
+          required: true,
+          assert: { notEmpty: true },
+        },
+      ],
+    },
+
+    // Second competitor per M2 breadth (previously deferred, see the note
+    // on oklo-sec-filings above) — NuScale (NYSE: SMR) is the other
+    // publicly-traded advanced-fission peer at a comparable pre-revenue,
+    // scaling stage. Identical shape to oklo-sec-filings by design: same
+    // API, same two facts, same Fair Access politeness.
+    {
+      id: "nuscale-sec-filings",
+      label: "NuScale Power — Latest SEC Filing",
+      entityId: "nuscale-power",
+      sectionId: "competitive",
+      kind: "api",
+      url: "https://data.sec.gov/submissions/CIK0001822966.json",
+      schedule: { cron: "0 12 * * 1-5", ttlHours: 48 },
+      politeness: { minIntervalMs: 2000, userAgent: SEC_UA },
+      notes:
+        'Verified live 2026-09-13: CIK 0001822966 resolves to "NUSCALE POWER Corp" (NYSE: SMR), ' +
+        "$.filings.recent.form[0] and .filingDate[0] populated identically to oklo-sec-filings' shape " +
+        "(most recent filing at triage time: a 4/A dated 2026-09-11). Same Fair Access reasoning as " +
+        "oklo-sec-filings — a weekday-daily cron against data.sec.gov is far under the 10 req/sec cap.",
       extractors: [
         {
           key: "latest_filing_form",
