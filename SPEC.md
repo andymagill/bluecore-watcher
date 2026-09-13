@@ -12,7 +12,7 @@
 
 ### **1. Vision & Purpose**
 
-The Configurable Market Intelligence Engine (CMIE) is a lightweight, high-density intelligence command center delivering a real-time, evidence-based operational snapshot of a target company, its industry segment, regulatory dockets, and macroeconomic climate.
+The Configurable Market Intelligence Engine (CMIE) is a lightweight, high-density intelligence command center delivering a real-time, evidence-based operational snapshot of a target company, its competitive landscape, regulatory dockets, and macroeconomic conditions.
 
 The CMIE is intentionally positioned as a **"Deal Command Center"** rather than a top-of-funnel company discovery tool (competing with PitchBook). It is deployed post-thesis when deal teams need absolute, noise-free operational truth without the risk of AI hallucination, database infrastructure overhead, or enterprise per-seat subscriptions.
 
@@ -56,14 +56,14 @@ The CMIE is intentionally positioned as a **"Deal Command Center"** rather than 
 - **Flat-File Architecture:** Zero database. Uses modular, isolated flat JSON storage as the runtime state snapshot to ensure clean, readable Git diffs. Scale ceiling stated explicitly in ADR-007.
 - **Zero-LLM Runtime:** **[Amended — ADR-003]** No LLM call occurs during ingestion, transformation, or rendering. LLMs may be used offline to draft extractor configs and propose replacement selectors, delivered as reviewed pull requests subject to the same validation gate. The determinism guarantee is about the data path; selector maintenance is not the data path.
 
-### **3. Core Intelligence Dimensions**
+### **3. Core Intelligence Dimensions** **[Amended 2026-09-13]**
 
-The UI dynamically renders four top-level operational sections configured in the target matrix:
+The UI dynamically renders four top-level operational sections configured in the target matrix, using the standard concentric-scan vocabulary a diligence analyst already reads day to day — the company, its rivals, the rules, the macro backdrop:
 
-1. **Target Company State:** Operational status, asset capacity, financial milestones, executive developments.
-2. **Industry Segment:** Competitor activity, sector capacity metrics, technology updates, supply chain bottlenecks.
-3. **Regulatory Landscape:** Active dockets, municipal/port approvals, federal frameworks, environmental reviews.
-4. **Market Climate:** Macroeconomic indicators, sector sentiment, policy incentives, commodity/capacity indices.
+1. **Company Performance:** Operational status, asset capacity, financial milestones, executive developments.
+2. **Competitive Landscape:** Competitor activity, sector capacity metrics, technology updates, supply chain bottlenecks.
+3. **Regulatory & Policy:** Active dockets, municipal/port approvals, federal frameworks, environmental reviews, policy incentives.
+4. **Market Conditions:** Macroeconomic indicators, sector sentiment, commodity/capacity indices.
 
 Section identifiers are configuration, not framework constants. Another environment may define a different set.
 
@@ -178,3 +178,5 @@ _The original design mapped a long-lived `data` branch to the production domain 
 **2026-09-12** — Amended following an implementation-readiness review. The Part 2 §1 stack constraint is no longer "unvalidated pending Q2" — ADR-010 made extraction a handler registry, so a source-kind mix can no longer invalidate the architecture, only the build order. Part 6's PDF gap reworded on the same basis. Four internal contradictions closed in `docs/00-DECISIONS.md` through `docs/06-OPS-RUNBOOK.md` (ADR-008 through ADR-012); see that log for detail. `docs/07-ROADMAP.md` corrected: the engine core (M0.5) does not block on source triage (Q1/M0) — it runs concurrently, per ADR-001's own premise that the engine is source-independent. A later pass the same day fixed two remaining staleness bugs: Part 2 §2 still listed `pdf` as a v1 extraction kind after ADR-010 removed it (`docs/02-CONFIG-SCHEMA.md` §2 had the same bug, fixed there too); and the positioning table's "Near-Zero" infrastructure cost row hadn't picked up ADR-007's Vercel-Hobby-excludes-commercial-use caveat, added the same day to `docs/06-OPS-RUNBOOK.md` and `README.md` but missed here.
 
 **2026-09-12 (later same day)** — Corrected under ADR-013: **Vercel was never an accepted decision.** Every reference to it in this document, `docs/00-DECISIONS.md`, `docs/03-INGESTION.md`, `docs/06-OPS-RUNBOOK.md`, `docs/07-ROADMAP.md`, and `README.md` is fixed to Cloudflare (Pages for the SPA and its preview deploys, Workers for the edge relay). ADR-005's branch/preview/gate mechanics are unchanged — Cloudflare Pages' branch-to-deployment model matches closely enough that only the vendor name and specific tokens/secrets moved. The Vercel-Hobby-excludes-commercial-use cost-floor finding from the previous entry does **not** carry over automatically; ADR-007's note now says so explicitly rather than restating an unverified number for a different vendor.
+
+**2026-09-13** — Part 1 §3's three non-standard section names replaced with commonplace diligence vocabulary: Industry Segment → **Competitive Landscape**, Regulatory Landscape → **Regulatory & Policy**, Market Climate → **Market Conditions** (Target Company State → **Company Performance** for consistency, though that label was already fine). The `fr-climate-doe-nuclear` target also moved from the macro section into regulatory — a DOE policy-attention document count is regulatory signal, not a macro indicator — so §3's Market Conditions bullet no longer claims "policy incentives," and that section renders a zero-state until the EIA sources land in M2. Section _ids_ changed too (`target`→`company`, `segment`→`competitive`, `climate`→`market`; `regulatory` unchanged) and are reflected in `config/bluecore.config.ts`, `config/example.config.ts`, and the regenerated `public/data/`; this is a config/data change, not an architectural one — no ADR needed, since SPEC §3's own "configuration, not framework constants" claim already covers it.

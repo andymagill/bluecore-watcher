@@ -13,13 +13,13 @@ public/data/
   manifest.json                    # environment metadata + target index
   health.json                      # pipeline health log
   sections/
-    target/
+    company/
       <targetId>.json
-    segment/
+    competitive/
       <targetId>.json
     regulatory/
       <targetId>.json
-    climate/
+    market/
       <targetId>.json
 ```
 
@@ -50,18 +50,18 @@ Fetched first. Everything else is discovered from it.
     { "id": "competitor-x", "name": "Competitor X", "role": "competitor" }
   ],
   "sections": [
-    { "id": "target", "label": "Target Company State", "order": 1 },
-    { "id": "segment", "label": "Industry Segment", "order": 2 },
-    { "id": "regulatory", "label": "Regulatory Landscape", "order": 3 },
-    { "id": "climate", "label": "Market Climate", "order": 4 }
+    { "id": "company", "label": "Company Performance", "order": 1 },
+    { "id": "competitive", "label": "Competitive Landscape", "order": 2 },
+    { "id": "regulatory", "label": "Regulatory & Policy", "order": 3 },
+    { "id": "market", "label": "Market Conditions", "order": 4 }
   ],
   "targets": [
     {
       "id": "port-albany-capacity",
-      "sectionId": "target",
+      "sectionId": "company",
       "entityId": "bluecore-energy",
       "label": "Port of Albany — Berth Capacity",
-      "path": "sections/target/port-albany-capacity.json",
+      "path": "sections/company/port-albany-capacity.json",
       "ttlHours": 72,
       "lastRunStatus": "ok",
       "lastSuccessAt": "2026-09-11T06:00:09Z"
@@ -89,7 +89,7 @@ Fetched first. Everything else is discovered from it.
   "schemaVersion": 1,
   "targetId": "port-albany-capacity",
   "entityId": "bluecore-energy",
-  "sectionId": "target",
+  "sectionId": "company",
   "label": "Port of Albany — Berth Capacity",
   "sourceUrl": "https://example.gov/port/capacity",
   "ttlHours": 72,
