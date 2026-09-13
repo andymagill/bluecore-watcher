@@ -226,10 +226,20 @@ describe("CmieConfig validation rules", () => {
 
     it("accepts maxLength on presenter list (per-item)", () => {
       const cfg = baseConfig();
-      cfg.targets[0]!.extractors[0]!.type = "string";
-      cfg.targets[0]!.extractors[0]!.presenter = "list";
-      cfg.targets[0]!.extractors[0]!.multiple = true;
-      cfg.targets[0]!.extractors[0]!.assert = { maxLength: 10 };
+      // Full reassignment, not field mutation: cfg.targets[0]!.extractors[0]
+      // is typed as the ExtractorDef union, so writing `.multiple` through a
+      // partially-narrowed reference doesn't type-check even when `kind` was
+      // set to "html" earlier — same pattern the rule 6 test above uses.
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        selector: "#x",
+        multiple: true,
+        type: "string",
+        assert: { maxLength: 10 },
+      };
       expect(CmieConfig.safeParse(cfg).success).toBe(true);
     });
 
@@ -245,10 +255,16 @@ describe("CmieConfig validation rules", () => {
 
     it("accepts maxChangePct/maxChangeAbs on presenter list (item count)", () => {
       const cfg = baseConfig();
-      cfg.targets[0]!.extractors[0]!.type = "string";
-      cfg.targets[0]!.extractors[0]!.presenter = "list";
-      cfg.targets[0]!.extractors[0]!.multiple = true;
-      cfg.targets[0]!.extractors[0]!.assert = { maxChangeAbs: 5 };
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        selector: "#x",
+        multiple: true,
+        type: "string",
+        assert: { maxChangeAbs: 5 },
+      };
       expect(CmieConfig.safeParse(cfg).success).toBe(true);
     });
 

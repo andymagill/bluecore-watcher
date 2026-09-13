@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // npm run ingest -- --env <id> [--dry] [--live] [--only <id[,id...]>]
-// 06-OPS-RUNBOOK.md §8 step 5: --dry writes nothing, prints what it would
+// 06-OPS-RUNBOOK.md §9 step 5: --dry writes nothing, prints what it would
 // extract. Without --dry, runs the offline gate before writing (M0.5 stand-in
 // for ADR-005 — see src/ingest/orchestrate.ts).
 //
