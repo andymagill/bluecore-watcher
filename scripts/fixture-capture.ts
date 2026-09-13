@@ -6,10 +6,16 @@
 // deliberately not a second, simpler fetch implementation, so a captured
 // fixture always matches what a live --live run would actually have seen.
 //
-// Writes fixtures/<targetId>/response.<ext> verbatim (no formatting --
-// .prettierignore excludes fixtures/** on purpose, see docs/00-DECISIONS.md).
-// Overwriting an existing fixture prints old vs. new byte size so a
-// redesign is visible before it's blessed.
+// Writes fixtures/<targetId>/response.<ext>, scrubbed of any active
+// auth.secretEnv value first (src/ingest/scrub.ts -- the same scrubbing the
+// persist layer applies to committed target files/health entries, reused
+// here rather than duplicated). This matters because an authenticated
+// source can echo the secret back in its own response body -- confirmed
+// live against EIA's v2 API, which echoes `api_key` in `request.params` --
+// and a fixture is committed to Git exactly like any other file. Otherwise
+// unformatted/verbatim (.prettierignore excludes fixtures/** on purpose,
+// see docs/00-DECISIONS.md). Overwriting an existing fixture prints old vs.
+// new byte size so a redesign is visible before it's blessed.
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -17,6 +23,7 @@ import { CmieConfig } from "../src/config/index.js";
 import { HttpFetcher } from "../src/ingest/fetch/http-fetcher.js";
 import { EXTENSION_BY_KIND } from "../src/ingest/fetch/fixture-fetcher.js";
 import { IngestError } from "../src/ingest/errors.js";
+import { collectActiveSecretValues, scrubSecrets } from "../src/ingest/scrub.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
@@ -74,6 +81,14 @@ async function main() {
     process.exit(1);
   }
 
+  const secretValues = collectActiveSecretValues(config);
+  const scrubbedBody = scrubSecrets(result.body, secretValues);
+  if (scrubbedBody !== result.body) {
+    console.log(
+      "Note: the live response echoed an active secret value back to us -- redacted before writing to disk.",
+    );
+  }
+
   const ext = EXTENSION_BY_KIND[target.kind];
   const dir = join(root, "fixtures", target.id);
   const path = join(dir, `response.${ext}`);
@@ -86,16 +101,16 @@ async function main() {
   }
 
   await mkdir(dir, { recursive: true });
-  await writeFile(path, result.body, "utf-8");
+  await writeFile(path, scrubbedBody, "utf-8");
 
   if (previousSize !== null) {
     console.log(
-      `Overwrote ${path} (${previousSize} -> ${result.body.length} bytes). ` +
+      `Overwrote ${path} (${previousSize} -> ${scrubbedBody.length} bytes). ` +
         `Diff the old and new fixtures before trusting the new one -- a byte-count ` +
         `swing usually means a structural change, not just fresh data.`,
     );
   } else {
-    console.log(`Captured ${path} (${result.body.length} bytes).`);
+    console.log(`Captured ${path} (${scrubbedBody.length} bytes).`);
   }
   console.log(`Next: npm run fixture:bless -- ${target.id}`);
 }

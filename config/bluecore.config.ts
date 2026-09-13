@@ -1,10 +1,13 @@
 // Real Bluecore Watcher config — triaged 2026-09-12, see docs/05-SOURCES.md
-// for the full method/notes behind each target. Seven targets across all
-// four sections; no auth/secrets required for this pass (EIA's key-gated
-// API was deferred to M2 — see docs/05-SOURCES.md §3 Market Conditions notes).
+// for the full method/notes behind each target. M2a (2026-09-13) brought
+// this to nine targets across all four sections, adding the second
+// competitor (nuscale-sec-filings) and the first authenticated target
+// (eia-ca-industrial-price, EIA_API_KEY) to populate Market Conditions.
 //
-// Paired fixtures live under fixtures/<targetId>/ — captured once, politely,
-// per docs/06-OPS-RUNBOOK.md §8 step 2 (see git history for capture notes).
+// Paired fixtures live under fixtures/<targetId>/ — captured via
+// `npm run fixture:capture` (scripts/fixture-capture.ts) per
+// docs/06-OPS-RUNBOOK.md §8 step 2; golden expected-output files via
+// `npm run fixture:bless` (scripts/fixture-bless.ts).
 import type { CmieConfigInput } from "../src/config/schema.js";
 
 const SEC_UA = "bluecore-watcher/0.1 (contact: andymagill@gmail.com)";
@@ -340,9 +343,56 @@ export const config: CmieConfigInput = {
     },
 
     // --- Market Conditions -----------------------------------------
-    // No live source yet: EIA's regional price/capacity indices are the
-    // intended fit but are key-gated (api.eia.gov 403s without one) —
-    // deferred to M2. This section renders a zero-state until then.
+
+    // EIA's regional retail electricity price index — the intended fit
+    // flagged since M0 (api.eia.gov 403s on every route, including
+    // metadata, without a key; deferred until now). California industrial
+    // rate is the regional/sector cut most relevant to a Long Beach port
+    // operator. First (and so far only) target in this config using
+    // `auth` — the config-time (rule 9) and runtime (AUTH_ERROR skip on a
+    // missing secret) paths were already implemented and tested before
+    // this target existed; this is their first real exercise.
+    {
+      id: "eia-ca-industrial-price",
+      label: "EIA — CA Industrial Retail Electricity Price",
+      entityId: "bluecore-energy",
+      sectionId: "market",
+      kind: "api",
+      url: "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1",
+      schedule: { cron: "0 16 * * *", ttlHours: 1440 },
+      auth: { type: "query", name: "api_key", secretEnv: "EIA_API_KEY" },
+      notes:
+        "EIA v2 API, verified live 2026-09-13: $.response.data[0].price and .period populated as " +
+        "expected (most recent at triage time: 20.74 cents/kWh, period 2026-06 — EIA's retail-sales " +
+        "series runs ~2-3 months behind real time, hence the generous ttlHours). period is kept as a " +
+        'plain string ("YYYY-MM"), not `type: "date"` — it has no day component, and forcing one ' +
+        "would be a fabricated fact. The response also echoes `api_key` back verbatim in " +
+        "`request.params` — fixture:capture scrubs this (src/ingest/scrub.ts) before writing to disk, " +
+        "the same scrubbing the persist layer already applies to committed target files.",
+      extractors: [
+        {
+          key: "retail_price_industrial",
+          label: "CA Industrial Retail Price",
+          presenter: "metric",
+          kind: "api",
+          jsonPath: "$.response.data[0].price",
+          type: "number",
+          unit: "¢/kWh",
+          required: true,
+          assert: { min: 0, max: 100, notEmpty: true },
+        },
+        {
+          key: "price_period",
+          label: "Price Period",
+          presenter: "markdown",
+          kind: "api",
+          jsonPath: "$.response.data[0].period",
+          type: "string",
+          required: true,
+          assert: { notEmpty: true, maxLength: 7 },
+        },
+      ],
+    },
   ],
 
   alerting: { channel: "github-issue", minSeverity: "warn" },
