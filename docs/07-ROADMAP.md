@@ -62,10 +62,17 @@ Config → fetch → extract → validate → diff → commit → branch → pre
 
 Every triaged source configured. Mostly config plus fixtures plus tests; architecture should not move.
 
-- All four sections populated.
-- A fixture and unit test per target.
-- Assertions tuned from dry-run values, not guesses.
-- Weekly drift check running.
+**PR sizing:** treat M2 as **two PRs**, not one, unless target count is very small. One-PR M2 tends to hide regressions because config churn and assertion tuning land together.
+
+**Recommended split:**
+
+- **M2a — Coverage PR:** add all remaining target configs + fixtures + baseline extractor tests; no assertion-tightening beyond obvious schema/range correctness. **Delivered 2026-09-13.** Scope turned out narrower than "all remaining target configs" implied — 7 of 9 targets were already configured with fixtures from Q1; the real gap was baseline tests (6 of 7 existing targets had none), two new targets (`nuscale-sec-filings`, the second competitor named at Q1 but deferred; `eia-ca-industrial-price`, populating the previously-empty Market Conditions section and exercising `auth`/`secretEnv` for the first time), the `fixture:capture`/`fixture:bless` tooling the ops runbook already prescribed but didn't exist, and a timezone-correctness bug in date coercion (ADR-017) found while building golden fixtures.
+- **M2b — Stabilization PR:** tune assertions from dry-run observations, fix drift/selector edge cases, and enable/verify weekly drift check.
+
+- All four sections populated. ✅ M2a.
+- A fixture and unit test per target. ✅ M2a — `tests/targets.baseline.test.ts`, table-driven over the real config, plus `fixtures/<id>/expected.json` golden files.
+- Assertions tuned from dry-run values, not guesses. M2b.
+- Weekly drift check running. M2b.
 
 **Exit:** a full run completes with `ok` on the large majority, and the health modal honestly reports the rest.
 

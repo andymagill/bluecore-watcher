@@ -4,10 +4,16 @@
 # branch + open issue. Serialized via the `ingest` concurrency group so two
 # overlapping runs can't both fork from the same `main` (§2).
 #
-# M1 scope: one target (bluecore-newsroom, --only) via the real HttpFetcher
-# (--live). The workflow-level cron matches that target's own schedule
-# (0 13 * * *) -- a real `plan`/due-date step is an M2 concern once more
-# than one cadence is live (docs/07-ROADMAP.md M1 judgment call).
+# M1 scoped this to one target (bluecore-newsroom, --only) on that target's
+# own cron (0 13 * * *). M2a (docs/07-ROADMAP.md) drops --only: every
+# target now runs on this one daily cron, regardless of its own `cron`
+# field, which stays documentation and the basis for `ttlHours`. This is
+# deliberately not a per-target due-date planner -- every target's
+# ttlHours is >= 48h, so a daily run under-polls nothing, and per-target
+# politeness (SEC UA + 2s interval, Lever's Crawl-delay: 1, etc.) is already
+# enforced inside HttpFetcher regardless of workflow cadence. A real
+# due-date planner is still deferred until more than one cadence actually
+# needs to diverge from daily.
 name: Ingest
 
 on:
@@ -54,10 +60,16 @@ jobs:
       # gate (checks 1-2) inline before any write (src/ingest/orchestrate.ts
       # runAndPersist). continue-on-error so a failure here is handled by
       # the explicit steps below rather than aborting the job silently.
-      - name: Run ingestion (--live, --only bluecore-newsroom)
+      # EIA_API_KEY is only consumed by the one target whose config
+      # declares auth.secretEnv: "EIA_API_KEY" -- if the secret is unset,
+      # that target skips with AUTH_ERROR (03-INGESTION.md §6) and every
+      # other target still runs.
+      - name: Run ingestion (--live, all targets)
         id: ingest
         continue-on-error: true
-        run: npm run ingest -- --env bluecore --only bluecore-newsroom --live
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: npm run ingest -- --env bluecore --live
 
       - name: Detect semantic change (ADR-011)
         id: changes

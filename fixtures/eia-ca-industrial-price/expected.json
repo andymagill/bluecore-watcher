@@ -1,0 +1,18 @@
+{
+  "retail_price_industrial": {
+    "presenter": "metric",
+    "value": 20.74,
+    "displayValue": "20.74 ¢/kWh",
+    "rawText": "20.74",
+    "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
+    "contentHash": "sha256:a1188ae4ce3c918f1081e2c6924346d88cd0614f0ddb281286935b4ec56dedfc"
+  },
+  "price_period": {
+    "presenter": "markdown",
+    "value": "2026-06",
+    "displayValue": "2026-06",
+    "rawText": "2026-06",
+    "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
+    "contentHash": "sha256:383eb859abccbfc4f33ef694d899c53e722bde6b6c54e6ffc3ca171476672f15"
+  }
+}

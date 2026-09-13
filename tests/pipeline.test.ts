@@ -1,7 +1,7 @@
 // Exercises the extract -> shape-assert -> guard pipeline directly against
 // the HtmlHandler, per 01-DATA-CONTRACT.md §6's three validation layers and
 // the error taxonomy in §7.
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it } from "vitest";
 import { CmieConfig, type ExtractorDef, type TargetDef } from "../src/config/schema.js";
 import { HtmlHandler } from "../src/ingest/extract/html-handler.js";
 import { IngestError } from "../src/ingest/errors.js";
@@ -93,6 +93,57 @@ describe("HtmlHandler + extractOne", () => {
     expect(candidate.rawText).toBe("48,200");
     expect(candidate.anchor).toContain("capacity");
     expect(candidate.contentHash).toMatch(/^sha256:[0-9a-f]+$/);
+  });
+});
+
+describe("date coercion is timezone-independent (docs/00-DECISIONS.md timezone entry)", () => {
+  // vitest.config.ts pins TZ=UTC for the whole run, which would hide this
+  // exact bug (no local offset to apply => the pre-fix code would already
+  // "accidentally" pass). Force a non-UTC host zone here so this test
+  // actually exercises the re-anchoring logic, not just the UTC case
+  // already covered by "an ISO date-only string" below.
+  const ORIGINAL_TZ = process.env.TZ;
+  afterEach(() => {
+    if (ORIGINAL_TZ === undefined) delete process.env.TZ;
+    else process.env.TZ = ORIGINAL_TZ;
+  });
+
+  it("a human-readable date with no zone info coerces to UTC midnight, not the host's local midnight", async () => {
+    process.env.TZ = "America/Los_Angeles"; // UTC-7 or UTC-8 -- always west of UTC
+    const target = buildTarget({ selector: "#posted", type: "date" });
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>September 11, 2026</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
+    expect(candidate.value).toBe("2026-09-11T00:00:00.000Z");
+    expect((candidate as { displayValue: string }).displayValue).toBe("11 Sep 2026");
+  });
+
+  it("an ISO date-only string is already UTC and passes through unchanged", async () => {
+    const target = buildTarget({ selector: "#posted", type: "date" });
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>2026-09-11</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
+    expect(candidate.value).toBe("2026-09-11T00:00:00.000Z");
+  });
+
+  it("a datetime with an explicit zone offset is not re-anchored (would otherwise double-shift)", async () => {
+    const target = buildTarget({ selector: "#posted", type: "date" });
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>2026-09-11T22:00:00-05:00</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
+    expect(candidate.value).toBe("2026-09-12T03:00:00.000Z");
   });
 });
 
