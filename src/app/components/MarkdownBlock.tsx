@@ -41,10 +41,10 @@ export function MarkdownBlock({
 
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
-      <p className="text-xs text-neutral-500">{block.label}</p>
+      <p className="text-xs text-muted-foreground">{block.label}</p>
       {suppressed ? (
         <details>
-          <summary className="cursor-pointer text-sm text-neutral-500">
+          <summary className="cursor-pointer text-sm text-muted-foreground">
             Last known value from an earlier check
           </summary>
           <div

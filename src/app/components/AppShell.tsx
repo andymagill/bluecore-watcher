@@ -32,7 +32,7 @@ export function AppShell() {
   if (state.status === "loading") {
     return (
       <main className="mx-auto max-w-6xl p-6">
-        <p className="text-neutral-500">Loading...</p>
+        <p className="text-muted-foreground">Loading...</p>
       </main>
     );
   }
@@ -40,7 +40,7 @@ export function AppShell() {
   if (state.status === "error") {
     return (
       <main className="mx-auto max-w-6xl p-6">
-        <p className="text-red-400">Failed to load dashboard data: {state.message}</p>
+        <p className="text-destructive">Failed to load dashboard data: {state.message}</p>
       </main>
     );
   }

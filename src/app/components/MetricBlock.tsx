@@ -35,23 +35,25 @@ export function MetricBlock({
 
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
-      <p className="text-xs text-neutral-500">{block.label}</p>
+      <p className="text-xs text-muted-foreground">{block.label}</p>
       {suppressed ? (
         <details>
-          <summary className="cursor-pointer text-sm text-neutral-500">
+          <summary className="cursor-pointer text-sm text-muted-foreground">
             Last known value from an earlier check
           </summary>
-          <p className="mt-1 text-2xl font-semibold tabular-nums text-neutral-300">
+          <p className="mt-1 text-2xl font-semibold tabular-nums text-foreground/80">
             {block.displayValue}
             {block.unit ? (
-              <span className="ml-1 text-sm text-neutral-500">{block.unit}</span>
+              <span className="ml-1 text-sm text-muted-foreground">{block.unit}</span>
             ) : null}
           </p>
         </details>
       ) : (
         <p className="text-2xl font-semibold tabular-nums">
           {block.displayValue}
-          {block.unit ? <span className="ml-1 text-sm text-neutral-500">{block.unit}</span> : null}
+          {block.unit ? (
+            <span className="ml-1 text-sm text-muted-foreground">{block.unit}</span>
+          ) : null}
         </p>
       )}
       <div className="flex flex-wrap items-center gap-2">
