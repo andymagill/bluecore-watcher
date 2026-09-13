@@ -67,14 +67,14 @@ Every triaged source configured. Mostly config plus fixtures plus tests; archite
 **Recommended split:**
 
 - **M2a — Coverage PR:** add all remaining target configs + fixtures + baseline extractor tests; no assertion-tightening beyond obvious schema/range correctness. **Delivered 2026-09-13.** Scope turned out narrower than "all remaining target configs" implied — 7 of 9 targets were already configured with fixtures from Q1; the real gap was baseline tests (6 of 7 existing targets had none), two new targets (`nuscale-sec-filings`, the second competitor named at Q1 but deferred; `eia-ca-industrial-price`, populating the previously-empty Market Conditions section and exercising `auth`/`secretEnv` for the first time), the `fixture:capture`/`fixture:bless` tooling the ops runbook already prescribed but didn't exist, and a timezone-correctness bug in date coercion (ADR-017) found while building golden fixtures.
-- **M2b — Stabilization PR:** tune assertions from dry-run observations, fix drift/selector edge cases, and enable/verify weekly drift check.
+- **M2b — Stabilization PR:** tune assertions from dry-run observations, fix drift/selector edge cases, and enable/verify weekly drift check. **Delivered 2026-09-13** ([PR #13](https://github.com/andymagill/bluecore-watcher/pull/13)). Widened beyond the line item: four date extractors (`bluecore-newsroom.latest_post_date`, both SEC targets' `latest_filing_date`) had zero silent-wrong protection before this — `min`/`max`/`expectMonotonic` only ever evaluated numbers, and a coerced date is always a string — closed via ADR-018 (`maxFutureDays`/`notBefore` shape assertions, `expectMonotonic` extended to dates via epoch-ms comparison, plus a config-time rule rejecting assert fields that are silent no-ops for an extractor's type). Also added a tenth target, `bluecore-sec-filings`, since `bluecore-form-d`'s URL is pinned to one accession number and could never observe BlueCore's next Form D on its own.
 
 - All four sections populated. ✅ M2a.
 - A fixture and unit test per target. ✅ M2a — `tests/targets.baseline.test.ts`, table-driven over the real config, plus `fixtures/<id>/expected.json` golden files.
-- Assertions tuned from dry-run values, not guesses. M2b.
-- Weekly drift check running. M2b.
+- Assertions tuned from dry-run values, not guesses. ✅ M2b — Federal Register guards backfilled from 3.5 months of real weekly counts (previous `maxChangePct: 25` was ~20x looser than observed movement); `eia-ca-industrial-price`'s `maxChangePct` sized from 36 months of the real series; SEC filing-form pattern verified against all 52 distinct historical values across both fixtures.
+- Weekly drift check running. ✅ M2b — `src/drift/`, `scripts/drift-check.ts` (`npm run drift`), `.github/workflows/drift.yml` (Monday cron + `workflow_dispatch`). Verified live on `main` (run [34782023672](https://github.com/andymagill/bluecore-watcher/actions/runs/34782023672)): 10/10 targets clean, zero issues opened.
 
-**Exit:** a full run completes with `ok` on the large majority, and the health modal honestly reports the rest.
+**Exit:** a full run completes with `ok` on the large majority, and the health modal honestly reports the rest. **Met** — verified live 2026-09-13 (run [34782290966](https://github.com/andymagill/bluecore-watcher/actions/runs/34782290966)): ingestion → offline gate → branch → live gate (schema/contract/smoke-render against a real Cloudflare Workers Builds preview) → squash-merge; `health.json` on `main` reports `"ok":10,"failed":0,"degraded":0` out of 10 targets.
 
 **Watch for:** if this milestone requires application-code changes, ADR-001 is being violated and the schema needs to absorb the difference instead.
 
