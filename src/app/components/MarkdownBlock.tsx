@@ -48,15 +48,12 @@ export function MarkdownBlock({
             Last known value from an earlier check
           </summary>
           <div
-            className="prose prose-invert prose-sm mt-1 max-w-none"
+            className="prose prose-sm mt-1 max-w-none"
             dangerouslySetInnerHTML={{ __html: html }}
           />
         </details>
       ) : (
-        <div
-          className="prose prose-invert prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
       )}
       <div className="flex flex-wrap items-center gap-2">
         <FreshnessBadge block={block} state={state} />
