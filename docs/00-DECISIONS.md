@@ -209,6 +209,18 @@ Last updated: 2026-09-12
 
 ---
 
+### ADR-017 — Date coercion is anchored to UTC, independent of the host's timezone
+
+**Decision.** `src/ingest/extract/coerce.ts`'s `date` case no longer trusts `new Date(rawText).toISOString()` (or, with `dateFormat` set, date-fns's `parse()`) to produce a host-independent result. Both resolve an unqualified date/time string — a human-readable page date like `"September 8, 2026"`, or a `dateFormat` pattern with no zone token — against the **host's local timezone**, not UTC. The committed `value` for `bluecore-newsroom.latest_post_date` (and any future `dateFormat` target) therefore depended on which machine or CI runner produced it: a UTC-7 laptop and a UTC GitHub Actions runner would coerce the same rawText to instants 7 hours apart, which is a spurious semantic change under ADR-011 / Invariant 7 (two runs against unchanged source data must agree) — and would have been baked permanently into the M2a golden fixture files. `formatDisplayValue`'s `date` case had the mirror bug: it re-parsed the already-UTC ISO `value` with date-fns's local-zone `format()`, so a UTC-midnight value could **display** as the previous day west of Greenwich.
+
+Fixed by re-anchoring: after parsing, an explicit `dateFormat` is always re-anchored (date-fns has no zone-token support, so it never resolves a zone correctly); the no-`dateFormat` path is re-anchored only when `rawText` carries no zone information at all — an ISO date-only string (`"2026-09-11"`) is already UTC by spec, and a string with an explicit offset/`Z`/`GMT` was already resolved correctly, so re-anchoring either of those would double-shift a value that was already right. Display now reads the stored ISO instant back with UTC getters instead of date-fns's local-zone `format()`.
+
+**Why this belongs in the M2a coverage PR, not a separate change.** M2a introduces golden fixture files (`fixtures/<id>/expected.json`) as the mechanism enforcing "a fixture and unit test per target" (`07-ROADMAP.md` M2). A golden file pins a value forever; pinning a timezone-dependent value would have made the bug permanent and machine-specific across every future CI run and contributor's laptop.
+
+**Consequences.** `bluecore-newsroom`'s committed `latest_post_date` value/`displayValue` for existing runs may shift, depending on the timezone the original commit was produced in — expected and desired, not a regression. `vitest.config.ts` (new; previously nonexistent, so vitest implicitly fell back to `vite.config.ts` for its React/Tailwind plugins — now explicitly re-imported via `mergeConfig`) additionally pins `TZ=UTC` for the test run as a belt-and-braces measure so a non-UTC dev machine's `npm test` agrees with CI; that pin is not itself the fix and does not mask it — `tests/pipeline.test.ts`'s regression tests explicitly override `process.env.TZ` to a non-UTC zone to prove the coercion logic is correct regardless of ambient TZ.
+
+---
+
 ## Open
 
 | #   | Question                                                                                                                                                                          | Blocks                                                                                                            | Owner    |
