@@ -62,6 +62,13 @@ Config → fetch → extract → validate → diff → commit → branch → pre
 
 Every triaged source configured. Mostly config plus fixtures plus tests; architecture should not move.
 
+**PR sizing:** treat M2 as **two PRs**, not one, unless target count is very small. One-PR M2 tends to hide regressions because config churn and assertion tuning land together.
+
+**Recommended split:**
+
+- **M2a — Coverage PR:** add all remaining target configs + fixtures + baseline extractor tests; no assertion-tightening beyond obvious schema/range correctness.
+- **M2b — Stabilization PR:** tune assertions from dry-run observations, fix drift/selector edge cases, and enable/verify weekly drift check.
+
 - All four sections populated.
 - A fixture and unit test per target.
 - Assertions tuned from dry-run values, not guesses.
