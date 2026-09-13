@@ -73,7 +73,11 @@ describe("target baselines — every real target's extractors match their golden
 
         for (const extractor of target.extractors) {
           const candidate = await extractOne(handler, doc, extractor, target);
-          const shapeFailures = checkShapeAssertions(candidate, extractor);
+          const shapeFailures = checkShapeAssertions(
+            candidate,
+            extractor,
+            new Date("2026-09-13T00:00:00Z"),
+          );
           expect(
             shapeFailures,
             `"${target.id}.${extractor.key}" failed shape assertions: ${JSON.stringify(shapeFailures)}`,

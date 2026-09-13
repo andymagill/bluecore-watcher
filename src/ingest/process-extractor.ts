@@ -49,6 +49,16 @@ interface ProcessExtractorParams<TDoc> {
   httpStatus: number;
 }
 
+// checkScalarGuard only ever compares numbers (validate.ts). A scalar
+// candidate/previous value is already a number for every type except
+// "date", which coerce.ts always renders as a full ISO instant string --
+// convert that to epoch milliseconds so expectMonotonic (ADR-018, the only
+// guard rule config validation permits on a date, per rule 8) can compare
+// it the same way it compares a plain number.
+function guardComparisonValue(value: number | string, extractor: ExtractorDef): number {
+  return extractor.type === "date" ? Date.parse(value as string) : (value as number);
+}
+
 function emptyBlockCommon(extractor: ExtractorDef) {
   return { key: extractor.key, label: extractor.label, type: extractor.type, unit: extractor.unit };
 }
@@ -141,7 +151,7 @@ export async function processExtractor<TDoc>(
     candidate.presenter !== "list"
       ? checkEnum((candidate as ScalarCandidate).value as string, extractor)
       : [];
-  const shapeFailures = [...checkShapeAssertions(candidate, extractor), ...enumFailures];
+  const shapeFailures = [...checkShapeAssertions(candidate, extractor, now), ...enumFailures];
   if (shapeFailures.length > 0) {
     return failureResult(
       target,
@@ -192,8 +202,8 @@ export async function processExtractor<TDoc>(
             extractor.assert ?? {},
           )
         : checkScalarGuard(
-            (candidate as ScalarCandidate).value as number,
-            previousBlock.value as number,
+            guardComparisonValue((candidate as ScalarCandidate).value, extractor),
+            guardComparisonValue(previousBlock.value as number | string, extractor),
             extractor.assert ?? {},
           )
       : null;
