@@ -1,0 +1,10 @@
+{
+  "open_roles_count": {
+    "presenter": "metric",
+    "value": 9,
+    "displayValue": "9 roles",
+    "rawText": "9",
+    "anchor": "https://api.lever.co/v0/postings/bluecore-energy?mode=json#$.length",
+    "contentHash": "sha256:19581e27de7ced00ff1ce50b2047e7a567c76b1cbaebabe5ef03f7c3017bb5b7"
+  }
+}

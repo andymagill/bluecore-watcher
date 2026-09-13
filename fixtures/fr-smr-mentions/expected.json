@@ -1,0 +1,10 @@
+{
+  "smr_mention_count": {
+    "presenter": "metric",
+    "value": 76,
+    "displayValue": "76 documents",
+    "rawText": "76",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
+    "contentHash": "sha256:f74efabef12ea619e30b79bddef89cffa9dda494761681ca862cff2871a85980"
+  }
+}

@@ -7,7 +7,9 @@ import type { TargetDef } from "../../config/schema.js";
 import { IngestError } from "../errors.js";
 import type { Fetcher, FetchResult, RunContext } from "./types.js";
 
-const EXTENSION_BY_KIND: Record<TargetDef["kind"], string> = {
+// Exported: scripts/fixture-capture.ts and scripts/fixture-bless.ts need the
+// same targetId -> fixture-path convention and must not duplicate it.
+export const EXTENSION_BY_KIND: Record<TargetDef["kind"], string> = {
   html: "html",
   api: "json",
 };

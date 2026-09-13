@@ -19,6 +19,8 @@
     "schema:check": "tsx scripts/schema-gen.ts --check",
     "validate:config": "tsx scripts/validate-config.ts",
     "ingest": "tsx scripts/ingest.ts",
+    "fixture:capture": "tsx scripts/fixture-capture.ts",
+    "fixture:bless": "tsx scripts/fixture-bless.ts",
     "gate": "tsx scripts/gate.ts",
     "prepare": "husky"
   },

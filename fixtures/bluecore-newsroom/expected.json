@@ -1,0 +1,26 @@
+{
+  "latest_headline": {
+    "presenter": "markdown",
+    "value": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
+    "displayValue": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
+    "rawText": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
+    "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(2)",
+    "contentHash": "sha256:2bb00c8ddb95e10ee5e09632a01b459f1a885f3627e7748fea27d76ac623fa48"
+  },
+  "latest_post_date": {
+    "presenter": "metric",
+    "value": "2026-09-08T00:00:00.000Z",
+    "displayValue": "08 Sep 2026",
+    "rawText": "September 8, 2026",
+    "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
+    "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86"
+  },
+  "latest_post_category": {
+    "presenter": "status",
+    "value": "Press Release",
+    "displayValue": "Press Release",
+    "rawText": "Press Release",
+    "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(1)",
+    "contentHash": "sha256:180c9abd7392671b20a7438ab3b9fe55dfbe981f3f783de7757dd0b203894e2c"
+  }
+}
