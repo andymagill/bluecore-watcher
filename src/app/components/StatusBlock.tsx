@@ -9,11 +9,18 @@ import { DeltaChip } from "./DeltaChip.js";
 import { ProvenancePopover } from "./ProvenancePopover.js";
 import { ZeroState } from "./ZeroState.js";
 
+// chart-1..5 is the token family for exactly this: categorical, carries no
+// meaning of its own -- unlike bg-success/bg-warning/bg-destructive, which
+// would assert a judgement this component deliberately doesn't make. Text
+// stays on `foreground` rather than `text-chart-N` so contrast holds in
+// both themes (04-FRONTEND.md §7); the hue lives in the tint and ring,
+// which carries no information the text doesn't already carry.
 const PILL_COLORS = [
-  "bg-blue-900/60 text-blue-300",
-  "bg-purple-900/60 text-purple-300",
-  "bg-teal-900/60 text-teal-300",
-  "bg-pink-900/60 text-pink-300",
+  "bg-chart-1/15 text-foreground ring-1 ring-chart-1/40",
+  "bg-chart-2/15 text-foreground ring-1 ring-chart-2/40",
+  "bg-chart-3/15 text-foreground ring-1 ring-chart-3/40",
+  "bg-chart-4/15 text-foreground ring-1 ring-chart-4/40",
+  "bg-chart-5/15 text-foreground ring-1 ring-chart-5/40",
 ];
 
 function colorFor(value: string): string {
@@ -47,7 +54,7 @@ export function StatusBlock({
 
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
-      <p className="text-xs text-neutral-500">{block.label}</p>
+      <p className="text-xs text-muted-foreground">{block.label}</p>
       <span
         className={`inline-block rounded-full px-2 py-0.5 text-sm font-medium ${colorFor(value)}`}
       >

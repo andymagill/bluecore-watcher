@@ -26,21 +26,21 @@ export function DeltaChip({
     const arrow = display.direction === "up" ? "▲" : "▼";
     return (
       <span
-        className="inline-flex items-center gap-1 text-xs text-neutral-300 tabular-nums"
+        className="inline-flex items-center gap-1 text-xs text-foreground tabular-nums"
         data-delta-kind="changed"
       >
         <span aria-hidden>{arrow}</span>
         <span>
           {Math.abs(display.absolute).toLocaleString()} ({Math.abs(display.percent).toFixed(1)}%)
         </span>
-        <span className="text-neutral-500">{daysLabel(display.daysAgo)}</span>
+        <span className="text-muted-foreground">{daysLabel(display.daysAgo)}</span>
       </span>
     );
   }
 
   if (display.kind === "unchanged-scalar") {
     return (
-      <span className="text-xs text-neutral-500" data-delta-kind="unchanged">
+      <span className="text-xs text-muted-foreground" data-delta-kind="unchanged">
         unchanged for {display.daysAgo} day{display.daysAgo === 1 ? "" : "s"}
       </span>
     );
@@ -51,15 +51,16 @@ export function DeltaChip({
     if (display.added.length > 0) parts.push(`+${display.added.length}`);
     if (display.removed.length > 0) parts.push(`-${display.removed.length}`);
     return (
-      <span className="text-xs text-neutral-300 tabular-nums" data-delta-kind="changed">
-        {parts.join(" ")} <span className="text-neutral-500">{daysLabel(display.daysAgo)}</span>
+      <span className="text-xs text-foreground tabular-nums" data-delta-kind="changed">
+        {parts.join(" ")}{" "}
+        <span className="text-muted-foreground">{daysLabel(display.daysAgo)}</span>
       </span>
     );
   }
 
   // unchanged-set
   return (
-    <span className="text-xs text-neutral-500" data-delta-kind="unchanged">
+    <span className="text-xs text-muted-foreground" data-delta-kind="unchanged">
       unchanged for {display.daysAgo} day{display.daysAgo === 1 ? "" : "s"}
     </span>
   );

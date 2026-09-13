@@ -4,9 +4,9 @@
 import type { HealthSummaryOverall } from "../../contract/manifest.js";
 
 const COLOR: Record<HealthSummaryOverall, string> = {
-  ok: "bg-green-900/60 text-green-300",
-  degraded: "bg-amber-900/60 text-amber-300",
-  failed: "bg-red-900/60 text-red-300",
+  ok: "bg-success text-success-foreground",
+  degraded: "bg-warning text-warning-foreground",
+  failed: "bg-destructive text-destructive-foreground",
 };
 
 export function HealthPill({

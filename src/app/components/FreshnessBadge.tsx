@@ -16,13 +16,17 @@ const LABEL: Record<FreshnessState, (block: Block) => string> = {
   flagged: (b) => relativeAge(b),
 };
 
+// stale and flagged share a colour, as do expired and fresh (differing only
+// in opacity) -- that's deliberate, not a gap: LABEL above already gives
+// each state distinct text, which is what 04-FRONTEND.md §7's "never
+// encoded by colour alone" actually requires.
 const COLOR: Record<FreshnessState, string> = {
   never: "",
-  fresh: "bg-neutral-800 text-neutral-300",
-  stale: "bg-amber-900/60 text-amber-300",
-  expired: "bg-neutral-800 text-neutral-500",
-  failing: "bg-red-900/60 text-red-300",
-  flagged: "bg-yellow-900/60 text-yellow-300",
+  fresh: "bg-muted text-muted-foreground",
+  stale: "bg-warning text-warning-foreground",
+  expired: "bg-muted text-muted-foreground/70",
+  failing: "bg-destructive/15 text-destructive",
+  flagged: "bg-warning text-warning-foreground",
 };
 
 function relativeAge(block: Block): string {

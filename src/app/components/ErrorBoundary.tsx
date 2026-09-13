@@ -37,10 +37,10 @@ export class ErrorBoundary extends Component<Props, State> {
       return (
         <div
           data-error-boundary-tripped="true"
-          className="rounded border border-red-800 bg-red-950/40 p-4 text-sm text-red-200"
+          className="rounded border border-destructive/50 bg-destructive/10 p-4 text-sm text-foreground"
         >
           <p className="font-medium">{this.props.sectionLabel} failed to render.</p>
-          <p className="mt-1 text-red-300/80">
+          <p className="mt-1 text-muted-foreground">
             This section is broken, not the whole dashboard. Check the Health modal.
           </p>
         </div>
