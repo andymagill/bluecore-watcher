@@ -6,7 +6,7 @@
 //
 // Paired fixtures live under fixtures/<targetId>/ — captured via
 // `npm run fixture:capture` (scripts/fixture-capture.ts) per
-// docs/06-OPS-RUNBOOK.md §9 step 2; golden expected-output files via
+// docs/06-OPS-RUNBOOK.md §10 step 2; golden expected-output files via
 // `npm run fixture:bless` (scripts/fixture-bless.ts).
 import type { CmieConfigInput } from "../src/config/schema.js";
 

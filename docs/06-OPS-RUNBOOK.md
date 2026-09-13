@@ -111,7 +111,23 @@ The branch is a complete reproduction. Check it out, run locally, fix forward. N
 
 ---
 
-## 8. Maintenance expectations
+## 8. Runbook: a drift warning opened
+
+**Symptom.** A GitHub Issue titled `Drift: <targetId>`, label `drift`. The Monday `Drift check` workflow (`.github/workflows/drift.yml`) opened it — never the daily ingest, and never a failed workflow run.
+
+This is the early-warning system working (`03-INGESTION.md` §5): the page or API response changed shape, but extraction may still be succeeding. Treat it as lower urgency than a broken selector (§3) — nothing is `cached`/`flagged` in production because of this alone — but higher urgency than routine, because the next redesign might land on the exact node a selector depends on.
+
+1. **Read the issue body.** Each signal names what changed: `EXTRACTION_BROKEN` (an extractor that works against the fixture now fails live — treat this one like §3, today), `ANCHOR_MOVED` (the selector still matches, but at a different position — the page shifted around it), `TYPE_CHANGED` (a `jsonPath` now resolves to a different JS type), `STRUCTURE_CHANGED` (the response's overall shape moved, independent of any one extractor).
+2. **`EXTRACTION_BROKEN`** → this is really §3 wearing a different label; go there.
+3. **`ANCHOR_MOVED` / `STRUCTURE_CHANGED` / `TYPE_CHANGED` with extraction still working** → capture a fresh fixture (`npm run fixture:capture -- --env bluecore <targetId>`) and diff it against the old one (still in Git history) to see what actually moved.
+4. **Benign** (a new section added elsewhere on the page, a field gained that nothing extracts) → re-bless (`npm run fixture:bless -- --env bluecore <targetId>`) so the fixture matches the new normal, and comment on the issue saying so before closing it yourself, or just leave it — the next clean weekly run closes it automatically.
+5. **Not benign** (the specific node an extractor depends on moved for a reason that will eventually break it) → treat as an early §3, before it actually breaks: tighten the selector or add resilience now, at your own pace rather than an operator's on a Saturday.
+
+The issue closes itself, with a comment, the first time the target comes back clean — no manual close needed for the common case.
+
+---
+
+## 9. Maintenance expectations
 
 Open question Q4 asks for an honest number. The shape, to be replaced with measurement:
 
@@ -129,7 +145,7 @@ The drift check (`03-INGESTION.md` §5) is what keeps this number from growing: 
 
 ---
 
-## 9. Onboarding a new environment
+## 10. Onboarding a new environment
 
 The ADR-001 test. Target: one afternoon (open question Q8).
 
@@ -145,7 +161,7 @@ If any step requires touching application code, ADR-001 is violated and the sche
 
 ---
 
-## 10. Unresolved operational risks
+## 11. Unresolved operational risks
 
 | Risk                                                                                                                                           | Status                                                                                                                                                                                                                                  |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // npm run fixture:capture -- --env <id> <targetId>
-// 06-OPS-RUNBOOK.md §3 step 3 / §9 step 2: capture a fresh fixture for one
+// 06-OPS-RUNBOOK.md §3 step 3 / §10 step 2: capture a fresh fixture for one
 // target. Reuses the real HttpFetcher (politeness, robots, auth, ${ENV_VAR}
 // interpolation) exactly as scripts/ingest.ts --live does -- this is
 // deliberately not a second, simpler fetch implementation, so a captured

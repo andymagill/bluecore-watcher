@@ -164,7 +164,17 @@ Scrapers cannot be tested against live sites — it's slow, rude, and non-determ
 
 **Contract tests.** The invariants in §8 of the data contract, run in the gate.
 
-**Weekly drift check.** A scheduled job fetches each source and compares the live response against the stored fixture, warning when a page has changed structurally — even if extraction still succeeds. This is the early-warning system for silent-wrong: it catches the redesign _before_ the selector starts matching the wrong node.
+**Weekly drift check (M2b, `src/drift/`, `scripts/drift-check.ts`, `.github/workflows/drift.yml`).** A Monday cron job fetches each target's live response with the same `HttpFetcher` a real ingestion run uses and compares it against the committed fixture, per extractor and for the response as a whole — even when extraction still succeeds. This is the early-warning system for silent-wrong: it catches the redesign _before_ the selector starts matching the wrong node. It deliberately reruns the real `extractOne` against both documents rather than parsing independently, so a finding here means the real pipeline would see the same thing.
+
+Five signals, none of them a run failure:
+
+- `EXTRACTION_BROKEN` — an extractor that succeeds against the fixture throws against the live response.
+- `ANCHOR_MOVED` (`html` only) — the selector still matches, but the resolved node's position (`01-DATA-CONTRACT.md` §4's anchor) shifted, meaning the page structure around it changed even though the match survived.
+- `TYPE_CHANGED` (`api` only) — the extractor's `jsonPath` resolves to a different raw JS type live than in the fixture (checked before `coerce.ts` normalizes it to the extractor's declared `type`, which would otherwise mask the change).
+- `STRUCTURE_CHANGED` — the whole response's structural fingerprint (`src/drift/structure.ts`: HTML tag/class parent-child pairs, or JSON key paths with array indices collapsed) drops below 80% similarity to the fixture, independent of any single extractor.
+- `FETCH_FAILED` — the live fetch itself failed. Informational only, and never treated as drift — real ingestion's health log already owns fetch failures (§1 "fetch").
+
+A changed **value** is never drift by itself; only these five signals are. One GitHub Issue per drifting target (label `drift`, title `Drift: <targetId>`), created/updated/auto-closed by `src/drift/issues.ts`'s pure `planIssueSync` — never duplicated, and closed automatically once a target comes back clean.
 
 The drift check is the highest-leverage test in this list and the one easiest to skip. Don't.
 

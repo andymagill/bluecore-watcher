@@ -1,0 +1,56 @@
+# 03-INGESTION.md §5 "weekly drift check" / docs/07-ROADMAP.md M2b. Runs
+# scripts/drift-check.ts against every live target and syncs one GitHub
+# Issue per drifting target (label "drift"). This workflow deliberately
+# never fails on drift itself -- scripts/drift-check.ts's own exit code
+# only reflects whether the check ran, not what it found (see that file's
+# header comment) -- because a drifting-but-still-extracting source is a
+# warning for a human to triage on their own schedule (06-OPS-RUNBOOK.md's
+# drift-warning runbook), not an incident. No Chromium install: unlike
+# ci.yml/ingest.yml, nothing here exercises gate check 3 (smoke render).
+name: Drift check
+
+on:
+  schedule:
+    # Monday, one hour after the daily ingest cron (ingest.yml: 0 13 * * *)
+    # -- gives that day's ingest run a clean head start so drift signals
+    # aren't confused with an in-flight ingestion.
+    - cron: "0 14 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  drift:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # scripts/drift-check.ts creates this label on first use too
+      # (--force, so a second run is a no-op) -- done explicitly here as
+      # well so the label exists (with a real description) even before the
+      # very first drift is ever found.
+      - name: Ensure the "drift" label exists
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create drift --force \
+            --description "Weekly drift check (03-INGESTION.md §5)" \
+            --color FBCA04
+
+      - name: Run the drift check (--issues)
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: npm run drift -- --env bluecore --issues
