@@ -19,7 +19,7 @@ const RUN_STATUS_COLOR: Record<TargetFile["run"]["status"], string> = {
 
 export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: Date }) {
   return (
-    <div className="rounded border border-border p-4">
+    <div className="rounded border border-border bg-card p-4 text-card-foreground">
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <a
           href={targetFile.sourceUrl}

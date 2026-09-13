@@ -14,14 +14,11 @@
   --popover-foreground: oklch(0.2097 0.0468 314.3101);
   --primary: oklch(0.787 0.1597 159.2392);
   --primary-foreground: oklch(1 0 0);
-  --secondary: oklch(0.4533 0.0568 283.9034);
-  --secondary-foreground: oklch(1 0 0);
   --muted: oklch(0.9665 0.0045 314.8046);
   --muted-foreground: oklch(0.5482 0.0362 314.5072);
   --accent: oklch(0.9491 0 0);
   --accent-foreground: oklch(0.2097 0.0468 314.3101);
   --border: oklch(0.9267 0.0091 314.7793);
-  --input: oklch(0.9267 0.0091 314.7793);
   --ring: oklch(0.787 0.1597 159.2392);
   --chart-1: oklch(0.5019 0.0633 283.8863);
   --chart-2: oklch(0.787 0.1597 159.2392);
@@ -53,14 +50,11 @@
   --popover-foreground: oklch(0.8109 0 0);
   --primary: oklch(0.787 0.1597 159.2392);
   --primary-foreground: oklch(0.2133 0.0061 337.8278);
-  --secondary: oklch(0.5019 0.0633 283.8863);
-  --secondary-foreground: oklch(0.2133 0.0061 337.8278);
   --muted: oklch(0.252 0 0);
   --muted-foreground: oklch(0.6268 0 0);
   --accent: oklch(0.3211 0 0);
   --accent-foreground: oklch(0.8109 0 0);
   --border: oklch(0.252 0 0);
-  --input: oklch(0.252 0 0);
   --ring: oklch(0.787 0.1597 159.2392);
   --chart-1: oklch(0.5019 0.0633 283.8863);
   --chart-2: oklch(0.787 0.1597 159.2392);
@@ -83,17 +77,22 @@
 
 /* ===== LOCAL DEVIATIONS FROM THE TWEAKCN EXPORT — see ADR-016 =====
    The exported --destructive is oklch(0.9237 0.1811 109.4770) in light
-   mode (a bright yellow-green) and identical to --secondary in dark
-   mode. Neither reads as an error and the light pair fails the 4.5:1
-   contrast bar in 04-FRONTEND.md §7. Replaced with an actual red.
+   mode (a bright yellow-green) and identical to the export's
+   --secondary in dark mode. Neither reads as an error and the light
+   pair fails the 4.5:1 contrast bar in 04-FRONTEND.md §7. Replaced
+   with an actual red.
 
    shadcn's token set has no success/warning. FreshnessBadge needs five
    states and HealthPill needs three; foregrounds are picked per theme
    rather than derived so both stay above 4.5:1.
 
-   --sidebar-* and --destructive-foreground's near-white default are
-   dropped: there is no sidebar in this app, and Geist Mono/serif from
-   the export are unused (see the --font-sans override above). */
+   --sidebar-*, --secondary/--secondary-foreground, and --input are
+   dropped: no sidebar, no secondary buttons, and no form inputs exist
+   in this app -- grep the component tree before reintroducing any of
+   these on a future tweakcn regeneration. --card/--card-foreground are
+   kept and wired into TargetCard even though the export's own default
+   card style is a no-op against --background (TargetCard is the one
+   surface that actually wants to sit visually above the page). */
 :root {
   --destructive: oklch(0.577 0.245 27.3);
   --destructive-foreground: oklch(0.985 0 0);
@@ -120,8 +119,6 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
@@ -133,7 +130,6 @@
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-border: var(--border);
-  --color-input: var(--input);
   --color-ring: var(--ring);
   --color-chart-1: var(--chart-1);
   --color-chart-2: var(--chart-2);
