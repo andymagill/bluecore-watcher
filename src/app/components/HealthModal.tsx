@@ -23,10 +23,12 @@ export function HealthModal({
   return (
     <Dialog.Root open={open} onOpenChange={onOpenChange}>
       <Dialog.Portal>
+        {/* Scrim stays a literal black in both themes -- bg-foreground/20
+            would go near-white under the light tokens. */}
         <Dialog.Overlay className="fixed inset-0 bg-black/60" />
-        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[80vh] w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded border border-neutral-700 bg-neutral-900 p-5 text-sm">
+        <Dialog.Content className="fixed left-1/2 top-1/2 max-h-[80vh] w-[90vw] max-w-2xl -translate-x-1/2 -translate-y-1/2 overflow-y-auto rounded border border-border bg-popover p-5 text-sm text-popover-foreground">
           <Dialog.Title className="text-lg font-semibold">Health</Dialog.Title>
-          <Dialog.Description className="mb-4 text-neutral-500">
+          <Dialog.Description className="mb-4 text-muted-foreground">
             {entries.length === 0
               ? "Everything is healthy."
               : `${failed.length} failed, ${flagged.length} flagged.`}
@@ -37,21 +39,27 @@ export function HealthModal({
               {entries.map((e) => (
                 <li
                   key={`${e.targetId}.${e.extractorKey}`}
-                  className="rounded border border-neutral-800 p-3"
+                  className="rounded border border-border p-3"
                 >
                   <div className="flex items-baseline justify-between gap-2">
                     <span className="font-medium">
                       {e.targetId}.{e.extractorKey}
                     </span>
-                    <span className={e.status === "failed" ? "text-red-400" : "text-yellow-400"}>
+                    <span
+                      className={
+                        e.status === "failed" ? "text-destructive" : "text-warning-foreground"
+                      }
+                    >
                       {e.errorClass}
                     </span>
                   </div>
-                  <p className="mt-1 text-neutral-400">{e.message}</p>
+                  <p className="mt-1 text-muted-foreground">{e.message}</p>
                   {e.failingSelector && (
-                    <p className="mt-1 font-mono text-xs text-neutral-500">{e.failingSelector}</p>
+                    <p className="mt-1 font-mono text-xs text-muted-foreground">
+                      {e.failingSelector}
+                    </p>
                   )}
-                  <p className="mt-1 text-xs text-neutral-500">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     First seen {new Date(e.firstSeenAt).toLocaleDateString()} -{" "}
                     {e.consecutiveFailures} consecutive run{e.consecutiveFailures === 1 ? "" : "s"}
                     {e.servingCachedFrom
@@ -60,10 +68,12 @@ export function HealthModal({
                   </p>
                   {e.stack && (
                     <details className="mt-1">
-                      <summary className="cursor-pointer text-xs text-neutral-600">
+                      <summary className="cursor-pointer text-xs text-muted-foreground">
                         Stack trace
                       </summary>
-                      <pre className="mt-1 overflow-x-auto text-xs text-neutral-500">{e.stack}</pre>
+                      <pre className="mt-1 overflow-x-auto text-xs text-muted-foreground">
+                        {e.stack}
+                      </pre>
                     </details>
                   )}
                 </li>
@@ -74,7 +84,7 @@ export function HealthModal({
           <Dialog.Close asChild>
             <button
               type="button"
-              className="mt-4 rounded border border-neutral-700 px-3 py-1 text-xs hover:bg-neutral-800"
+              className="mt-4 rounded border border-border px-3 py-1 text-xs hover:bg-accent hover:text-accent-foreground"
             >
               Close
             </button>

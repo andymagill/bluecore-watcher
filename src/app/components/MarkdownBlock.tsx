@@ -41,22 +41,19 @@ export function MarkdownBlock({
 
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
-      <p className="text-xs text-neutral-500">{block.label}</p>
+      <p className="text-xs text-muted-foreground">{block.label}</p>
       {suppressed ? (
         <details>
-          <summary className="cursor-pointer text-sm text-neutral-500">
+          <summary className="cursor-pointer text-sm text-muted-foreground">
             Last known value from an earlier check
           </summary>
           <div
-            className="prose prose-invert prose-sm mt-1 max-w-none"
+            className="prose prose-sm mt-1 max-w-none"
             dangerouslySetInnerHTML={{ __html: html }}
           />
         </details>
       ) : (
-        <div
-          className="prose prose-invert prose-sm max-w-none"
-          dangerouslySetInnerHTML={{ __html: html }}
-        />
+        <div className="prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: html }} />
       )}
       <div className="flex flex-wrap items-center gap-2">
         <FreshnessBadge block={block} state={state} />

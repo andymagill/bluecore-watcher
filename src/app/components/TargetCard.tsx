@@ -12,14 +12,14 @@ const RUN_STATUS_LABEL: Record<TargetFile["run"]["status"], string> = {
 };
 
 const RUN_STATUS_COLOR: Record<TargetFile["run"]["status"], string> = {
-  ok: "text-green-400",
-  partial: "text-amber-400",
-  failed_cached: "text-red-400",
+  ok: "text-success-foreground",
+  partial: "text-warning-foreground",
+  failed_cached: "text-destructive",
 };
 
 export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: Date }) {
   return (
-    <div className="rounded border border-neutral-800 p-4">
+    <div className="rounded border border-border bg-card p-4 text-card-foreground">
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <a
           href={targetFile.sourceUrl}

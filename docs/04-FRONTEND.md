@@ -50,14 +50,16 @@ No state library. `useState` in an app shell, passed down. The data is read-only
 
 Implements the state machine in `01-DATA-CONTRACT.md` §5. Computed at render from `Date.now()`, never precomputed.
 
-| State     | Badge                            | Value                          |
-| --------- | -------------------------------- | ------------------------------ |
-| `fresh`   | Neutral, relative age            | Shown                          |
-| `stale`   | Amber, "Updated 3 days ago"      | Shown                          |
-| `expired` | Grey, "Last verified 4 Aug"      | **Hidden** behind a disclosure |
-| `failing` | Red, links to Health Modal       | Shown, marked                  |
-| `flagged` | Caution marker, links to warning | Shown, marked                  |
-| `never`   | —                                | `ZeroState`                    |
+| State     | Badge                                   | Value                          |
+| --------- | --------------------------------------- | ------------------------------ |
+| `fresh`   | `muted`, relative age                   | Shown                          |
+| `stale`   | `warning`, "Updated 3 days ago"         | Shown                          |
+| `expired` | `muted` (dimmer), "Last verified 4 Aug" | **Hidden** behind a disclosure |
+| `failing` | `destructive`, links to Health Modal    | Shown, marked                  |
+| `flagged` | `warning`, links to warning             | Shown, marked                  |
+| `never`   | —                                       | `ZeroState`                    |
+
+`stale` and `flagged` intentionally share a colour, as do `expired` and `fresh` (differing only in opacity) — the label text distinguishes them, which is what "never encoded by colour alone" (§7) actually requires. See `ADR-016` for the token set (`00-DECISIONS.md`).
 
 `expired` is the important one. Past the stale ceiling the UI stops presenting the value as current and presents it as a historical observation with a date. An analyst should not be able to misread a six-week-old number as today's, and the interface — not a footnote — is what enforces that.
 
@@ -108,7 +110,7 @@ Open question Q4 lives here: a source broken for six weeks needs to look differe
 
 - Freshness and status never encoded by colour alone — always paired with text or an icon.
 - Full keyboard navigation; the modal traps focus and restores it on close.
-- Contrast ratios ≥ 4.5:1 in both themes.
+- Contrast ratios ≥ 4.5:1 in both themes. "Both themes" means dark (what ships on screen) and light (what the print stylesheet renders) — there is no on-screen theme toggle; see `ADR-016` (`00-DECISIONS.md`) for the token set backing both.
 - Dense by design, but numbers get a tabular-figures font so columns align.
 - Print stylesheet: this will be screenshotted into diligence memos. Make that output not embarrassing — provenance visible, badges legible in greyscale.
 

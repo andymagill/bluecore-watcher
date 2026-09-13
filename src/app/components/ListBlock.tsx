@@ -33,7 +33,7 @@ export function ListBlock({
 
   return (
     <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
-      <p className="text-xs text-neutral-500">{block.label}</p>
+      <p className="text-xs text-muted-foreground">{block.label}</p>
       <ul className="list-disc space-y-0.5 pl-4 text-sm">
         {(block.displayValue ?? []).map((item, i) => (
           <li key={i}>

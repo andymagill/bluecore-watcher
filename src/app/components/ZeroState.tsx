@@ -3,8 +3,8 @@
 // the M1 wording, kept short and honest rather than apologetic.
 export function ZeroState({ label, reason }: { label: string; reason?: string }) {
   return (
-    <div className="rounded border border-dashed border-neutral-700 p-3 text-sm text-neutral-500">
-      <p className="font-medium text-neutral-400">{label}</p>
+    <div className="rounded border border-dashed border-border p-3 text-sm text-muted-foreground">
+      <p className="font-medium text-foreground/70">{label}</p>
       <p>{reason ?? "Not yet available."}</p>
     </div>
   );
