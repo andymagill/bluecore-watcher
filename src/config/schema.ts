@@ -86,6 +86,14 @@ export const AssertDef = z.object({
   maxChangePct: z.number().positive().optional(),
   maxChangeAbs: z.number().positive().optional(),
   expectMonotonic: z.enum(["increasing", "decreasing"]).optional(),
+  // ADR-018 — type: "date" only. Dates coerce to an ISO instant string
+  // (coerce.ts), not a number, so min/max/maxChangePct/maxChangeAbs never
+  // ran against them (checkScalarShape/checkScalarGuard both type-guard on
+  // `typeof value === "number"`) -- these two fields are what "shape
+  // assertions" means for a date, and expectMonotonic (below) is threaded
+  // through separately by comparing epoch milliseconds.
+  maxFutureDays: z.number().nonnegative().optional(), // reject value > now + N days
+  notBefore: z.iso.date().optional(), // reject value < this date (YYYY-MM-DD, UTC)
 });
 export type AssertDef = z.infer<typeof AssertDef>;
 
@@ -177,6 +185,73 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
       code: "custom",
       input: ex,
       message: 'minItems/maxItems only apply to presenter "list" (rule 8)',
+      path: ["assert"],
+    });
+  }
+
+  // Rule 8 (extended, ADR-018) — an assert field silently does nothing
+  // outside its applicable type: min/max only ever ran through
+  // checkScalarShape's `typeof value === "number"` guard, so setting them
+  // on a string/date extractor looked configured but never fired. Reject
+  // the mismatch at config time rather than let an author believe a value
+  // is guarded when it isn't.
+  const isNumericType = ex.type === "number" || ex.type === "currency" || ex.type === "percent";
+  const isDateType = ex.type === "date";
+  const isStringlikeType = ex.type === "string" || ex.type === "markdown" || ex.type === "enum";
+  const isList = ex.presenter === "list"; // list items are always type "string" (rule 7)
+
+  if ((ex.assert?.min !== undefined || ex.assert?.max !== undefined) && !isNumericType) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'min/max only apply to a numeric type ("number"/"currency"/"percent") (rule 8)',
+      path: ["assert"],
+    });
+  }
+  if (
+    (ex.assert?.pattern !== undefined || ex.assert?.maxLength !== undefined) &&
+    !isStringlikeType &&
+    !isList
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'pattern/maxLength only apply to a string-like type or presenter "list" (rule 8)',
+      path: ["assert"],
+    });
+  }
+  if (
+    (ex.assert?.maxChangePct !== undefined || ex.assert?.maxChangeAbs !== undefined) &&
+    !isNumericType &&
+    !isList
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'maxChangePct/maxChangeAbs only apply to a numeric type, or presenter "list" ' +
+        '(compared against item count) — not type "date": use expectMonotonic there (rule 8)',
+      path: ["assert"],
+    });
+  }
+  if (ex.assert?.expectMonotonic !== undefined && !isNumericType && !isDateType && !isList) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'expectMonotonic only applies to a numeric type, type "date" (compared as an instant), ' +
+        'or presenter "list" (compared against item count) (rule 8)',
+      path: ["assert"],
+    });
+  }
+  if (
+    (ex.assert?.maxFutureDays !== undefined || ex.assert?.notBefore !== undefined) &&
+    !isDateType
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'maxFutureDays/notBefore only apply to type "date" (rule 8, ADR-018)',
       path: ["assert"],
     });
   }

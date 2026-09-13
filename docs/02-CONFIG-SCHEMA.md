@@ -153,15 +153,17 @@ type LocationDef =
 ```ts
 export interface AssertDef {
   notEmpty?: boolean;
-  min?: number;
-  max?: number;
-  pattern?: string; // regex the final value must satisfy
-  maxLength?: number;
+  min?: number; // numeric types only
+  max?: number; // numeric types only
+  pattern?: string; // regex the final value must satisfy — string-like types / "list" only
+  maxLength?: number; // string-like types / "list" only
   minItems?: number; // presenter: "list" only — bounds array length
   maxItems?: number; // presenter: "list" only
-  maxChangePct?: number; // vs previous committed value; for "list", vs item count
-  maxChangeAbs?: number;
-  expectMonotonic?: "increasing" | "decreasing";
+  maxChangePct?: number; // numeric types / "list" (vs item count) only — vs previous committed value
+  maxChangeAbs?: number; // numeric types / "list" (vs item count) only
+  expectMonotonic?: "increasing" | "decreasing"; // numeric, "date", or "list" (item count)
+  maxFutureDays?: number; // type: "date" only (ADR-018) — reject value > now + N days
+  notBefore?: string; // type: "date" only (ADR-018) — ISO date (YYYY-MM-DD, UTC); reject value < this
 }
 ```
 
@@ -227,7 +229,7 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, **or** `schedule.ttlOverrideReason` is a non-empty string. _(Corrected 2026-09-12 — the original override mechanism was a `// eslint-disable`-style comment, which a JSON Schema / Zod validator cannot see. `ttlOverrideReason` is a real schema field so the override is machine-checkable and self-documenting.)_
 6. Location fields match `kind` per the discriminated union in §3: `{ kind: "html", selector, ... }` requires the target's `kind` to be `"html"`; `{ kind: "api", jsonPath }` requires `"api"`. Mismatch is a type error at author time (the union makes it unrepresentable), and a defence-in-depth runtime check for anything hand-constructed.
 7. `type` and `presenter` are compatible per the table in §3.
-8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`. `minItems`/`maxItems` set ⟹ `presenter: "list"`.
+8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`. `minItems`/`maxItems` set ⟹ `presenter: "list"`. **(Extended, ADR-018)** every other `assert` field is rejected outside the type/presenter it can actually affect, since a field that can never fire is worse than no field — it reads as a guard that isn't one: `min`/`max` ⟹ a numeric type; `pattern`/`maxLength` ⟹ a string-like type or `presenter: "list"`; `maxChangePct`/`maxChangeAbs` ⟹ a numeric type or `"list"` (compared against item count); `expectMonotonic` ⟹ numeric, `"date"`, or `"list"`; `maxFutureDays`/`notBefore` ⟹ `type: "date"`. `notEmpty` is unrestricted.
 9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the _name_, not the _value_, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. _(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)_
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.

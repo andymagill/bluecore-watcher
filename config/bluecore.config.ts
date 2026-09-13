@@ -6,7 +6,7 @@
 //
 // Paired fixtures live under fixtures/<targetId>/ — captured via
 // `npm run fixture:capture` (scripts/fixture-capture.ts) per
-// docs/06-OPS-RUNBOOK.md §8 step 2; golden expected-output files via
+// docs/06-OPS-RUNBOOK.md §10 step 2; golden expected-output files via
 // `npm run fixture:bless` (scripts/fixture-bless.ts).
 import type { CmieConfigInput } from "../src/config/schema.js";
 
@@ -59,7 +59,10 @@ export const config: CmieConfigInput = {
         "Cheerio's default (non-XML) parser handles the custom tags fine (verified against the live " +
         "filing). Episodic: only 2 filings exist since incorporation (2026-04-06, 2026-09-04), so " +
         "maxChangePct is set generously — an early-stage seed company's next filing could plausibly " +
-        "show a multiple of this amount, and that's a real jump worth surfacing, not a selector bug.",
+        "show a multiple of this amount, and that's a real jump worth surfacing, not a selector bug. " +
+        "This URL is pinned to one specific filing (accession 0002125928-26-000003) and cannot see a " +
+        "future Form D on its own — bluecore-sec-filings below (M2b) surfaces a new D/D-A so the " +
+        "operator knows to repoint this URL.",
       extractors: [
         {
           key: "total_offering_amount",
@@ -82,6 +85,59 @@ export const config: CmieConfigInput = {
           currency: "USD",
           required: true,
           assert: { min: 0, max: 200_000_000, maxChangePct: 300 },
+        },
+      ],
+    },
+
+    // M2b — companion to bluecore-form-d above, which is pinned to one
+    // specific accession number and so can never observe BlueCore's next
+    // Form D on its own. Same shape as oklo-sec-filings/nuscale-sec-filings:
+    // SEC's own submissions JSON, newest-filing-first. Its job is to reveal
+    // *that* a new filing exists so the operator can repoint the pinned URL
+    // above — not to replace it, since the XML-vs-JSON extraction paths
+    // pull genuinely different facts (dollar amounts vs. form/date).
+    {
+      id: "bluecore-sec-filings",
+      label: "BlueCore Energy — Latest SEC Filing",
+      entityId: "bluecore-energy",
+      sectionId: "company",
+      kind: "api",
+      url: "https://data.sec.gov/submissions/CIK0002125928.json",
+      schedule: { cron: "0 12 * * 1-5", ttlHours: 48 },
+      politeness: { minIntervalMs: 2000, userAgent: SEC_UA },
+      notes:
+        "Verified live 2026-09-13: $.filings.recent.form[0]/.filingDate[0] resolve to the same 'D' " +
+        "filing bluecore-form-d's pinned URL currently points at (2026-09-04, accession " +
+        "0002125928-26-000003) — identical shape to oklo-sec-filings/nuscale-sec-filings. " +
+        "any-change alert so a new filing is visible without waiting on M3 alert dispatch review; " +
+        "notBefore is set to the entity's own incorporation (2026-04-06), tighter than the 2020 " +
+        "floor used for the two established competitors above.",
+      extractors: [
+        {
+          key: "latest_filing_form",
+          label: "Latest Filing Type",
+          presenter: "markdown",
+          kind: "api",
+          jsonPath: "$.filings.recent.form[0]",
+          type: "string",
+          required: true,
+          assert: { notEmpty: true, maxLength: 20, pattern: "^[A-Z0-9][A-Z0-9 ./-]*$" },
+          alert: { on: "any-change", severity: "warn" },
+        },
+        {
+          key: "latest_filing_date",
+          label: "Latest Filing Date",
+          presenter: "metric",
+          kind: "api",
+          jsonPath: "$.filings.recent.filingDate[0]",
+          type: "date",
+          required: true,
+          assert: {
+            notEmpty: true,
+            maxFutureDays: 1,
+            notBefore: "2026-01-01",
+            expectMonotonic: "increasing",
+          },
         },
       ],
     },
@@ -111,7 +167,16 @@ export const config: CmieConfigInput = {
           label: "Latest Headline",
           presenter: "markdown",
           kind: "html",
-          selector: ".bc-n-ctitle:first",
+          // M2b (was ".bc-n-ctitle:first"): the three fields on this card were
+          // each matched by an independent :first over the whole page. Every
+          // card carries all three elements today (verified against the
+          // fixture: 12/12/12), but that made it possible for a future
+          // redesign to drop one field from just the newest card -- the
+          // other two :first selectors would then silently pair the
+          // headline/date/category from *different* cards. Scoping to
+          // ".bc-n-card:first" first, then the field, ties all three to the
+          // same DOM node the way "latest post" actually means.
+          selector: ".bc-n-card:first .bc-n-ctitle",
           type: "string",
           required: true,
           assert: { notEmpty: true, maxLength: 200 },
@@ -121,17 +186,22 @@ export const config: CmieConfigInput = {
           label: "Latest Post Date",
           presenter: "metric",
           kind: "html",
-          selector: ".bc-n-cdate:first",
+          selector: ".bc-n-card:first .bc-n-cdate",
           type: "date",
           required: true,
-          assert: { notEmpty: true },
+          // ADR-018: maxFutureDays catches a selector landing on a scheduled/
+          // draft post; expectMonotonic catches a selector regressing to an
+          // older card once a newer one is published. A once-real reordering
+          // (a post edited and bumped) is exactly what an acknowledgement
+          // (ADR-012) is for, not a wider tolerance.
+          assert: { notEmpty: true, maxFutureDays: 1, expectMonotonic: "increasing" },
         },
         {
           key: "latest_post_category",
           label: "Latest Post Category",
           presenter: "status",
           kind: "html",
-          selector: ".bc-n-cat-key:first",
+          selector: ".bc-n-card:first .bc-n-cat-key",
           type: "enum",
           enumValues: ["Press Release", "In the News", "Insights"],
           alert: { on: "any-change", severity: "info" },
@@ -199,7 +269,12 @@ export const config: CmieConfigInput = {
           jsonPath: "$.filings.recent.form[0]",
           type: "string",
           required: true,
-          assert: { notEmpty: true, maxLength: 20 },
+          // M2b: pattern tuned against all 52 distinct form values across
+          // both SEC targets' fixtures (e.g. "4/A", "SCHEDULE 13G/A", "SEC
+          // STAFF LETTER") — every one matches; the point is to reject
+          // something SEC's own form-code vocabulary would never produce
+          // (stray HTML, a JSON key leaking through).
+          assert: { notEmpty: true, maxLength: 20, pattern: "^[A-Z0-9][A-Z0-9 ./-]*$" },
         },
         {
           key: "latest_filing_date",
@@ -209,7 +284,15 @@ export const config: CmieConfigInput = {
           jsonPath: "$.filings.recent.filingDate[0]",
           type: "date",
           required: true,
-          assert: { notEmpty: true },
+          // ADR-018: `recent` is SEC's own newest-first array, so a
+          // backwards move means the shape changed underneath jsonPath, not
+          // a real event. notBefore predates this entity's SEC registration.
+          assert: {
+            notEmpty: true,
+            maxFutureDays: 1,
+            notBefore: "2020-01-01",
+            expectMonotonic: "increasing",
+          },
         },
       ],
     },
@@ -242,7 +325,9 @@ export const config: CmieConfigInput = {
           jsonPath: "$.filings.recent.form[0]",
           type: "string",
           required: true,
-          assert: { notEmpty: true, maxLength: 20 },
+          // M2b: same pattern/reasoning as oklo-sec-filings — tuned against
+          // all 52 distinct form values across both fixtures.
+          assert: { notEmpty: true, maxLength: 20, pattern: "^[A-Z0-9][A-Z0-9 ./-]*$" },
         },
         {
           key: "latest_filing_date",
@@ -252,7 +337,13 @@ export const config: CmieConfigInput = {
           jsonPath: "$.filings.recent.filingDate[0]",
           type: "date",
           required: true,
-          assert: { notEmpty: true },
+          // ADR-018: same reasoning as oklo-sec-filings.
+          assert: {
+            notEmpty: true,
+            maxFutureDays: 1,
+            notBefore: "2020-01-01",
+            expectMonotonic: "increasing",
+          },
         },
       ],
     },
@@ -269,7 +360,10 @@ export const config: CmieConfigInput = {
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
       notes:
         "Federal Register's own documented `count` field. No expectMonotonic — the index can in " +
-        "principle be revised down, so a decrease isn't necessarily a bug.",
+        "principle be revised down, so a decrease isn't necessarily a bug. M2b: backfilled weekly " +
+        "counts 2026-06-01 through 2026-09-13 (73→76) show real movement of 0-1 document/week; " +
+        "maxChangeAbs 10 is ~10x that observed ceiling. min/max are a sanity floor/ceiling, not a " +
+        "volatility bound.",
       extractors: [
         {
           key: "smr_mention_count",
@@ -279,7 +373,7 @@ export const config: CmieConfigInput = {
           jsonPath: "$.count",
           type: "number",
           unit: "documents",
-          assert: { min: 0, maxChangePct: 25 }, // tuned: real weekly deltas here run a handful of documents, not dozens
+          assert: { min: 50, max: 500, maxChangeAbs: 10 },
         },
       ],
     },
@@ -298,7 +392,10 @@ export const config: CmieConfigInput = {
       url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest",
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
       notes:
-        "Revisit once/if a Bluecore-specific NRC docket opens; until then this tracks the class of reactor, not the company.",
+        "Revisit once/if a Bluecore-specific NRC docket opens; until then this tracks the class of " +
+        "reactor, not the company. M2b: backfilled weekly counts 2026-06-01 through 2026-09-13 " +
+        "(52→55) show real movement of 0-1 document/week; maxChangeAbs 10 is ~10x that observed " +
+        "ceiling.",
       extractors: [
         {
           key: "nrc_smr_document_count",
@@ -308,7 +405,7 @@ export const config: CmieConfigInput = {
           jsonPath: "$.count",
           type: "number",
           unit: "documents",
-          assert: { min: 0, maxChangePct: 25 }, // tuned: real weekly deltas here run a handful of documents, not dozens
+          assert: { min: 35, max: 400, maxChangeAbs: 10 },
         },
       ],
     },
@@ -325,9 +422,8 @@ export const config: CmieConfigInput = {
       url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest",
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
       notes:
-        "EIA's regional price-index APIs (the shape example.config.ts's synthetic market target " +
-        "mimics) require a free api_key (confirmed: api.eia.gov 403s without one) — deferred to M2 " +
-        "rather than adding a secret for this pass.",
+        "M2b: backfilled weekly counts 2026-06-01 through 2026-09-13 (49→51) show real movement of " +
+        "0-1 document/week; maxChangeAbs 10 is ~10x that observed ceiling.",
       extractors: [
         {
           key: "doe_nuclear_policy_count",
@@ -337,7 +433,7 @@ export const config: CmieConfigInput = {
           jsonPath: "$.count",
           type: "number",
           unit: "documents",
-          assert: { min: 0, maxChangePct: 25 }, // tuned: real weekly deltas here run a handful of documents, not dozens
+          assert: { min: 35, max: 400, maxChangeAbs: 10 },
         },
       ],
     },
@@ -379,7 +475,18 @@ export const config: CmieConfigInput = {
           type: "number",
           unit: "¢/kWh",
           required: true,
-          assert: { min: 0, max: 100, notEmpty: true },
+          // M2b: min/max tightened from a bare non-negative check to a real
+          // sanity band for a US industrial retail rate in ¢/kWh (EIA's
+          // national range across all states/sectors runs roughly 5-40;
+          // California industrial has run 17.7-25.53 over the 3yr backfill
+          // below). maxChangePct backfilled against 36mo of this series'
+          // real history (api.eia.gov, 2023-07 through 2026-06): prices
+          // trace a seasonal summer-peak/winter-trough pattern, and the
+          // largest observed single-month move in that window was 16.31%
+          // (2025-10: 23.05 -> 2025-11: 19.29). 25 is ~1.5x that ceiling —
+          // real seasonal swings publish, a decimal-place/unit error (a 10x
+          // jump) doesn't.
+          assert: { min: 5, max: 60, maxChangePct: 25, notEmpty: true },
         },
         {
           key: "price_period",
@@ -389,7 +496,11 @@ export const config: CmieConfigInput = {
           jsonPath: "$.response.data[0].period",
           type: "string",
           required: true,
-          assert: { notEmpty: true, maxLength: 7 },
+          // M2b: pattern is tighter than maxLength alone — rejects a
+          // structurally-valid-but-wrong string (e.g. a day-granularity
+          // period, or the API starting to echo a range) that 7 characters
+          // wouldn't catch.
+          assert: { notEmpty: true, maxLength: 7, pattern: "^\\d{4}-(0[1-9]|1[0-2])$" },
         },
       ],
     },

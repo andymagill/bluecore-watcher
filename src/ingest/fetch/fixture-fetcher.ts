@@ -1,6 +1,8 @@
 // Satisfies Fetcher from fixtures/<targetId>/response.<ext> instead of the
 // network. This is how the whole engine is exercised offline (03-INGESTION.md
-// §5) — the weekly drift check reuses the same fixture directory later.
+// §5) — src/drift/check.ts (M2b, the weekly drift check) also uses this
+// fetcher directly to load each target's baseline before comparing it
+// against a live HttpFetcher response.
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import type { TargetDef } from "../../config/schema.js";

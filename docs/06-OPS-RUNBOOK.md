@@ -55,7 +55,21 @@ The routine failure. Expect these weekly.
 
 ---
 
-## 4. Runbook: a change guard tripped
+## 4. Runbook: a new Form D filing appeared
+
+**Symptom.** `bluecore-sec-filings.latest_filing_form`/`.latest_filing_date` change (M2b `any-change` alert fires on the form field) — most likely the next real event, not a bug, since this target's whole purpose is catching the next filing.
+
+`bluecore-form-d` (the XML target extracting `totalOfferingAmount`/`totalAmountSold`) is pinned to one specific accession number's URL and does not follow this on its own.
+
+1. Confirm via the new filing's accession number (`$.filings.recent.accessionNumber[0]` in the same submissions JSON) that it's a real new Form D or D/A, not a different form type this target also alerts on.
+2. Build the new filing's XML URL: `https://www.sec.gov/Archives/edgar/data/2125928/<accession-no-dashes>/primary_doc.xml`.
+3. Update `bluecore-form-d.url` in `config/bluecore.config.ts` to point at it.
+4. Capture and bless: `npm run fixture:capture -- --env bluecore bluecore-form-d`, then `npm run fixture:bless -- --env bluecore bluecore-form-d`. Review the diff — a real new filing should show the new dollar amounts, not a structural change.
+5. Merge. `maxChangePct: 300` on both extractors (`config/bluecore.config.ts`) is already generous for an early-stage company's next filing plausibly showing a multiple of the current amount — expect it to publish rather than guard-trip, but check `health.json` after the next run either way.
+
+---
+
+## 5. Runbook: a change guard tripped
 
 **Symptom.** `CHANGE_GUARD_TRIPPED`; block `flagged`; value withheld.
 
@@ -70,7 +84,7 @@ If a guard trips repeatedly on legitimate movement, retune it (step 3) immediate
 
 ---
 
-## 5. Runbook: a source started blocking
+## 6. Runbook: a source started blocking
 
 **Symptom.** `BLOCKED` — 403, 429, or a captcha heuristic.
 
@@ -83,7 +97,7 @@ If a guard trips repeatedly on legitimate movement, retune it (step 3) immediate
 
 ---
 
-## 6. Runbook: the gate failed
+## 7. Runbook: the gate failed
 
 **Symptom.** Ingestion run exits non-zero, branch left open, production untouched.
 
@@ -97,7 +111,23 @@ The branch is a complete reproduction. Check it out, run locally, fix forward. N
 
 ---
 
-## 7. Maintenance expectations
+## 8. Runbook: a drift warning opened
+
+**Symptom.** A GitHub Issue titled `Drift: <targetId>`, label `drift`. The Monday `Drift check` workflow (`.github/workflows/drift.yml`) opened it — never the daily ingest, and never a failed workflow run.
+
+This is the early-warning system working (`03-INGESTION.md` §5): the page or API response changed shape, but extraction may still be succeeding. Treat it as lower urgency than a broken selector (§3) — nothing is `cached`/`flagged` in production because of this alone — but higher urgency than routine, because the next redesign might land on the exact node a selector depends on.
+
+1. **Read the issue body.** Each signal names what changed: `EXTRACTION_BROKEN` (an extractor that works against the fixture now fails live — treat this one like §3, today), `ANCHOR_MOVED` (the selector still matches, but at a different position — the page shifted around it), `TYPE_CHANGED` (a `jsonPath` now resolves to a different JS type), `STRUCTURE_CHANGED` (the response's overall shape moved, independent of any one extractor).
+2. **`EXTRACTION_BROKEN`** → this is really §3 wearing a different label; go there.
+3. **`ANCHOR_MOVED` / `STRUCTURE_CHANGED` / `TYPE_CHANGED` with extraction still working** → capture a fresh fixture (`npm run fixture:capture -- --env bluecore <targetId>`) and diff it against the old one (still in Git history) to see what actually moved.
+4. **Benign** (a new section added elsewhere on the page, a field gained that nothing extracts) → re-bless (`npm run fixture:bless -- --env bluecore <targetId>`) so the fixture matches the new normal, and comment on the issue saying so before closing it yourself, or just leave it — the next clean weekly run closes it automatically.
+5. **Not benign** (the specific node an extractor depends on moved for a reason that will eventually break it) → treat as an early §3, before it actually breaks: tighten the selector or add resilience now, at your own pace rather than an operator's on a Saturday.
+
+The issue closes itself, with a comment, the first time the target comes back clean — no manual close needed for the common case.
+
+---
+
+## 9. Maintenance expectations
 
 Open question Q4 asks for an honest number. The shape, to be replaced with measurement:
 
@@ -115,7 +145,7 @@ The drift check (`03-INGESTION.md` §5) is what keeps this number from growing: 
 
 ---
 
-## 8. Onboarding a new environment
+## 10. Onboarding a new environment
 
 The ADR-001 test. Target: one afternoon (open question Q8).
 
@@ -131,7 +161,7 @@ If any step requires touching application code, ADR-001 is violated and the sche
 
 ---
 
-## 9. Unresolved operational risks
+## 11. Unresolved operational risks
 
 | Risk                                                                                                                                           | Status                                                                                                                                                                                                                                  |
 | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -139,5 +169,5 @@ If any step requires touching application code, ADR-001 is violated and the sche
 | robots.txt / ToS posture unwritten (Q6)                                                                                                        | **Deferred to M3/M4 by decision.** `respectRobotsTxt` defaults to `true` until then. Needed before any client deliverable.                                                                                                              |
 | Git retention past ~2,000 commits (Q7)                                                                                                         | Deferred.                                                                                                                                                                                                                               |
 | Single operator — no coverage                                                                                                                  | Accepted for now. The `notes` field and this runbook are the mitigation.                                                                                                                                                                |
-| Edge relay unvalidated (ADR-006)                                                                                                               | Gathering evidence via §5.                                                                                                                                                                                                              |
+| Edge relay unvalidated (ADR-006)                                                                                                               | Gathering evidence via §6.                                                                                                                                                                                                              |
 | Cloudflare's actual free-tier terms for this usage pattern haven't been re-verified since the host correction (ADR-013, superseded by ADR-014) | **Open.** The retired Vercel-specific finding (Hobby tier prohibits commercial use, forcing Pro at M4) does not necessarily transfer to the Cloudflare Worker (Static Assets) this now runs on. Verify before treating M4 as cost-free. |

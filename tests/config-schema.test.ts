@@ -183,4 +183,130 @@ describe("CmieConfig validation rules", () => {
     if (!result.success)
       expect(result.error.issues.some((i) => i.message.includes("rule 11"))).toBe(true);
   });
+
+  // ADR-018 — rule 8's no-op-assert-field extension. Each case sets an
+  // assert field that could never fire against the extractor's own
+  // type/presenter before this change (checkScalarShape/checkScalarGuard
+  // both type-guard internally), which config validation now catches
+  // instead of silently accepting a guard that never runs.
+  describe("rule 8 (extended, ADR-018): rejects assert fields that are no-ops for the extractor's type", () => {
+    it("rejects min/max on a non-numeric type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "string";
+      cfg.targets[0]!.extractors[0]!.presenter = "markdown";
+      cfg.targets[0]!.extractors[0]!.assert = { min: 0 };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it("accepts min/max on a numeric type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.assert = { min: 0, max: 100 };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects pattern/maxLength on a numeric type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.assert = { pattern: "^\\d+$" };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it("accepts pattern/maxLength on a string-like type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "string";
+      cfg.targets[0]!.extractors[0]!.presenter = "markdown";
+      cfg.targets[0]!.extractors[0]!.assert = { pattern: "^\\d+$", maxLength: 10 };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("accepts maxLength on presenter list (per-item)", () => {
+      const cfg = baseConfig();
+      // Full reassignment, not field mutation: cfg.targets[0]!.extractors[0]
+      // is typed as the ExtractorDef union, so writing `.multiple` through a
+      // partially-narrowed reference doesn't type-check even when `kind` was
+      // set to "html" earlier — same pattern the rule 6 test above uses.
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        selector: "#x",
+        multiple: true,
+        type: "string",
+        assert: { maxLength: 10 },
+      };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects maxChangePct/maxChangeAbs on type date", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "date";
+      cfg.targets[0]!.extractors[0]!.assert = { maxChangePct: 25 };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it("accepts maxChangePct/maxChangeAbs on presenter list (item count)", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        selector: "#x",
+        multiple: true,
+        type: "string",
+        assert: { maxChangeAbs: 5 },
+      };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects expectMonotonic on a string type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "string";
+      cfg.targets[0]!.extractors[0]!.presenter = "markdown";
+      cfg.targets[0]!.extractors[0]!.assert = { expectMonotonic: "increasing" };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it("accepts expectMonotonic on type date", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "date";
+      cfg.targets[0]!.extractors[0]!.assert = { expectMonotonic: "increasing" };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects maxFutureDays/notBefore on a non-date type", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.assert = { maxFutureDays: 1 };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it("accepts maxFutureDays/notBefore on type date", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "date";
+      cfg.targets[0]!.extractors[0]!.assert = { maxFutureDays: 1, notBefore: "2020-01-01" };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects a malformed notBefore date string", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "date";
+      cfg.targets[0]!.extractors[0]!.assert = { notBefore: "not-a-date" };
+      expect(CmieConfig.safeParse(cfg).success).toBe(false);
+    });
+  });
 });

@@ -7,6 +7,7 @@ import { HtmlHandler } from "../src/ingest/extract/html-handler.js";
 import { IngestError } from "../src/ingest/errors.js";
 import { extractOne } from "../src/ingest/extract/pipeline.js";
 import { processExtractor } from "../src/ingest/process-extractor.js";
+import { checkShapeAssertions } from "../src/ingest/validate.js";
 import { AcknowledgementStore } from "../src/ingest/acknowledgements.js";
 import { join } from "node:path";
 import { mkdtemp, rm } from "node:fs/promises";
@@ -293,6 +294,182 @@ describe("processExtractor — shape assertions and change guards", () => {
       expect(result.block.status).toBe("ok");
       expect(result.block.value).toBe(90000);
       expect(result.consumedAcknowledgement).not.toBeNull();
+    });
+  });
+});
+
+describe("ADR-018 — date shape assertions (maxFutureDays / notBefore)", () => {
+  const target = buildTarget({
+    selector: "#posted",
+    type: "date",
+    assert: { maxFutureDays: 1, notBefore: "2020-01-01" },
+  });
+  const extractor = target.extractors[0]!;
+
+  function dateCandidate(iso: string) {
+    return {
+      presenter: "metric" as const,
+      value: iso,
+      displayValue: iso,
+      rawText: iso,
+      anchor: "https://example.test/page#posted",
+      contentHash: "sha256:dead",
+    };
+  }
+
+  it("passes a date within both bounds", () => {
+    const failures = checkShapeAssertions(
+      dateCandidate("2026-09-11T00:00:00.000Z"),
+      extractor,
+      new Date("2026-09-12T00:00:00Z"),
+    );
+    expect(failures).toEqual([]);
+  });
+
+  it("maxFutureDays: rejects a date more than N days past now", () => {
+    const failures = checkShapeAssertions(
+      dateCandidate("2026-09-20T00:00:00.000Z"), // 8 days past "now" below, limit is 1
+      extractor,
+      new Date("2026-09-12T00:00:00Z"),
+    );
+    expect(failures).toEqual([{ rule: "maxFutureDays", message: expect.any(String) }]);
+  });
+
+  it("maxFutureDays: the same date passes once the clock advances past it (ADR-011 asymmetry)", () => {
+    const failures = checkShapeAssertions(
+      dateCandidate("2026-09-20T00:00:00.000Z"),
+      extractor,
+      new Date("2026-09-25T00:00:00Z"), // now later than the value + tolerance
+    );
+    expect(failures).toEqual([]);
+  });
+
+  it("notBefore: rejects a date earlier than the floor", () => {
+    const failures = checkShapeAssertions(
+      dateCandidate("2019-06-01T00:00:00.000Z"),
+      extractor,
+      new Date("2026-09-12T00:00:00Z"),
+    );
+    expect(failures).toEqual([{ rule: "notBefore", message: expect.any(String) }]);
+  });
+});
+
+describe("ADR-018 — expectMonotonic applies to dates via epoch-ms comparison", () => {
+  function buildDateTarget() {
+    return buildTarget({
+      selector: "#posted",
+      type: "date",
+      assert: { expectMonotonic: "increasing" },
+    });
+  }
+
+  function previousDateBlock(iso: string) {
+    return {
+      key: "ex1",
+      label: "Extractor 1",
+      type: "date" as const,
+      presenter: "metric" as const,
+      status: "ok" as const,
+      value: iso,
+      displayValue: iso,
+      provenance: {
+        sourceUrl: "https://example.test/page",
+        anchor: "#posted",
+        extractedAt: "2026-09-01T00:00:00.000Z",
+        rawText: iso,
+        contentHash: "sha256:prev",
+      },
+      delta: null,
+      validation: { passed: true, warnings: [] },
+    };
+  }
+
+  it("trips when the new date is earlier than the previous one", async () => {
+    const target = buildDateTarget();
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>2026-09-01</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+
+    await withAckStore(async (acks) => {
+      const result = await processExtractor({
+        handler,
+        doc,
+        extractor: target.extractors[0]!,
+        target,
+        previousBlock: previousDateBlock("2026-09-11T00:00:00.000Z"),
+        acknowledgements: acks,
+        now: new Date("2026-09-12T00:00:00Z"),
+        httpStatus: 200,
+      });
+      expect(result.block.status).toBe("flagged");
+      expect(result.block.value).toBe("2026-09-11T00:00:00.000Z"); // prior value retained
+      expect(result.healthEntryDraft?.errorClass).toBe("CHANGE_GUARD_TRIPPED");
+    });
+  });
+
+  it("ADR-012: a matching acknowledgement releases a tripped date guard", async () => {
+    const target = buildDateTarget();
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>2026-09-01</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+    const candidate = await extractOne(handler, doc, target.extractors[0]!, target);
+
+    await withAckStore(async (acks) => {
+      // @ts-expect-error accessing private state for the test seed
+      acks.acknowledgements = [
+        {
+          targetId: target.id,
+          extractorKey: "ex1",
+          contentHash: candidate.contentHash,
+          reason: "confirmed backdated post",
+          acknowledgedBy: "test",
+          acknowledgedAt: "2026-09-12T00:00:00.000Z",
+        },
+      ];
+      const result = await processExtractor({
+        handler,
+        doc,
+        extractor: target.extractors[0]!,
+        target,
+        previousBlock: previousDateBlock("2026-09-11T00:00:00.000Z"),
+        acknowledgements: acks,
+        now: new Date("2026-09-12T00:00:00Z"),
+        httpStatus: 200,
+      });
+      expect(result.block.status).toBe("ok");
+      expect(result.block.value).toBe("2026-09-01T00:00:00.000Z");
+      expect(result.consumedAcknowledgement).not.toBeNull();
+    });
+  });
+
+  it("does not trip when the new date is later than the previous one", async () => {
+    const target = buildDateTarget();
+    const handler = new HtmlHandler();
+    const doc = handler.parse({
+      body: "<html><body><span id='posted'>2026-09-15</span></body></html>",
+      httpStatus: 200,
+      fetchedAt: new Date().toISOString(),
+    });
+
+    await withAckStore(async (acks) => {
+      const result = await processExtractor({
+        handler,
+        doc,
+        extractor: target.extractors[0]!,
+        target,
+        previousBlock: previousDateBlock("2026-09-11T00:00:00.000Z"),
+        acknowledgements: acks,
+        now: new Date("2026-09-16T00:00:00Z"),
+        httpStatus: 200,
+      });
+      expect(result.block.status).toBe("ok");
+      expect(result.block.value).toBe("2026-09-15T00:00:00.000Z");
     });
   });
 });

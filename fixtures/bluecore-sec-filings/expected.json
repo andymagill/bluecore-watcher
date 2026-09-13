@@ -1,0 +1,18 @@
+{
+  "latest_filing_form": {
+    "presenter": "markdown",
+    "value": "D",
+    "displayValue": "D",
+    "rawText": "D",
+    "anchor": "https://data.sec.gov/submissions/CIK0002125928.json#$.filings.recent.form[0]",
+    "contentHash": "sha256:3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43"
+  },
+  "latest_filing_date": {
+    "presenter": "metric",
+    "value": "2026-09-04T00:00:00.000Z",
+    "displayValue": "04 Sep 2026",
+    "rawText": "2026-09-04",
+    "anchor": "https://data.sec.gov/submissions/CIK0002125928.json#$.filings.recent.filingDate[0]",
+    "contentHash": "sha256:ec00d6c3e1a390cb687d96168d38fbb1c79e6fcd9e3d1193448e5bc2dea06efa"
+  }
+}

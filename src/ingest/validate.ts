@@ -10,13 +10,18 @@ export interface AssertionFailure {
 
 // Shape assertions — 01-DATA-CONTRACT.md §6 layer 1. For `list`, per-item
 // checks apply to every item (§4.1); minItems/maxItems bound the array.
+// `now` drives the two date-only checks (ADR-018, maxFutureDays/notBefore);
+// callers pass a fixed clock (processExtractor's `now` param) so a fake-clock
+// test is deterministic and the offline dry run never depends on wall time.
 export function checkShapeAssertions(
   candidate: Candidate,
   extractor: ExtractorDef,
+  now: Date,
 ): AssertionFailure[] {
   const assert = extractor.assert;
   if (!assert) return [];
   const failures: AssertionFailure[] = [];
+  const isDate = extractor.type === "date";
 
   if (candidate.presenter === "list") {
     const list = candidate as ListCandidate;
@@ -33,18 +38,20 @@ export function checkShapeAssertions(
       });
     }
     for (const item of list.value) {
-      failures.push(...checkScalarShape(item, assert));
+      failures.push(...checkScalarShape(item, assert, false, now));
     }
     return failures;
   }
 
   const scalar = candidate as ScalarCandidate;
-  return checkScalarShape(scalar.value, assert);
+  return checkScalarShape(scalar.value, assert, isDate, now);
 }
 
 function checkScalarShape(
   value: number | string,
   assert: NonNullable<ExtractorDef["assert"]>,
+  isDate: boolean,
+  now: Date,
 ): AssertionFailure[] {
   const failures: AssertionFailure[] = [];
   if (assert.notEmpty && (value === "" || value === null || value === undefined)) {
@@ -68,6 +75,30 @@ function checkScalarShape(
         rule: "pattern",
         message: `"${value}" does not match pattern ${assert.pattern}`,
       });
+    }
+    // ADR-018 — value is coerce.ts's output for type "date": always a full
+    // ISO instant (see coerce.ts), so Date.parse is exact, never a
+    // rawText-format guess.
+    if (isDate) {
+      const instant = Date.parse(value);
+      if (assert.maxFutureDays !== undefined) {
+        const limit = now.getTime() + assert.maxFutureDays * 24 * 60 * 60 * 1000;
+        if (instant > limit) {
+          failures.push({
+            rule: "maxFutureDays",
+            message: `${value} is more than ${assert.maxFutureDays} day(s) past now (${now.toISOString()})`,
+          });
+        }
+      }
+      if (assert.notBefore !== undefined) {
+        const floor = Date.parse(`${assert.notBefore}T00:00:00.000Z`);
+        if (instant < floor) {
+          failures.push({
+            rule: "notBefore",
+            message: `${value} is before notBefore ${assert.notBefore}`,
+          });
+        }
+      }
     }
   }
   return failures;
@@ -93,6 +124,12 @@ export interface GuardTrip {
   message: string;
 }
 
+// For type "date" extractors, callers pass epoch milliseconds (Date.parse
+// of the ISO instant coerce.ts always produces), not the ISO string itself
+// -- this function only ever compares numbers. Config validation (rule 8,
+// ADR-018) restricts a date extractor's assert to expectMonotonic only
+// (maxChangePct/maxChangeAbs stay numeric-type-only), so the branches below
+// that don't apply to a date simply never trigger for one.
 export function checkScalarGuard(
   candidateValue: number,
   previousValue: number,

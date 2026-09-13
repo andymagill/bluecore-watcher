@@ -221,6 +221,24 @@ Fixed by re-anchoring: after parsing, an explicit `dateFormat` is always re-anch
 
 ---
 
+### ADR-018 — `type: "date"` gets its own shape assertions and guard, and no-op assert combinations are rejected at config time
+
+**Decision.** Before this, a `type: "date"` extractor had **zero** silent-wrong protection: `checkScalarShape` (`01-DATA-CONTRACT.md` §6 layer 1) only evaluates `min`/`max` under a `typeof value === "number"` guard, and a coerced date is always a string (`coerce.ts`); `checkScalarGuard` (layer 3) likewise returns `null` unless both the candidate and the previous value are numbers. `bluecore-newsroom.latest_post_date` and both `*-sec-filings.latest_filing_date` extractors carried only `assert: { notEmpty: true }` — which rejects an empty string, and nothing else. A selector that started resolving to the wrong node but still produced _some_ parseable date string would publish silently.
+
+Two additions close this, both `type: "date"`-only:
+
+- `AssertDef.maxFutureDays` (shape) — reject a value later than `now + N` days. Catches a selector that lands on a "scheduled" or placeholder date.
+- `AssertDef.notBefore` (shape) — reject a value earlier than a fixed floor date. Catches a selector that regresses to a stale or unrelated node.
+- `expectMonotonic` (existing guard field) now also applies to dates — `process-extractor.ts` converts an ISO instant to epoch milliseconds before calling the same `checkScalarGuard` a numeric extractor uses, so "this source's dates only move forward" is enforceable the same way "this count only increases" already was. `maxChangePct`/`maxChangeAbs` deliberately stay numeric-only — a percentage change between two instants isn't a meaningful quantity — so a date extractor's guard vocabulary is `expectMonotonic` alone.
+
+Because `checkShapeAssertions` needed a clock for `maxFutureDays`, it now takes `now: Date` as a parameter — `processExtractor` already carries one (its own `now` param), and `maxFutureDays`'s asymmetry keeps this compatible with ADR-011: it only ever rejects, and a rejection can flip to a pass as the clock advances (the value is no longer "in the future") but never the reverse, so a value that published once can't later be invalidated by the same clock movement.
+
+**Rule 8 also grew a general no-op check.** Before this, config validation would silently accept e.g. `min: 0` on a `type: "string"` extractor — a config author could reasonably believe the value was bounded when `checkScalarShape`'s numeric guard meant it never was. Every `assert` field is now checked against the extractor's `type`/`presenter` and rejected if it can never fire: `min`/`max` need a numeric type; `pattern`/`maxLength` need a string-like type or presenter `"list"` (per-item, per the existing list semantics); `maxChangePct`/`maxChangeAbs` need a numeric type or `"list"` (item count); `expectMonotonic` needs numeric, `"date"`, or `"list"`; `maxFutureDays`/`notBefore` need `"date"`. `notEmpty` is intentionally left unrestricted — it was already harmlessly inert on a numeric type before this change (e.g. `eia-ca-industrial-price.retail_price_industrial` combines it with `min`/`max`), and narrowing it now would break a currently-valid, currently-correct config for no safety gain.
+
+**Why this is a schema change, not a config change.** `07-ROADMAP.md`'s M2 "Watch for" line: "if this milestone requires application-code changes, ADR-001 is being violated and the schema needs to absorb the difference instead." A date extractor with no usable guard is a gap in what the engine can express, independent of which client's dates are involved — the fix has to live in the schema/validator, not in any one target's config.
+
+---
+
 ## Open
 
 | #   | Question                                                                                                                                                                          | Blocks                                                                                                            | Owner    |

@@ -256,9 +256,9 @@ A selector that throws is caught by the health log. A selector that still matche
 
 Three layers, all configured per extractor (see `02-CONFIG-SCHEMA.md`):
 
-1. **Shape assertions** — `min`, `max`, `pattern`, `maxLength`, `notEmpty`, `enumValues`. A capacity figure that arrives as `0` or `1.2e9` is rejected before it is written.
+1. **Shape assertions** — `min`, `max`, `pattern`, `maxLength`, `notEmpty`, `enumValues`, and (`type: "date"` only, ADR-018) `maxFutureDays`/`notBefore`. A capacity figure that arrives as `0` or `1.2e9` is rejected before it is written; a filing date that arrives implausibly far in the future or before the source could plausibly have existed is rejected the same way. Before ADR-018 a date extractor had no shape defence at all — `min`/`max` only ever evaluated a `typeof value === "number"` candidate, and a coerced date is always a string.
 2. **Ambiguity detection** — if a selector matches more than one node and the config did not declare `multiple: true`, that is `SELECTOR_AMBIGUOUS`, not a silent first-match. A page redesign that duplicates a class name is caught the day it happens.
-3. **Change-magnitude guards** — `maxChangePct`, `maxChangeAbs`, `expectMonotonic`. A value that moves more than the configured tolerance is **not published**. The prior value is retained, the block is marked `flagged`, and a health entry records both figures for human adjudication.
+3. **Change-magnitude guards** — `maxChangePct`, `maxChangeAbs`, `expectMonotonic`. A value that moves more than the configured tolerance is **not published**. The prior value is retained, the block is marked `flagged`, and a health entry records both figures for human adjudication. `expectMonotonic` applies to `type: "date"` too (ADR-018), comparing instants rather than magnitudes; `maxChangePct`/`maxChangeAbs` stay numeric-only — a percentage change between two dates isn't a meaningful quantity.
 
 Guard failures write `validation.warnings`; hard assertion failures produce `ASSERTION_FAILED` and retain cache. The difference: a warning still publishes, a failure does not.
 
