@@ -1,0 +1,11 @@
+# Normalize text to LF in the repo -- both stored blobs and worktree
+# checkouts. This is what M2b's line-ending fix (docs/07-ROADMAP.md)
+# applies -- the pre-existing schema-freshness/resolve-preview-url CRLF
+# bug class came from core.autocrlf=true with no .gitattributes at all,
+# which let a Windows checkout silently diverge from the committed (LF)
+# blobs. Fixtures are included, not exempted: leaving them to
+# core.autocrlf would let this exact class of corruption reach captured
+# response bytes on the next `git add`. eol=lf (not text=auto's platform
+# default) keeps checkouts LF on every OS, matching what Linux CI already
+# sees, so a contentHash computed locally never disagrees with CI's.
+* text=auto eol=lf
