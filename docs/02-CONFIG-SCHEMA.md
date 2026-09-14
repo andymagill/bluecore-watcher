@@ -23,6 +23,8 @@ export interface EnvironmentDef {
   displayName: string; // "Bluecore Watcher"
   entities: EntityDef[];
   staleCeilingMultiplier?: number; // default 3 — see freshness state machine
+  // M3c: resolved into TargetFile.staleCeilingHours (01-DATA-CONTRACT.md §3)
+  // at ingest time and consumed there, not just validated here.
 }
 
 export interface EntityDef {
@@ -81,7 +83,7 @@ export interface ScheduleDef {
   cron: string; // when the orchestrator may consider it
   ttlHours: number; // age past which the UI calls it stale
   jitterSeconds?: number; // default 0–120, avoids thundering herd
-  staleCeilingHours?: number; // overrides environment multiplier
+  staleCeilingHours?: number; // overrides environment multiplier — M3c: published on TargetFile and actually consumed by the freshness state machine
   ttlOverrideReason?: string; // required when ttlHours < 2× the cron interval — see rule 5
 }
 

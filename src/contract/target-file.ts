@@ -25,6 +25,15 @@ export const TargetFile = z.object({
   label: z.string().min(1),
   sourceUrl: z.url(),
   ttlHours: z.number().positive(),
+  // M3c — resolved server-side from schedule.staleCeilingHours (per-target
+  // override) or environment.staleCeilingMultiplier × ttlHours (the default),
+  // per 02-CONFIG-SCHEMA.md. Publishing the resolved number means the
+  // freshness state machine (src/app/lib/freshness.ts) doesn't need to
+  // re-derive it, and a config change to either input actually takes effect
+  // instead of being validated but silently unused. Optional so a target
+  // file committed before this field existed still validates; freshness.ts
+  // falls back to the documented 3x default when absent.
+  staleCeilingHours: z.number().positive().optional(),
   run: RunInfo,
   blocks: z.array(Block),
 });

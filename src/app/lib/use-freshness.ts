@@ -9,7 +9,12 @@ import { computeFreshness, type FreshnessState } from "./freshness.js";
 
 const RECOMPUTE_INTERVAL_MS = 60_000;
 
-export function useFreshness(block: Block, ttlHours: number, nowOverride?: Date): FreshnessState {
+export function useFreshness(
+  block: Block,
+  ttlHours: number,
+  staleCeilingHours: number | undefined,
+  nowOverride?: Date,
+): FreshnessState {
   const [tick, setTick] = useState(0);
 
   useEffect(() => {
@@ -25,5 +30,5 @@ export function useFreshness(block: Block, ttlHours: number, nowOverride?: Date)
   void tick;
 
   const now = nowOverride ?? new Date();
-  return computeFreshness({ now, block, ttlHours });
+  return computeFreshness({ now, block, ttlHours, staleCeilingHours });
 }

@@ -12,14 +12,16 @@ export function ListBlock({
   targetId,
   block,
   ttlHours,
+  staleCeilingHours,
   now,
 }: {
   targetId: string;
   block: ListBlockType;
   ttlHours: number;
+  staleCeilingHours?: number;
   now?: Date;
 }) {
-  const state = useFreshness(block, ttlHours, now);
+  const state = useFreshness(block, ttlHours, staleCeilingHours, now);
 
   if (block.status === "missing" || !block.provenance || !block.value) {
     return (

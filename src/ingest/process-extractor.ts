@@ -75,6 +75,7 @@ function missingBlock(extractor: ExtractorDef): Block {
       provenance: null,
       delta: null,
       validation: { passed: false, warnings: [] },
+      failingSince: null,
     } as ListBlock;
   }
   return {
@@ -86,13 +87,19 @@ function missingBlock(extractor: ExtractorDef): Block {
     provenance: null,
     delta: null,
     validation: { passed: false, warnings: [] },
+    failingSince: null,
   } as ScalarBlock;
 }
 
-function cachedBlock(previousBlock: Block): Block {
+// M3c — failingSince is stamped the first run a block turns cached (nowIso),
+// then carried forward unchanged on every subsequent failing run via
+// `previousBlock.failingSince ?? nowIso`: if the previous block wasn't
+// already cached, its failingSince is null, so this naturally stamps fresh.
+function cachedBlock(previousBlock: Block, nowIso: string): Block {
   return {
     ...previousBlock,
     status: "cached",
+    failingSince: previousBlock.failingSince ?? nowIso,
     validation: { passed: false, warnings: previousBlock.validation.warnings },
   };
 }
@@ -105,9 +112,10 @@ function failureResult(
   message: string,
   failingSelector: string | null,
   httpStatus: number | null,
+  nowIso: string,
 ): ProcessExtractorResult {
   return {
-    block: previousBlock ? cachedBlock(previousBlock) : missingBlock(extractor),
+    block: previousBlock ? cachedBlock(previousBlock, nowIso) : missingBlock(extractor),
     healthEntryDraft: {
       targetId: target.id,
       extractorKey: extractor.key,
@@ -141,6 +149,7 @@ export async function processExtractor<TDoc>(
       ingestErr?.message ?? String(err),
       ingestErr?.failingSelector ?? null,
       httpStatus,
+      nowIso,
     );
   }
 
@@ -161,6 +170,7 @@ export async function processExtractor<TDoc>(
       shapeFailures.map((f) => `${f.rule}: ${f.message}`).join("; "),
       extractor.kind === "html" ? extractor.selector : extractor.jsonPath,
       httpStatus,
+      nowIso,
     );
   }
 
@@ -182,12 +192,14 @@ export async function processExtractor<TDoc>(
             status: "ok",
             provenance: { ...previousBlock.provenance, extractedAt: nowIso },
             validation: { passed: true, warnings: [] },
+            failingSince: null, // recovered, if it was cached
           }
         : {
             ...previousBlock,
             status: "ok",
             provenance: { ...previousBlock.provenance, extractedAt: nowIso },
             validation: { passed: true, warnings: [] },
+            failingSince: null, // recovered, if it was cached
           };
     return { block, healthEntryDraft: null, consumedAcknowledgement: null };
   }
@@ -215,6 +227,7 @@ export async function processExtractor<TDoc>(
       const block: Block = {
         ...previousBlock!,
         status: "flagged",
+        failingSince: null, // a guard trip isn't an extraction failure
         validation: {
           passed: false,
           warnings: [
@@ -283,6 +296,7 @@ function publish(
       },
       delta,
       validation: { passed: true, warnings: [] },
+      failingSince: null,
     };
     return { block, healthEntryDraft: null };
   }
@@ -312,6 +326,7 @@ function publish(
     },
     delta,
     validation: { passed: true, warnings: [] },
+    failingSince: null,
   };
   return { block, healthEntryDraft: null };
 }
