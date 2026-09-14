@@ -19,8 +19,8 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 | Workstream                          | Status      | PR                                                            |
 | ----------------------------------- | ----------- | ------------------------------------------------------------- |
 | M3a — Alerting                      | Delivered   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
-| M3b — Repair tooling                | Next        | —                                                             |
-| M3c — Analyst-facing health UX (Q4) | Not started | —                                                             |
+| M3b — Repair tooling                | Delivered   | [#18](https://github.com/andymagill/bluecore-watcher/pull/18) |
+| M3c — Analyst-facing health UX (Q4) | Next        | —                                                             |
 | M3d — Drill, ops report, close-out  | Not started | —                                                             |
 
 ## Context / findings (all of M3)
@@ -56,7 +56,7 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 - **(M3a)** Add `rejectedContentHash` to the validation-warning shape, so an ADR-012 acknowledgement can be written directly from an alert issue's body.
 - **(M3a)** `ingest.yml` also runs on `push` to `main` with `paths: config/**`, so a merged repair (M3b) re-ingests immediately and its alert auto-closes.
 - **(M3b)** The skill lives in `.claude/skills/repair-selector/` (Copilot reads `.claude/skills` as well as `.github/skills`, so one copy serves both hosts).
-- **(M3b)** The agent never touches the network or secrets directly. `copilot-setup-steps.yml` (using a `copilot` environment holding `EIA_API_KEY`) captures every target's live fixture into `.runs/live/` _before_ the agent starts — setup steps run outside the agent's firewall. The firewall itself stays at its default allowlist.
+- **(M3b)** The agent never touches the network directly. `copilot-setup-steps.yml` captures every target's live fixture into `.runs/live/` _before_ the agent starts — setup steps run outside the agent's firewall. The firewall itself stays at its default allowlist. **Corrected during implementation:** the design above assumed a `copilot` GitHub Actions environment holding `EIA_API_KEY`; GitHub replaced that with a repo-level **Agents** secret type, and `copilot-setup-steps.yml` doesn't accept an `environment:` key at all (only `steps`/`permissions`/`runs-on`/`services`/`snapshot`/`timeout-minutes`). `EIA_API_KEY` is an Agents secret instead — reachable by the setup step as designed, but also by the agent's own shell (masked in its session logs), which the original "never touches secrets directly" framing didn't anticipate. Accepted as a deliberate tradeoff for a free, low-value key (`06-OPS-RUNBOOK.md` §2); reconsider before repeating this for a higher-value secret.
 - **(M3b)** Fixture pairs are not kept on disk; `repair:diff` reads the prior fixture with `git show`, using git history as the pair. This amends `03-INGESTION.md` §5 and runbook §3 step 3 ("the old one is kept").
 
 ## M3a — Alerting
@@ -76,25 +76,25 @@ Summary of what ships:
 
 ## M3b — Repair tooling
 
-**Prerequisites:** M3a merged. Read `docs/00-DECISIONS.md` ADR-019 and the alert issue body shape it produces before starting.
+**Delivered** — [PR #18](https://github.com/andymagill/bluecore-watcher/pull/18). See the PR / commit history for the implementation; this section is a pointer, not a spec.
 
-- **`src/repair/relocate.ts`** (pure, engine-generic — no "bluecore" in code, per ADR-001). Given the old block (`rawText`, `anchor`) and the newly-fetched document, find location candidates deterministically, before any LLM involvement:
-  - `html`: nodes whose normalized text contains the old `rawText`, emitted as class/attribute/text-based selectors (never re-proposing `nth-child`).
-  - `api`: JSON paths whose value equals the old raw value.
-- **`src/repair/score.ts`.** For each candidate `ExtractorDef` patch: run `extractOne` against the new fixture, then the existing `checkShapeAssertions`/`checkScalarGuard` (reused from `src/ingest/process-extractor.ts`) against the previously committed block. Rank by: passes all checks, `matchCount === 1`, value equal to or close to the previous value, with a penalty for positional selectors (`nth-child`, `:eq`).
-- **`scripts/repair-diff.ts --env <id> <targetId> [--live-dir .runs/live] [--baseline HEAD]`.** Diffs the git-historical fixture against the new one (`src/drift/structure.ts`'s `setDiff`). Per extractor: old anchor/context, whether it still extracts, and the relocation candidates. Writes `.runs/repair/<id>/context.md`.
-- **`scripts/repair-verify.ts --env <id> <targetId> --extractor <key> (--selector|--json-path <v> | --candidates <file>)`.** Prints a ranked table; exits non-zero if nothing passes.
-- **`scripts/fixture-capture.ts`:** add `--all` and `--out <dir>` (default behavior for a single target is unchanged; one target's failure must not abort `--all`).
-- **npm scripts:** `repair:diff`, `repair:verify`.
-- **`.claude/skills/repair-selector/SKILL.md`** — steps: read the alert issue and the target's `notes`; get a fresh fixture (`.runs/live/<id>/` if present, else `fixture:capture`); run `repair:diff`; propose up to 5 resilient candidates; run `repair:verify` and apply the best one to `config/<env>.config.ts`; run `fixture:bless`, `validate:config`, `npm test`; open a PR `repair(<targetId>): …` with the verify table, `Fixes #<n>`, and a `Time spent:` line.
-  - **Hard rules:** never edit `src/` or `public/data/`; if the fix needs an engine change, stop and say so (ADR-001). Never loosen an `assert` or guard to make a candidate pass — that launders a silent-wrong.
-- **`.github/workflows/copilot-setup-steps.yml`:** a single `copilot-setup-steps` job, `environment: copilot` (holding `EIA_API_KEY`): checkout, Node 22, `npm ci`, `npm run fixture:capture -- --env bluecore --all --out .runs/live`.
-- **`.github/copilot-instructions.md`:** a short pointer at the skill and its hard rules.
-- **M3a alert body:** add a "Repair: assign this issue to Copilot" block for `SELECTOR_*`/`PARSE_ERROR` health alerts (this is the one place M3b modifies M3a's output).
-- **ESLint (`eslint.config.js`):** `src/app` may not import `**/repair/*`; `src/repair` may not import `**/app/*`.
-- **Tests (`tests/repair.test.ts`):** an in-test mutated newsroom fixture (renamed class) — relocation finds the node by its old `rawText`, and a positional candidate ranks below a class-based one; a candidate that fails assertions is rejected; an `api` case where a moved key is relocated by value.
-- **One-time operator setup (add to runbook, not code):** enable the Copilot cloud agent for the repo; create the `copilot` environment with the `EIA_API_KEY` secret; leave the firewall at its default allowlist.
-- **Verify:** mutate a copy of the newsroom fixture into `.runs/live/` and confirm `repair:diff`/`repair:verify` rank the correct selector first; push the branch so `copilot-setup-steps.yml` runs its own validation.
+Summary of what ships:
+
+- `src/repair/relocate.ts` + `src/repair/score.ts` — pure, engine-generic (ADR-001) candidate-finding and ranking. Given the old block's evidence (`rawText`) and the newly-fetched document, finds location candidates before any LLM involvement (`html`: class/tag-class/data-attribute/ancestor-scope/label-sibling selectors, plus a flagged positional fallback; `api`: JSONPath value matches), then scores each by re-running `extractOne` plus the target's own `checkShapeAssertions`/`checkEnum`/`checkScalarGuard`/`checkListCountGuard` against the previously committed block.
+- `scripts/repair-diff.ts --env <id> <targetId> [--live-dir .runs/live] [--baseline HEAD]` / `scripts/repair-verify.ts --env <id> <targetId> --extractor <key> (--selector|--json-path <v>|--candidates <file>)` — `repair:diff`/`repair:verify` npm scripts.
+- `scripts/lib/git.ts` (`gitShowFile`/`gitShowStateReader`, shared with `alert-dispatch.ts`) and `scripts/lib/repair-inputs.ts` — the fixture pair is git history, not a second file kept on disk; `repair-diff.ts` reads the prior fixture with `git show`.
+- `scripts/fixture-capture.ts --all --out <dir>` — one target's fetch failure no longer aborts the rest.
+- `.claude/skills/repair-selector/SKILL.md` + `.github/copilot-instructions.md` — the portable skill, runnable by Copilot's cloud agent or local Claude Code.
+- `.github/workflows/copilot-setup-steps.yml` — captures a live snapshot of every target before the agent starts, so the agent never touches the network or a secret directly.
+- `docs/06-OPS-RUNBOOK.md` §2/§3/§10 rewritten; `docs/03-INGESTION.md` §5 corrected.
+
+**Decided during implementation, not in the original design above:** `src/alerts/plan.ts` does **not** get a "Repair: assign this issue to Copilot" block. Alerts stay pure notifications (consistent with ADR-009 — operator-facing, not action-triggering) and don't nudge past runbook §3 step 1's own triage-by-age judgment call; the skill is fully discoverable from `.claude/skills/` and the runbook regardless of whether the alert body echoes it, so nothing is lost by keeping M3a's alert body untouched. `EIA_API_KEY` (and any future authenticated source's key) is mirrored into the repo's Agents secret store with `gh secret set <NAME> --app agents`, documented as one extra step in runbook §10's onboarding checklist rather than a second manual dashboard visit.
+
+**Design correction from the original plan above:** GitHub replaced the per-repo `copilot` Actions environment with a repo-level **Agents** secret type (`Settings → Secrets and variables → Agents`), and `copilot-setup-steps.yml` does not accept an `environment:` key at all — only `steps`/`permissions`/`runs-on`/`services`/`snapshot`/`timeout-minutes`. `EIA_API_KEY` is an Agents secret instead, exposed to both the setup step and the agent's own shell (masked in session logs) — a deliberate, documented tradeoff for a free, low-value key (`06-OPS-RUNBOOK.md` §2).
+
+**One-time operator setup — not done as of PR #18.** Enabling the Copilot cloud agent and adding the `EIA_API_KEY` Agents secret are manual GitHub-settings steps; see `06-OPS-RUNBOOK.md` §3's "one-time operator setup" list.
+
+**Prerequisites to start M3c:** none from M3a/M3b (independent), but sequence after them so the health-entry shape used in M3c stays stable against what M3a/M3b already ship.
 
 ## M3c — Analyst-facing health UX (Q4 + modal copy)
 

@@ -23,6 +23,8 @@
     "fixture:bless": "tsx scripts/fixture-bless.ts",
     "gate": "tsx scripts/gate.ts",
     "drift": "tsx scripts/drift-check.ts",
+    "repair:diff": "tsx scripts/repair-diff.ts",
+    "repair:verify": "tsx scripts/repair-verify.ts",
     "alert:dispatch": "tsx scripts/alert-dispatch.ts",
     "prepare": "husky"
   },
