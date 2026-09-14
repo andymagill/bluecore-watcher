@@ -82,7 +82,7 @@ Every triaged source configured. Mostly config plus fixtures plus tests; archite
 
 ## M3 — Operability
 
-The milestone that decides whether this is maintainable by one person.
+The milestone that decides whether this is maintainable by one person. Delivered across four sequential workstreams — see [`docs/plans/m3-operability.md`](plans/m3-operability.md) for the plan, decisions, and status.
 
 - Alerting live (GitHub Issues, operator-only).
 - Repair tooling: fixture capture, selector diff, LLM-proposed repair PRs (ADR-003).

@@ -112,7 +112,7 @@ Serialized. Two overlapping runs both forking from `main` is a merge conflict in
 5. Commit with a message summarising the run: `data: 3 targets updated, 1 failed (runId)`.
 6. Push the branch. Cloudflare Workers builds a preview.
 7. Run the gate (§3).
-8. Pass → squash-merge into `main`, delete branch. Fail → leave the branch, open or update a GitHub issue with the health entries, exit non-zero.
+8. Pass → squash-merge into `main`, delete branch, dispatch alerts for the merged diff (§4). Fail → leave the branch, dispatch (or update) the single deduped pipeline-failure issue (§4), exit non-zero.
 
 A failed gate leaves production serving the last good data. That is the correct failure mode and it is strictly better than the SPEC's original design, where bad data reached the origin with nothing standing in between.
 
@@ -140,17 +140,23 @@ Check 3 is the one worth the complexity. It is a real integration test of the ex
 
 ## 4. Alerting
 
-Dispatched post-merge, from the run artifact.
+**Dispatched post-merge, from a diff of two committed states — not the run artifact** (ADR-019, M3a; amends the original wording here, which predated the implementation). `scripts/alert-dispatch.ts --env <id> --from <sha> --to <sha> --issues` runs inside the same ingest job, right after the squash-merge (§2 step 8): it loads `public/data` as committed at `--from` (the job's base commit) and `--to` (the merge it just made) via two `git show`-backed readers into `src/ingest/persist.ts`'s `loadPreviousState`, and hands both states to `src/alerts/plan.ts`'s `planAlerts()` — a pure function, evaluated against the _current_ config's alert rules, not whatever was configured historically at either commit. Running after the merge, never before, is deliberate: alerting on data that then fails its gate and never reaches `main` would be worse than not alerting at all. The same invocation is safe to replay offline against any two historical shas for testing.
 
-v1 channel is `github-issue` (ADR-004, Q5): zero cost, zero new infrastructure, GitHub handles delivery and threading. One issue per alert key, reopened rather than duplicated, labelled `alert` plus severity.
+v1 channel is `github-issue` (ADR-004, Q5): zero cost, zero new infrastructure, GitHub handles delivery and threading. Health alerts are one issue per `targetId` (`Health: <targetId>`); value alerts are one issue per `targetId.extractorKey` (`Alert: <targetId>.<extractorKey>`) — reopened rather than duplicated, labelled `alert` plus `severity:<level>`.
 
 Operator-only in v1. Client-facing alerting waits on auth, because an alert containing a value is a data disclosure through an unauthenticated channel.
 
 Noise controls, in order of importance:
 
 - `alert.on` defaults to `never`. Alerting is opt-in per extractor. This is the main control and it should stay conservative.
-- `quietHours` suppresses repeats for the same key.
+- `alerting.minSeverity` filters out anything below it (default `warn`) — both value and health alerts.
+- `quietHours` suppresses a value alert's repeats for the same key, measured against GitHub's own `updatedAt` on that key's issue.
 - Health-derived alerts fire on the _transition_ to failing and again at 3 and 7 consecutive failures — not every run. A source that fails 30 times should generate 3 notifications, not 30.
+- A value alert only ever fires on a block actually published this run (`status: "ok"`) — anything else (`cached`/`flagged`/`missing`) already has a health alert covering it, and a value that didn't actually get republished has nothing to alert about.
+
+**Pipeline-gate failures are a separate, single deduped issue**, not a value/health alert: `alert-dispatch.ts --pipeline-failure <offline|gate> --run-url <url> --issues` keeps exactly one `Pipeline: ingestion gate failed` issue, commenting on repeats rather than opening a new one per failing run (§2 steps 4 and 7's failure paths both call this), and closing itself the next time a merge succeeds.
+
+A `CHANGE_GUARD_TRIPPED` health alert's body includes a ready-to-paste ADR-012 acknowledgement entry, built from the quarantined candidate's `contentHash` (`validation.warnings[].rejectedContentHash`, `01-DATA-CONTRACT.md` §4) — the operator can paste it straight into `config/acknowledgements.json` without re-running ingestion locally to find the hash.
 
 ---
 

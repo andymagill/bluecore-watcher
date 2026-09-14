@@ -15,8 +15,6 @@
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { appendFile } from "node:fs/promises";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { CmieConfig, type TargetDef } from "../src/config/index.js";
 import { HttpFetcher } from "../src/ingest/fetch/http-fetcher.js";
 import { FixtureFetcher } from "../src/ingest/fetch/fixture-fetcher.js";
@@ -30,8 +28,14 @@ import {
   type TargetDriftResult,
 } from "../src/drift/check.js";
 import { planIssueSync, issueTitle, type OpenDriftIssue } from "../src/drift/issues.js";
+import {
+  ensureLabel,
+  listIssuesByLabel,
+  createIssue,
+  commentOnIssue,
+  closeIssue,
+} from "./lib/gh-issues.js";
 
-const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 const ISSUE_LABEL = "drift";
@@ -91,17 +95,7 @@ function formatTable(results: readonly TargetDriftResult[]): string {
 }
 
 async function listOpenDriftIssues(): Promise<OpenDriftIssue[]> {
-  const { stdout } = await execFileAsync("gh", [
-    "issue",
-    "list",
-    "--label",
-    ISSUE_LABEL,
-    "--state",
-    "open",
-    "--json",
-    "number,title",
-  ]);
-  const issues = JSON.parse(stdout) as { number: number; title: string }[];
+  const issues = await listIssuesByLabel(ISSUE_LABEL, "open");
   const open: OpenDriftIssue[] = [];
   for (const issue of issues) {
     const match = /^Drift: (.+)$/.exec(issue.title);
@@ -111,33 +105,20 @@ async function listOpenDriftIssues(): Promise<OpenDriftIssue[]> {
 }
 
 async function syncIssues(results: readonly TargetDriftResult[]): Promise<void> {
-  await execFileAsync("gh", ["label", "create", ISSUE_LABEL, "--force"]).catch(() => {
-    // Label may already exist under different color/description text --
-    // --force handles that; anything else surfaces via the next gh call.
-  });
+  await ensureLabel(ISSUE_LABEL, { description: "Weekly drift check (03-INGESTION.md §5)" });
 
   const openIssues = await listOpenDriftIssues();
   const actions = planIssueSync(results, openIssues);
 
   for (const action of actions) {
     if (action.type === "create") {
-      await execFileAsync("gh", [
-        "issue",
-        "create",
-        "--title",
-        issueTitle(action.targetId),
-        "--body",
-        action.body,
-        "--label",
-        ISSUE_LABEL,
-      ]);
+      await createIssue(issueTitle(action.targetId), action.body, [ISSUE_LABEL]);
       console.log(`  created issue for ${action.targetId}`);
     } else if (action.type === "comment") {
-      await execFileAsync("gh", ["issue", "comment", String(action.number), "--body", action.body]);
+      await commentOnIssue(action.number, action.body);
       console.log(`  commented on issue #${action.number} (${action.targetId})`);
     } else {
-      await execFileAsync("gh", ["issue", "comment", String(action.number), "--body", action.body]);
-      await execFileAsync("gh", ["issue", "close", String(action.number)]);
+      await closeIssue(action.number, action.body);
       console.log(`  closed issue #${action.number} (${action.targetId})`);
     }
   }

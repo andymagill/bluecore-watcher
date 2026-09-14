@@ -78,6 +78,11 @@ export const Validation = z.object({
       guard: z.string(),
       rejectedCandidate: z.union([z.string(), z.number(), z.array(z.string())]),
       retainedValue: z.union([z.string(), z.number(), z.array(z.string())]),
+      // ADR-019/M3a: the quarantined candidate's contentHash — what an
+      // ADR-012 acknowledgement entry must key on (contract/acknowledgements.ts).
+      // Optional so a warning committed before this field existed still
+      // validates; every warning written from this point on carries it.
+      rejectedContentHash: z.string().optional(),
     }),
   ),
 });

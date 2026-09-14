@@ -256,6 +256,38 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
     });
   }
 
+  // Rule 8 (extended, M3a/ADR-019) — same no-op-field principle applied to
+  // alert.thresholdPct: it only ever means something when alert.on is
+  // "threshold", against a numeric type or presenter "list" (item-count
+  // percent change) — the same applicability set as maxChangePct/maxChangeAbs
+  // above, since both compare a percent change against the same delta shape.
+  if (ex.alert?.thresholdPct !== undefined && ex.alert.on !== "threshold") {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'alert.thresholdPct only applies when alert.on is "threshold" (rule 8)',
+      path: ["alert", "thresholdPct"],
+    });
+  }
+  if (ex.alert?.on === "threshold" && ex.alert.thresholdPct === undefined) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'alert.on "threshold" requires alert.thresholdPct (rule 8)',
+      path: ["alert", "thresholdPct"],
+    });
+  }
+  if (ex.alert?.on === "threshold" && !isNumericType && !isList) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'alert.on "threshold" only applies to a numeric type, or presenter "list" ' +
+        "(compared against item count) (rule 8)",
+      path: ["alert", "on"],
+    });
+  }
+
   // multiple: true only makes sense for html + list.
   if (ex.kind === "html" && ex.multiple && ex.presenter !== "list") {
     ctx.issues.push({
@@ -374,12 +406,29 @@ export const TargetDefaults = z.object({
 });
 export type TargetDefaults = z.infer<typeof TargetDefaults>;
 
-export const AlertingConfig = z.object({
-  channel: z.enum(["github-issue", "webhook", "email"]),
-  webhookUrlEnv: z.string().optional(),
-  emailToEnv: z.string().optional(),
-  minSeverity: z.enum(["info", "warn", "critical"]).default("warn"),
-});
+export const AlertingConfig = z
+  .object({
+    channel: z.enum(["github-issue", "webhook", "email"]),
+    webhookUrlEnv: z.string().optional(),
+    emailToEnv: z.string().optional(),
+    minSeverity: z.enum(["info", "warn", "critical"]).default("warn"),
+  })
+  .check((ctx) => {
+    // M3a/ADR-019 ships only the github-issue dispatcher. "webhook"/"email"
+    // stay documented union members (02-CONFIG-SCHEMA.md §4) so config
+    // authoring and this schema don't need to change again the day one is
+    // built, but selecting either today would be a config field that reads
+    // as configured and silently does nothing — the same no-op-field
+    // principle as ADR-018's assert-field rules.
+    if (ctx.value.channel !== "github-issue") {
+      ctx.issues.push({
+        code: "custom",
+        input: ctx.value,
+        message: `alerting.channel "${ctx.value.channel}" is not implemented yet — only "github-issue" dispatches (rule 12, M3a)`,
+        path: ["channel"],
+      });
+    }
+  });
 export type AlertingConfig = z.infer<typeof AlertingConfig>;
 
 export const CmieConfig = z

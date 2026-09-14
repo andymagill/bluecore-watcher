@@ -23,6 +23,7 @@
     "fixture:bless": "tsx scripts/fixture-bless.ts",
     "gate": "tsx scripts/gate.ts",
     "drift": "tsx scripts/drift-check.ts",
+    "alert:dispatch": "tsx scripts/alert-dispatch.ts",
     "prepare": "husky"
   },
   "lint-staged": {

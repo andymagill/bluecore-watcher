@@ -3,7 +3,7 @@
 Status of record for architectural decisions on Bluecore Watcher / CMIE.
 Where this document and `SPEC.md` disagree, **this document wins** and SPEC.md is the bug.
 
-Last updated: 2026-09-12
+Last updated: 2026-09-14
 
 ---
 
@@ -236,6 +236,22 @@ Because `checkShapeAssertions` needed a clock for `maxFutureDays`, it now takes 
 **Rule 8 also grew a general no-op check.** Before this, config validation would silently accept e.g. `min: 0` on a `type: "string"` extractor — a config author could reasonably believe the value was bounded when `checkScalarShape`'s numeric guard meant it never was. Every `assert` field is now checked against the extractor's `type`/`presenter` and rejected if it can never fire: `min`/`max` need a numeric type; `pattern`/`maxLength` need a string-like type or presenter `"list"` (per-item, per the existing list semantics); `maxChangePct`/`maxChangeAbs` need a numeric type or `"list"` (item count); `expectMonotonic` needs numeric, `"date"`, or `"list"`; `maxFutureDays`/`notBefore` need `"date"`. `notEmpty` is intentionally left unrestricted — it was already harmlessly inert on a numeric type before this change (e.g. `eia-ca-industrial-price.retail_price_industrial` combines it with `min`/`max`), and narrowing it now would break a currently-valid, currently-correct config for no safety gain.
 
 **Why this is a schema change, not a config change.** `07-ROADMAP.md`'s M2 "Watch for" line: "if this milestone requires application-code changes, ADR-001 is being violated and the schema needs to absorb the difference instead." A date extractor with no usable guard is a gap in what the engine can express, independent of which client's dates are involved — the fix has to live in the schema/validator, not in any one target's config.
+
+---
+
+### ADR-019 — Alerts are dispatched from a diff of two committed states, not a run artifact
+
+**Decision.** `03-INGESTION.md` §4 originally specified alerting "dispatched post-merge, from the run artifact" — a run-scoped object nothing in the codebase ever produced. M3a implements alerting instead as a diff of `public/data` as committed at two git shas: the ingest job's base commit (`main`'s `HEAD` before the run touched anything) and the commit the squash-merge just produced. `scripts/alert-dispatch.ts --env <id> --from <sha> --to <sha> --issues` runs inside the same job, immediately after the merge, and hands both states — loaded via `src/ingest/persist.ts`'s `loadPreviousState`, now generalized to take a pluggable `StateReader` rather than only a filesystem path — to `src/alerts/plan.ts`'s `planAlerts()`, a pure function evaluated against config.
+
+**Rationale.** A "run artifact" implies alerting logic threaded through the orchestrator itself, coupling it to the exact shape of one run's in-memory state. Diffing two _committed_ states instead means: the dispatcher is a standalone script the ingest workflow calls once, after the merge (so a run that fails its gate never alerts on data that never reached `main` — `03-INGESTION.md` §4's own stated invariant); the same diff can be replayed offline against any two shas in git history, for testing, without a live run; and `StateReader` is generic enough that a `git show`-backed reader (this) and a filesystem reader (every existing caller) are the same fifteen lines of code, not two parallel implementations.
+
+**Consequences.**
+
+- GitHub Issues are the entire alert state store — no new database, no run-artifact file format to design or version. Health alerts are one issue per `targetId`; value alerts are one issue per `targetId.extractorKey`; both dedup by title (`Health: <targetId>` / `Alert: <targetId>.<extractorKey>`) and reopen a closed issue rather than duplicating it.
+- Pipeline-gate failures (the offline gate, or the live gate against the preview) are a third, independent case: one deduped `Pipeline: ingestion gate failed` issue, replacing the previous per-run `gh issue create` in `.github/workflows/ingest.yml` that made a week-long outage open 7 separate issues.
+- `alert.thresholdPct` gets the same no-op-field validation ADR-018 gave `assert` fields: it only means something when `alert.on` is `"threshold"`, against a numeric type or `presenter: "list"`. `alerting.channel` is restricted to `"github-issue"` at config time — `"webhook"`/`"email"` stay documented union members with no dispatcher, so selecting either today would be a config field that reads as configured and silently does nothing.
+- A change-guard warning (`Validation.warnings[]`, `01-DATA-CONTRACT.md` §4) grew `rejectedContentHash` — the ADR-012 acknowledgement key an operator previously had to re-derive by re-running ingestion locally — so a guard-trip alert's body can carry a paste-ready acknowledgement entry.
+- Full design and the remaining M3 workstreams (repair tooling, the analyst-facing health UX resolving Q4, the fire-drill exit proof) are tracked in `docs/plans/m3-operability.md`.
 
 ---
 

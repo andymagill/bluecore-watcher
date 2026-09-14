@@ -167,7 +167,7 @@ A block is one rendered fact. Every block carries its own provenance — not inh
 
 **`delta`** is `null` only on first extraction. On every subsequent run it is present: when `contentHash` changed, it is recomputed against the previous value; when `contentHash` is unchanged, the entire object — including `changedAt` — is **carried forward untouched** from the prior committed file. `changedAt` is the extraction time at which the value _became_ its current value, and because it survives unchanged runs, it is what powers "unchanged for 34 days" (see `04-FRONTEND.md` §4). _(Corrected 2026-09-12 — this file previously said `delta` is null when `contentHash` is unchanged, which is incompatible with `changedAt` surviving unchanged runs, since `changedAt` lives inside `delta`. `03-INGESTION.md` §1 "diff" was already correct; this file was the bug.)_
 
-**`validation.warnings`** is non-empty when a change guard quarantined a candidate value. Each warning records the rejected candidate, the guard that rejected it, and the retained value — everything a human needs to adjudicate without re-fetching. See §6.
+**`validation.warnings`** is non-empty when a change guard quarantined a candidate value. Each warning records the rejected candidate, the guard that rejected it, the retained value, and (**M3a/ADR-019**) the rejected candidate's `rejectedContentHash` — everything a human needs to adjudicate without re-fetching, including writing an ADR-012 acknowledgement entry (`contract/acknowledgements.ts`) directly from an alert issue's body rather than re-running ingestion locally to find the hash. Optional on the schema so a warning committed before this field existed still validates. See §6.
 
 ### `status` (block level)
 
