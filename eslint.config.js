@@ -39,9 +39,9 @@ export default tseslint.config(
         {
           patterns: [
             {
-              group: ["**/ingest/*", "**/gate/*", "**/alerts/*"],
+              group: ["**/ingest/*", "**/gate/*", "**/alerts/*", "**/repair/*"],
               message:
-                "The frontend renders committed data files; it must not import ingestion, gate, or alerts code (04-FRONTEND.md).",
+                "The frontend renders committed data files; it must not import ingestion, gate, alerts, or repair code (04-FRONTEND.md).",
             },
           ],
         },
@@ -49,7 +49,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ["src/ingest/**/*.ts", "src/gate/**/*.ts", "src/alerts/**/*.ts"],
+    files: ["src/ingest/**/*.ts", "src/gate/**/*.ts", "src/alerts/**/*.ts", "src/repair/**/*.ts"],
     rules: {
       "no-restricted-imports": [
         "error",
@@ -57,7 +57,7 @@ export default tseslint.config(
           patterns: [
             {
               group: ["**/app/*"],
-              message: "Ingestion, the gate, and alerts must not depend on the frontend.",
+              message: "Ingestion, the gate, alerts, and repair must not depend on the frontend.",
             },
           ],
         },

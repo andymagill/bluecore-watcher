@@ -55,7 +55,7 @@ interface ProcessExtractorParams<TDoc> {
 // convert that to epoch milliseconds so expectMonotonic (ADR-018, the only
 // guard rule config validation permits on a date, per rule 8) can compare
 // it the same way it compares a plain number.
-function guardComparisonValue(value: number | string, extractor: ExtractorDef): number {
+export function guardComparisonValue(value: number | string, extractor: ExtractorDef): number {
   return extractor.type === "date" ? Date.parse(value as string) : (value as number);
 }
 
