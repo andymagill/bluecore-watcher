@@ -76,7 +76,7 @@ The routine failure. Expect these weekly.
 This is the system working. A number moved more than its configured tolerance and is waiting for a human.
 
 1. Open the source page. Is the new value real?
-2. **Real, and a one-off** (ADR-012) → add an entry to the committed acknowledgements file, keyed by `targetId.extractorKey` and the candidate's `contentHash`. Merge; the next run publishes that exact candidate and consumes the entry. The guard's tolerance is untouched, so it still catches the _next_ anomalous move at the same target.
+2. **Real, and a one-off** (ADR-012) → add an entry to the committed acknowledgements file, keyed by `targetId.extractorKey` and the candidate's `contentHash`. **(M3a)** The alert issue for this trip already carries a ready-to-paste JSON block with the right `contentHash` (from `validation.warnings[].rejectedContentHash`) — copy it in rather than hunting the value down by re-running ingestion locally. Merge; the next run publishes that exact candidate and consumes the entry. The guard's tolerance is untouched, so it still catches the _next_ anomalous move at the same target.
 3. **Real, and the source's normal volatility has changed** → widen `maxChangePct`, merge, re-run. Reserve this for when the guard was tuned too tight for how this source actually behaves, not for a single legitimate spike — widening on every real move ratchets the guard toward meaningless over time.
 4. **Wrong** → you just caught a silent-wrong before it published. Repair the selector per §3.
 
@@ -99,7 +99,7 @@ If a guard trips repeatedly on legitimate movement, retune it (step 3) immediate
 
 ## 7. Runbook: the gate failed
 
-**Symptom.** Ingestion run exits non-zero, branch left open, production untouched.
+**Symptom.** Ingestion run exits non-zero, branch left open, production untouched. **(M3a)** One GitHub Issue, `Pipeline: ingestion gate failed`, tracks this — a run of consecutive failures comments on the same issue rather than opening a new one each time, and it closes itself the next time a merge succeeds.
 
 Correct behaviour — production is serving the last good data. No urgency beyond data ageing.
 

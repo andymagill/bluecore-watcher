@@ -1,6 +1,6 @@
 #!/usr/bin/env tsx
 // npm run alert:dispatch -- --env <id> --from <sha> --to <sha> [--issues]
-// npm run alert:dispatch -- --pipeline-failure <offline|gate> --run-url <url> [--issues]
+// npm run alert:dispatch -- --pipeline-failure <offline|gate> --run-url <url> [--branch <name>] [--preview-url <url>] [--issues]
 //
 // M3a/ADR-019. Two independent modes, both writing to the "alert" label:
 //
@@ -50,7 +50,7 @@ const PIPELINE_ISSUE_TITLE = "Pipeline: ingestion gate failed";
 function usage(): never {
   console.error(
     "Usage: npm run alert:dispatch -- --env <environmentId> --from <sha> --to <sha> [--issues]\n" +
-      "       npm run alert:dispatch -- --pipeline-failure <offline|gate> --run-url <url> [--issues]",
+      "       npm run alert:dispatch -- --pipeline-failure <offline|gate> --run-url <url> [--branch <name>] [--preview-url <url>] [--issues]",
   );
   process.exit(2);
 }
@@ -192,12 +192,14 @@ async function runNormalMode(withIssues: boolean): Promise<void> {
 async function runPipelineFailureMode(kind: string, withIssues: boolean): Promise<void> {
   if (kind !== "offline" && kind !== "gate") usage();
   const runUrl = getArg("--run-url");
+  const branch = getArg("--branch");
+  const previewUrl = getArg("--preview-url");
   if (!runUrl) usage();
 
   const body =
     kind === "offline"
       ? `Schema validation or contract assertions failed during ingestion — an engine defect (03-INGESTION.md §3), not a source problem. Run: ${runUrl}`
-      : `The gate (schema/contract/smoke-render against the preview) failed and the branch was left unmerged — \`main\` is untouched, still serving the last good data. Run: ${runUrl}`;
+      : `Branch \`${branch ?? "?"}\` failed the gate and was left unmerged — \`main\` is untouched, still serving the last good data. ${previewUrl ? `Preview: ${previewUrl}. ` : ""}Run: ${runUrl}`;
   const marked = `${body}\n\n<!-- bw-alert key=pipeline firedAt=${new Date().toISOString()} -->`;
 
   console.log(`Pipeline failure (${kind}): ${runUrl}`);

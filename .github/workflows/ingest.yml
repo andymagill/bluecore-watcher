@@ -14,11 +14,24 @@
 # enforced inside HttpFetcher regardless of workflow cadence. A real
 # due-date planner is still deferred until more than one cadence actually
 # needs to diverge from daily.
+#
+# M3a (ADR-019, docs/plans/m3-operability.md) adds alerting: on a
+# successful squash-merge, scripts/alert-dispatch.ts diffs public/data as
+# committed before and after this run and opens/updates/closes GitHub
+# Issues for it. On either gate failure it dispatches through the same
+# script's --pipeline-failure mode instead of an inline `gh issue create`,
+# so a run of consecutive failures keeps one deduped issue rather than one
+# per run. The `push` trigger on `config/**` exists so a merged repair PR
+# (M3b) re-ingests immediately and its alert can auto-close, rather than
+# waiting for the next scheduled cron.
 name: Ingest
 
 on:
   schedule:
     - cron: "0 13 * * *"
+  push:
+    branches: [main]
+    paths: ["config/**"]
   workflow_dispatch: {}
 
 concurrency:
@@ -54,7 +67,11 @@ jobs:
 
       - name: Compute run id
         id: meta
-        run: echo "run_id=$(date -u +%Y-%m-%dT%H-%M-%S)-000Z-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+        run: |
+          echo "run_id=$(date -u +%Y-%m-%dT%H-%M-%S)-000Z-$(git rev-parse --short HEAD)" >> "$GITHUB_OUTPUT"
+          # M3a: main's HEAD before this run touches anything -- the "prev"
+          # side of alert-dispatch.ts's committed-state diff.
+          echo "base_sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
       # fetch -> extract -> validate -> diff -> persist, plus the offline
       # gate (checks 1-2) inline before any write (src/ingest/orchestrate.ts
@@ -80,15 +97,15 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Offline gate failed -- open an issue and stop
+      - name: Offline gate failed -- dispatch a pipeline alert and stop
         if: steps.ingest.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue create \
-            --title "Ingestion offline gate failed (${{ steps.meta.outputs.run_id }})" \
-            --body "Schema validation or contract assertions failed during ingestion -- an engine defect (03-INGESTION.md §3), not a source problem. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --label alert
+          npx tsx scripts/alert-dispatch.ts \
+            --pipeline-failure offline \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --issues
           exit 1
 
       - name: No semantic change -- nothing to do
@@ -138,20 +155,47 @@ jobs:
       # routed through a PR to do it.
       - name: Gate passed -- squash-merge into main
         if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success'
+        id: merge
         run: |
           git checkout main
           git merge --squash "${{ steps.branch.outputs.branch }}"
           git commit -m "data: ingest run ${{ steps.meta.outputs.run_id }}"
           git push origin main
           git push origin --delete "${{ steps.branch.outputs.branch }}"
+          echo "sha=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
 
-      - name: Gate failed -- leave the branch, open an issue
+      # M3a/ADR-019 -- diffs public/data as committed at base_sha (before
+      # this run) and the merge just made (after), against the current
+      # config's alert rules, and opens/updates/closes GitHub Issues for
+      # it. Also closes the deduped pipeline-failure issue if one was open
+      # (this merge succeeding is the recovery signal). Runs after the
+      # merge, never before -- alerting on data that then failed its gate
+      # and never reached main would be worse than not alerting
+      # (03-INGESTION.md §4).
+      - name: Dispatch alerts for the merged diff
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          # Defense in depth for alert-dispatch's own secret-scrub pass
+          # (src/ingest/scrub.ts) -- the committed data it reads is already
+          # scrubbed at persist time, but this costs nothing to also carry.
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: |
+          npx tsx scripts/alert-dispatch.ts \
+            --env bluecore \
+            --from "${{ steps.meta.outputs.base_sha }}" \
+            --to "${{ steps.merge.outputs.sha }}" \
+            --issues
+
+      - name: Gate failed -- leave the branch, dispatch a pipeline alert
         if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh issue create \
-            --title "Ingestion gate failed (${{ steps.meta.outputs.run_id }})" \
-            --body "Branch \`${{ steps.branch.outputs.branch }}\` failed the gate and was left unmerged -- main is untouched, still serving the last good data. Preview: ${{ steps.preview.outputs.url }}. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --label alert
+          npx tsx scripts/alert-dispatch.ts \
+            --pipeline-failure gate \
+            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
+            --branch "${{ steps.branch.outputs.branch }}" \
+            --preview-url "${{ steps.preview.outputs.url }}" \
+            --issues
           exit 1

@@ -214,7 +214,7 @@ export interface AlertingConfig {
 }
 ```
 
-`github-issue` is the v1 default: zero cost, zero new infrastructure, and GitHub's own notification system handles delivery. Per ADR-004 and open question Q5, alerts route to the operator only in v1.
+`github-issue` is the v1 default: zero cost, zero new infrastructure, and GitHub's own notification system handles delivery. Per ADR-004 and open question Q5, alerts route to the operator only in v1. **(M3a/ADR-019)** `"webhook"` and `"email"` stay documented union members — so config authoring and this schema don't need to change again the day one is built — but neither has a dispatcher yet; validation rule 12 below rejects selecting either today.
 
 ---
 
@@ -233,6 +233,7 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the _name_, not the _value_, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. _(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)_
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
+12. **(M3a/ADR-019)** `alert.thresholdPct` follows rule 8's no-op-field principle: it's rejected unless `alert.on` is `"threshold"`, against a numeric type or `presenter: "list"` (compared against item count, same applicability as `maxChangePct`/`maxChangeAbs`) — and `alert.on: "threshold"` itself requires `thresholdPct` to be set. `alerting.channel` is restricted to `"github-issue"`; `"webhook"`/`"email"` are rejected until a dispatcher for either exists (§4).
 
 ---
 
