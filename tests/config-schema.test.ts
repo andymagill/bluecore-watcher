@@ -309,4 +309,82 @@ describe("CmieConfig validation rules", () => {
       expect(CmieConfig.safeParse(cfg).success).toBe(false);
     });
   });
+
+  // M3a/ADR-019 — alert.thresholdPct follows the same no-op-field principle
+  // rule 8 already applies to assert fields, and alerting.channel is
+  // restricted to the one dispatcher that actually exists.
+  describe("rule 8 (extended, M3a): alert.thresholdPct", () => {
+    it('rejects thresholdPct without on: "threshold"', () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.alert = { on: "any-change", thresholdPct: 10 };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it('rejects on: "threshold" without thresholdPct', () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.alert = { on: "threshold" };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it('rejects on: "threshold" on a non-numeric, non-list type', () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.type = "string";
+      cfg.targets[0]!.extractors[0]!.presenter = "markdown";
+      cfg.targets[0]!.extractors[0]!.alert = { on: "threshold", thresholdPct: 10 };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 8"))).toBe(true);
+    });
+
+    it('accepts on: "threshold" with thresholdPct on a numeric type', () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0]!.alert = { on: "threshold", thresholdPct: 10 };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it('accepts on: "threshold" with thresholdPct on presenter list (item count)', () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        selector: "#x",
+        multiple: true,
+        type: "string",
+        alert: { on: "threshold", thresholdPct: 10 },
+      };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+  });
+
+  describe("rule 12 (M3a): alerting.channel is restricted to github-issue", () => {
+    it("rejects channel: webhook", () => {
+      const cfg = baseConfig();
+      cfg.alerting = { channel: "webhook" };
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 12"))).toBe(true);
+    });
+
+    it("rejects channel: email", () => {
+      const cfg = baseConfig();
+      cfg.alerting = { channel: "email" };
+      expect(CmieConfig.safeParse(cfg).success).toBe(false);
+    });
+
+    it("accepts channel: github-issue", () => {
+      const cfg = baseConfig();
+      cfg.alerting = { channel: "github-issue" };
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+  });
 });

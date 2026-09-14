@@ -222,6 +222,7 @@ export async function processExtractor<TDoc>(
               guard: guardTrip.rule,
               rejectedCandidate: candidate.value,
               retainedValue: previousBlock!.value as string | number | string[],
+              rejectedContentHash: candidate.contentHash,
             },
           ],
         },

@@ -175,6 +175,9 @@
                               }
                             }
                           ]
+                        },
+                        "rejectedContentHash": {
+                          "type": "string"
                         }
                       },
                       "required": [
@@ -402,6 +405,9 @@
                               }
                             }
                           ]
+                        },
+                        "rejectedContentHash": {
+                          "type": "string"
                         }
                       },
                       "required": [
