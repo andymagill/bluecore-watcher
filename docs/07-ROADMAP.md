@@ -84,7 +84,7 @@ Every triaged source configured. Mostly config plus fixtures plus tests; archite
 
 The milestone that decides whether this is maintainable by one person. Delivered across four sequential workstreams — see [`docs/plans/m3-operability.md`](plans/m3-operability.md) for the plan, decisions, and status.
 
-- Alerting live (GitHub Issues, operator-only).
+- Alerting live (GitHub Issues, operator-only). ✅ M3a — [PR #16](https://github.com/andymagill/bluecore-watcher/pull/16), ADR-019.
 - Repair tooling: fixture capture, selector diff, LLM-proposed repair PRs (ADR-003).
 - Health modal copy rewritten for analysts rather than developers.
 - Six-weeks-broken UX resolved (Q4).
