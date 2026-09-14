@@ -1,9 +1,9 @@
 #!/usr/bin/env tsx
 // npm run fixture:bless -- <targetId> [<targetId2> ...] | --all
 // Runs the real, offline extraction pipeline (FixtureFetcher -> handler ->
-// extractOne, exactly what tests/targets.baseline.test.ts asserts against)
+// extractOne, exactly what scripts/fixture-verify.ts asserts against)
 // for one or more targets and writes fixtures/<id>/expected.json -- the
-// golden file 03-INGESTION.md §5 specifies and tests/targets.baseline.test.ts
+// golden file 03-INGESTION.md §5 specifies and fixture-verify.ts
 // enforces exists for every target (docs/07-ROADMAP.md M2 "a fixture and
 // unit test per target").
 //

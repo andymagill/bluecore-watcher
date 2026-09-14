@@ -21,6 +21,7 @@
     "ingest": "tsx scripts/ingest.ts",
     "fixture:capture": "tsx scripts/fixture-capture.ts",
     "fixture:bless": "tsx scripts/fixture-bless.ts",
+    "fixture:verify": "tsx scripts/fixture-verify.ts",
     "gate": "tsx scripts/gate.ts",
     "drift": "tsx scripts/drift-check.ts",
     "repair:diff": "tsx scripts/repair-diff.ts",

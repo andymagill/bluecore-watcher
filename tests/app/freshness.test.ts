@@ -7,7 +7,7 @@ import { computeFreshness } from "../../src/app/lib/freshness.js";
 import type { ScalarBlock } from "../../src/contract/block.js";
 
 const EXTRACTED_AT = "2026-09-01T00:00:00Z";
-const TTL_HOURS = 168; // 7 days, matching bluecore-newsroom
+const TTL_HOURS = 168; // 7 days, a representative weekly TTL
 
 function block(overrides: Partial<ScalarBlock> = {}): ScalarBlock {
   return {

@@ -20,11 +20,11 @@ const NOW = new Date("2026-09-12T00:00:00Z");
 function makeTargetFile(): TargetFile {
   return TargetFile.parse({
     schemaVersion: 1,
-    targetId: "bluecore-newsroom",
-    entityId: "bluecore-energy",
+    targetId: "example-newsroom",
+    entityId: "example-co",
     sectionId: "company",
-    label: "BlueCore Energy - Latest News",
-    sourceUrl: "https://www.bluecore.energy/news-insights",
+    label: "Example Co - Latest News",
+    sourceUrl: "https://www.example.test/news-insights",
     ttlHours: 168,
     run: {
       runId: "r1",
@@ -42,13 +42,13 @@ function makeTargetFile(): TargetFile {
         type: "string",
         presenter: "markdown",
         status: "ok",
-        value: "BlueCore announces new milestone",
-        displayValue: "BlueCore announces new milestone",
+        value: "Example Co announces new milestone",
+        displayValue: "Example Co announces new milestone",
         provenance: {
-          sourceUrl: "https://www.bluecore.energy/news-insights",
+          sourceUrl: "https://www.example.test/news-insights",
           anchor: ".bc-n-ctitle:first",
           extractedAt: "2026-09-12T00:00:00Z",
-          rawText: "BlueCore announces new milestone",
+          rawText: "Example Co announces new milestone",
           contentHash: "sha256:aabbcc",
         },
         delta: null,
@@ -66,24 +66,24 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
         section={{ id: "company", label: "Company Performance", order: 1 }}
         manifestTargets={[
           {
-            id: "bluecore-newsroom",
+            id: "example-newsroom",
             sectionId: "company",
-            entityId: "bluecore-energy",
+            entityId: "example-co",
             label: tf.label,
-            path: "sections/company/bluecore-newsroom.json",
+            path: "sections/company/example-newsroom.json",
             ttlHours: 168,
             lastRunStatus: "ok",
             lastSuccessAt: "2026-09-12T00:00:00Z",
           },
         ]}
-        targetFiles={new Map([["bluecore-newsroom", tf]])}
+        targetFiles={new Map([["example-newsroom", tf]])}
         now={NOW}
       />,
     );
     expect(screen.getByText("Company Performance")).toBeInTheDocument();
     expect(screen.getByText(tf.label)).toBeInTheDocument();
     expect(
-      document.querySelector('[data-block-key="bluecore-newsroom.latest_headline"]'),
+      document.querySelector('[data-block-key="example-newsroom.latest_headline"]'),
     ).not.toBeNull();
   });
 
@@ -105,13 +105,13 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
           type: "string",
           presenter: "markdown",
           status: "cached",
-          value: "BlueCore announces new milestone",
-          displayValue: "BlueCore announces new milestone",
+          value: "Example Co announces new milestone",
+          displayValue: "Example Co announces new milestone",
           provenance: {
-            sourceUrl: "https://www.bluecore.energy/news-insights",
+            sourceUrl: "https://www.example.test/news-insights",
             anchor: ".bc-n-ctitle:first",
             extractedAt: "2026-08-01T00:00:00Z",
-            rawText: "BlueCore announces new milestone",
+            rawText: "Example Co announces new milestone",
             contentHash: "sha256:aabbcc",
           },
           delta: null,
@@ -125,24 +125,22 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
         section={{ id: "company", label: "Company Performance", order: 1 }}
         manifestTargets={[
           {
-            id: "bluecore-newsroom",
+            id: "example-newsroom",
             sectionId: "company",
-            entityId: "bluecore-energy",
+            entityId: "example-co",
             label: longFailingTargetFile.label,
-            path: "sections/company/bluecore-newsroom.json",
+            path: "sections/company/example-newsroom.json",
             ttlHours: 2160,
             lastRunStatus: "partial",
             lastSuccessAt: "2026-08-01T00:00:00Z",
           },
         ]}
-        targetFiles={new Map([["bluecore-newsroom", longFailingTargetFile]])}
+        targetFiles={new Map([["example-newsroom", longFailingTargetFile]])}
         now={NOW}
       />,
     );
     // Still counted -- the gate risk this test guards against.
-    const blockNode = document.querySelector(
-      '[data-block-key="bluecore-newsroom.latest_headline"]',
-    );
+    const blockNode = document.querySelector('[data-block-key="example-newsroom.latest_headline"]');
     expect(blockNode).not.toBeNull();
     // And genuinely suppressed, not just present: the value sits behind a
     // <details> summary rather than in the open, same as ttl-based expired.

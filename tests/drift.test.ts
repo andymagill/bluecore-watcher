@@ -1,20 +1,14 @@
 // 03-INGESTION.md §5 "weekly drift check" / docs/07-ROADMAP.md M2b.
-// checkTargetDrift is exercised against the REAL config
-// (config/bluecore.config.ts) throughout, and against real committed
-// fixtures for the JSON (Federal Register, SEC) cases, mutated in memory
-// to simulate the specific failure modes a redesign actually produces —
-// a key removed, a field's type changed, an envelope wrapped around the
-// whole body. The HTML (newsroom) cases use a small synthetic document
-// shaped like the real one (same `.bc-n-card`/`.bc-n-ctitle` selector
-// convention) rather than string-surgery on the real ~40KB Webflow export,
-// which is too deeply nested to mutate reliably by hand — the extraction
-// logic under test (extractOne, the real handler) is identical either way.
+// checkTargetDrift is exercised against synthetic targets and fixtures
+// (ADR-021 — tests stay entity-agnostic; real-config drift behavior is
+// verified live by scripts/drift-check.ts, which reuses this same module).
+// The HTML case builds a small document shaped like a generic "card list"
+// page; the API cases build small literal JSON envelopes shaped like the
+// edge cases a redesign actually produces — a key removed, a field's type
+// changed, an envelope wrapped around the whole body — rather than
+// string-surgery on a real page export.
 import { describe, expect, it } from "vitest";
-import { readFile } from "node:fs/promises";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import { CmieConfig, type TargetDef } from "../src/config/schema.js";
-import { config as bluecoreConfig } from "../config/bluecore.config.js";
 import {
   checkTargetDrift,
   fetchFailedResult,
@@ -24,49 +18,72 @@ import {
 import { planIssueSync, type OpenDriftIssue } from "../src/drift/issues.js";
 import type { FetchResult } from "../src/ingest/fetch/types.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const config = CmieConfig.parse(bluecoreConfig);
-
-function realTarget(id: string): TargetDef {
-  const target = config.targets.find((t) => t.id === id);
-  if (!target) throw new Error(`no such target in config/bluecore.config.ts: ${id}`);
-  return target;
-}
-
-async function fixtureBody(targetId: string, ext: "html" | "json"): Promise<string> {
-  return readFile(join(root, "fixtures", targetId, `response.${ext}`), "utf-8");
-}
-
 function asFetchResult(body: string): FetchResult {
   return { body, httpStatus: 200, fetchedAt: "2026-09-13T00:00:00.000Z" };
 }
 
-// A small, hand-built document shaped like the real newsroom page: three
-// `.bc-n-card`s, each carrying `.bc-n-ctitle`/`.bc-n-cdate`/`.bc-n-cat-key`,
-// matching config/bluecore.config.ts's real ".bc-n-card:first <field>"
-// selectors (M2b's selector-scoping fix) exactly.
-function newsroomDoc(cards: string[]): string {
-  return `<html><body><div class="bc-n-grid">${cards.join("")}</div></body></html>`;
+// `extractors` is typed `unknown[]` rather than `ExtractorDef[]` so callers
+// can pass a discriminated-union literal without fighting the output type's
+// defaulted fields (regexGroup/trim/locale) — CmieConfig.parse validates the
+// real shape at runtime regardless.
+function baseTarget(kind: "html" | "api", extractors: unknown[]): TargetDef {
+  return CmieConfig.parse({
+    schemaVersion: 1,
+    environment: {
+      id: "t",
+      displayName: "T",
+      entities: [{ id: "p", name: "P", role: "primary" }],
+    },
+    sections: [{ id: "s", label: "S", order: 1 }],
+    targets: [
+      {
+        id: "target-1",
+        label: "Target 1",
+        entityId: "p",
+        sectionId: "s",
+        kind,
+        url: "https://example.test/page",
+        schedule: { cron: "0 6 * * *", ttlHours: 48 },
+        extractors,
+      },
+    ],
+  }).targets[0]!;
+}
+
+// A small, hand-built document shaped like a generic "card list" page:
+// three cards, each carrying a title/date/category, matching the
+// ".card:first <field>" selector-scoping convention (M2b's fix).
+function cardListDoc(cards: string[]): string {
+  return `<html><body><div class="list-grid">${cards.join("")}</div></body></html>`;
 }
 
 function card(headline: string, date: string, category: string): string {
   return (
-    `<a class="bc-n-card"><div class="bc-n-cat-key">${category}</div>` +
-    `<div class="bc-n-cdate">${date}</div><div class="bc-n-ctitle">${headline}</div></a>`
+    `<a class="card"><div class="cat-key">${category}</div>` +
+    `<div class="cdate">${date}</div><div class="ctitle">${headline}</div></a>`
   );
 }
 
-describe("checkTargetDrift — html (newsroom-shaped, selector-matched)", () => {
-  const newsroom = realTarget("bluecore-newsroom");
-  const baselineDoc = newsroomDoc([
+describe("checkTargetDrift — html (card-list-shaped, selector-matched)", () => {
+  const cardListTarget = baseTarget("html", [
+    {
+      key: "latest_headline",
+      label: "Latest Headline",
+      presenter: "markdown",
+      kind: "html",
+      selector: ".card:first .ctitle",
+      type: "string",
+      required: true,
+    },
+  ]);
+  const baselineDoc = cardListDoc([
     card("First post", "September 8, 2026", "Press Release"),
     card("Second post", "August 1, 2026", "Insights"),
   ]);
 
   it("identical baseline and live: clean", async () => {
     const result = await checkTargetDrift(
-      newsroom,
+      cardListTarget,
       asFetchResult(baselineDoc),
       asFetchResult(baselineDoc),
     );
@@ -74,9 +91,9 @@ describe("checkTargetDrift — html (newsroom-shaped, selector-matched)", () => 
   });
 
   it("a renamed class breaks extraction: EXTRACTION_BROKEN on that extractor", async () => {
-    const live = baselineDoc.replaceAll("bc-n-ctitle", "bc-n-ctitle-v2");
+    const live = baselineDoc.replaceAll("ctitle", "ctitle-v2");
     const result = await checkTargetDrift(
-      newsroom,
+      cardListTarget,
       asFetchResult(baselineDoc),
       asFetchResult(live),
     );
@@ -88,13 +105,13 @@ describe("checkTargetDrift — html (newsroom-shaped, selector-matched)", () => 
   });
 
   it("a new card prepended (new content, same structure): clean", async () => {
-    const live = newsroomDoc([
+    const live = cardListDoc([
       card("Brand new post", "September 20, 2026", "Press Release"),
       card("First post", "September 8, 2026", "Press Release"),
       card("Second post", "August 1, 2026", "Insights"),
     ]);
     const result = await checkTargetDrift(
-      newsroom,
+      cardListTarget,
       asFetchResult(baselineDoc),
       asFetchResult(live),
     );
@@ -103,13 +120,10 @@ describe("checkTargetDrift — html (newsroom-shaped, selector-matched)", () => 
 
   it("an extra wrapper div around the card list: ANCHOR_MOVED", async () => {
     const live = baselineDoc
-      .replace(
-        '<div class="bc-n-grid">',
-        '<div class="bc-n-grid"><div class="bc-n-redesign-wrapper">',
-      )
+      .replace('<div class="list-grid">', '<div class="list-grid"><div class="redesign-wrapper">')
       .replace("</div></body>", "</div></div></body>");
     const result = await checkTargetDrift(
-      newsroom,
+      cardListTarget,
       asFetchResult(baselineDoc),
       asFetchResult(live),
     );
@@ -117,55 +131,92 @@ describe("checkTargetDrift — html (newsroom-shaped, selector-matched)", () => 
   });
 });
 
-describe("checkTargetDrift — api (real Federal Register / SEC fixtures, mutated)", () => {
-  it("identical baseline and live (real fr-nrc-smr fixture): clean", async () => {
-    const body = await fixtureBody("fr-nrc-smr", "json");
+describe("checkTargetDrift — api (synthetic envelopes)", () => {
+  const countTarget = baseTarget("api", [
+    {
+      key: "document_count",
+      label: "Document Count",
+      presenter: "metric",
+      kind: "api",
+      jsonPath: "$.count",
+      type: "number",
+      required: true,
+    },
+  ]);
+  // Enough baseline key-paths that adding one unrelated field stays a small
+  // proportional change (jaccardSimilarity stays above the 0.8 threshold) —
+  // a 2-key object would let one new field alone read as STRUCTURE_CHANGED.
+  const countBaseline = JSON.stringify({
+    count: 12,
+    total_pages: 1,
+    results: [
+      {
+        id: "a",
+        title: "First",
+        type: "Notice",
+        publication_date: "2026-09-08",
+        agencies: [{ name: "Example Agency" }],
+      },
+    ],
+  });
+
+  it("identical baseline and live: clean", async () => {
     const result = await checkTargetDrift(
-      realTarget("fr-nrc-smr"),
-      asFetchResult(body),
-      asFetchResult(body),
+      countTarget,
+      asFetchResult(countBaseline),
+      asFetchResult(countBaseline),
     );
     expect(isDrifting(result)).toBe(false);
   });
 
   it("`count` removed from the response: EXTRACTION_BROKEN", async () => {
-    const baseline = await fixtureBody("fr-nrc-smr", "json");
-    const parsed = JSON.parse(baseline) as Record<string, unknown>;
+    const parsed = JSON.parse(countBaseline) as Record<string, unknown>;
     delete parsed.count;
     const live = JSON.stringify(parsed);
     const result = await checkTargetDrift(
-      realTarget("fr-nrc-smr"),
-      asFetchResult(baseline),
+      countTarget,
+      asFetchResult(countBaseline),
       asFetchResult(live),
     );
     expect(
       result.signals.some(
-        (s) => s.code === "EXTRACTION_BROKEN" && s.extractorKey === "nrc_smr_document_count",
+        (s) => s.code === "EXTRACTION_BROKEN" && s.extractorKey === "document_count",
       ),
     ).toBe(true);
   });
 
   it("results[0] gains an unrelated optional field: clean", async () => {
-    const baseline = await fixtureBody("fr-nrc-smr", "json");
-    const parsed = JSON.parse(baseline) as { results: Record<string, unknown>[] };
+    const parsed = JSON.parse(countBaseline) as { results: Record<string, unknown>[] };
     parsed.results[0]!.some_new_optional_field = "unrelated";
     const live = JSON.stringify(parsed);
     const result = await checkTargetDrift(
-      realTarget("fr-nrc-smr"),
-      asFetchResult(baseline),
+      countTarget,
+      asFetchResult(countBaseline),
       asFetchResult(live),
     );
     expect(isDrifting(result)).toBe(false);
   });
 
+  const formTarget = baseTarget("api", [
+    {
+      key: "latest_filing_form",
+      label: "Latest Filing Form",
+      presenter: "markdown",
+      kind: "api",
+      jsonPath: "$.filings.recent.form[0]",
+      type: "string",
+      required: true,
+    },
+  ]);
+  const formBaseline = JSON.stringify({ filings: { recent: { form: ["424B5", "8-K"] } } });
+
   it("form[0] changes from string to number: TYPE_CHANGED", async () => {
-    const baseline = await fixtureBody("oklo-sec-filings", "json");
-    const parsed = JSON.parse(baseline) as { filings: { recent: { form: unknown[] } } };
-    parsed.filings.recent.form[0] = 424; // was a string like "424B5"
+    const parsed = JSON.parse(formBaseline) as { filings: { recent: { form: unknown[] } } };
+    parsed.filings.recent.form[0] = 424;
     const live = JSON.stringify(parsed);
     const result = await checkTargetDrift(
-      realTarget("oklo-sec-filings"),
-      asFetchResult(baseline),
+      formTarget,
+      asFetchResult(formBaseline),
       asFetchResult(live),
     );
     expect(
@@ -176,11 +227,10 @@ describe("checkTargetDrift — api (real Federal Register / SEC fixtures, mutate
   });
 
   it("the whole body gets wrapped in a new envelope: STRUCTURE_CHANGED", async () => {
-    const baseline = await fixtureBody("oklo-sec-filings", "json");
-    const live = JSON.stringify({ data: JSON.parse(baseline) });
+    const live = JSON.stringify({ data: JSON.parse(formBaseline) });
     const result = await checkTargetDrift(
-      realTarget("oklo-sec-filings"),
-      asFetchResult(baseline),
+      formTarget,
+      asFetchResult(formBaseline),
       asFetchResult(live),
     );
     expect(result.signals.some((s) => s.code === "STRUCTURE_CHANGED")).toBe(true);

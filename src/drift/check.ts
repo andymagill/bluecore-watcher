@@ -3,7 +3,7 @@
 // node, per that doc's own framing: "even if extraction still succeeds."
 //
 // Deliberately reuses the real extraction pipeline (getHandler + extractOne,
-// exactly what a live ingestion run and targets.baseline.test.ts both call)
+// exactly what a live ingestion run and scripts/fixture-verify.ts both call)
 // rather than a second, drift-specific parser — running the *actual*
 // extractor against both the committed fixture (baseline) and a freshly
 // fetched live response is what makes EXTRACTION_BROKEN/ANCHOR_MOVED/
@@ -115,7 +115,7 @@ async function checkExtractorDrift(
     baselineCandidate = await extractOne(handler, baselineDoc, extractor, target);
   } catch {
     // The fixture itself doesn't extract cleanly — not this run's drift to
-    // report. targets.baseline.test.ts is what catches a broken
+    // report. scripts/fixture-verify.ts is what catches a broken
     // fixture/config pairing; comparing a live response against a baseline
     // that's already broken would only produce noise.
     return [];
