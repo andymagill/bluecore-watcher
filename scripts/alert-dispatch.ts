@@ -24,12 +24,11 @@
 // itself the next time normal mode runs after a successful merge.
 import { join, dirname } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
 import { CmieConfig } from "../src/config/index.js";
-import { loadPreviousState, type StateReader } from "../src/ingest/persist.js";
+import { loadPreviousState } from "../src/ingest/persist.js";
 import { planAlerts, type AlertAction, type ExistingAlertIssue } from "../src/alerts/plan.js";
 import { collectActiveSecretValues, scrubSecrets } from "../src/ingest/scrub.js";
+import { gitShowStateReader } from "./lib/git.js";
 import {
   ensureLabel,
   listIssuesByLabel,
@@ -39,7 +38,6 @@ import {
   closeIssue,
 } from "./lib/gh-issues.js";
 
-const execFileAsync = promisify(execFile);
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = join(__dirname, "..");
 
@@ -58,29 +56,6 @@ function usage(): never {
 function getArg(flag: string): string | undefined {
   const idx = process.argv.indexOf(flag);
   return idx !== -1 ? process.argv[idx + 1] : undefined;
-}
-
-// A StateReader backed by `git show <sha>:public/data/<relPath>` — lets
-// loadPreviousState (src/ingest/persist.ts) diff two *committed* states
-// without touching the filesystem or requiring either sha to be checked out.
-function gitShowReader(sha: string): StateReader {
-  return async (relPath) => {
-    try {
-      const { stdout } = await execFileAsync("git", ["show", `${sha}:public/data/${relPath}`], {
-        cwd: root,
-        maxBuffer: 10 * 1024 * 1024,
-      });
-      return stdout;
-    } catch (err) {
-      // git show's exit code and stderr text are the only signal execFile
-      // gives us to tell "path doesn't exist at that commit" (expected — a
-      // target added or retired between --from and --to) from a real error
-      // (bad sha, corrupt object, wrong cwd).
-      const message = (err as { stderr?: string }).stderr ?? (err as Error).message ?? "";
-      if (/does not exist|exists on disk, but not in/.test(message)) return null;
-      throw err;
-    }
-  };
 }
 
 async function loadConfig(envId: string): Promise<CmieConfig> {
@@ -152,8 +127,8 @@ async function runNormalMode(withIssues: boolean): Promise<void> {
   if (!envId || !from || !to) usage();
 
   const config = await loadConfig(envId);
-  const prev = await loadPreviousState(gitShowReader(from));
-  const next = await loadPreviousState(gitShowReader(to));
+  const prev = await loadPreviousState(gitShowStateReader(from));
+  const next = await loadPreviousState(gitShowStateReader(to));
 
   if (!next.manifest || !next.health) {
     console.log(`No data committed at ${to} — nothing to dispatch.`);
