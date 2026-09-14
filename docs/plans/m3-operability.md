@@ -86,8 +86,9 @@ Summary of what ships:
 - `scripts/fixture-capture.ts --all --out <dir>` — one target's fetch failure no longer aborts the rest.
 - `.claude/skills/repair-selector/SKILL.md` + `.github/copilot-instructions.md` — the portable skill, runnable by Copilot's cloud agent or local Claude Code.
 - `.github/workflows/copilot-setup-steps.yml` — captures a live snapshot of every target before the agent starts, so the agent never touches the network or a secret directly.
-- `src/alerts/plan.ts`: a `Health:` alert for a repairable errorClass (`SELECTOR_NO_MATCH`/`SELECTOR_AMBIGUOUS`/`PARSE_ERROR`) now includes a "Repair" block pointing at the skill and `repair:diff` — the one place M3b modifies M3a's output.
-- `docs/06-OPS-RUNBOOK.md` §2/§3 rewritten; `docs/03-INGESTION.md` §5 corrected.
+- `docs/06-OPS-RUNBOOK.md` §2/§3/§10 rewritten; `docs/03-INGESTION.md` §5 corrected.
+
+**Decided during implementation, not in the original design above:** `src/alerts/plan.ts` does **not** get a "Repair: assign this issue to Copilot" block. Alerts stay pure notifications (consistent with ADR-009 — operator-facing, not action-triggering) and don't nudge past runbook §3 step 1's own triage-by-age judgment call; the skill is fully discoverable from `.claude/skills/` and the runbook regardless of whether the alert body echoes it, so nothing is lost by keeping M3a's alert body untouched. `EIA_API_KEY` (and any future authenticated source's key) is mirrored into the repo's Agents secret store with `gh secret set <NAME> --app agents`, documented as one extra step in runbook §10's onboarding checklist rather than a second manual dashboard visit.
 
 **Design correction from the original plan above:** GitHub replaced the per-repo `copilot` Actions environment with a repo-level **Agents** secret type (`Settings → Secrets and variables → Agents`), and `copilot-setup-steps.yml` does not accept an `environment:` key at all — only `steps`/`permissions`/`runs-on`/`services`/`snapshot`/`timeout-minutes`. `EIA_API_KEY` is an Agents secret instead, exposed to both the setup step and the agent's own shell (masked in session logs) — a deliberate, documented tradeoff for a free, low-value key (`06-OPS-RUNBOOK.md` §2).
 

@@ -31,7 +31,7 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 All GitHub Actions repository secrets. Never in config — config is committed, and a literal-secret pattern scan runs in CI (validation rule 11).
 
-**M3b addition — `EIA_API_KEY` must also exist as a repo-level _Agents_ secret** (`Settings → Secrets and variables → Agents`, not the Actions table above), so `.github/workflows/copilot-setup-steps.yml` can capture a live EIA snapshot for the Copilot cloud agent (see §3's one-time setup below). This is a real tradeoff, accepted deliberately for a free, low-value key: an Agents secret is exposed as an env var both to setup steps _and_ to the agent's own shell — masked in the agent's session logs, but visible to it in a way `EIA_API_KEY` in the Actions table above never is to ingestion's own agent-free jobs. Don't repeat this for a higher-value secret without reconsidering.
+**M3b addition — every authenticated source's key also exists as a repo-level _Agents_ secret** (`Settings → Secrets and variables → Agents`, a separate store from the Actions table above — or `gh secret set <NAME> --app agents`, §10), so `.github/workflows/copilot-setup-steps.yml` can capture a live snapshot for the Copilot cloud agent (see §3's one-time setup below). This is a real tradeoff, accepted deliberately: an Agents secret is exposed as an env var both to setup steps _and_ to the agent's own shell — masked in the agent's session logs, but visible to it in a way the Actions table above never is to ingestion's own agent-free jobs. Fine for a low-value key like `EIA_API_KEY`; reconsider before mirroring a genuinely sensitive one this way.
 
 A captured fixture is not automatically safe from this either: an authenticated source can echo its own key back in the response body (confirmed live against EIA's v2 API, which returns `request.params.api_key` verbatim). `npm run fixture:capture` scrubs the captured body against every active `secretEnv` value before writing to disk (the same `src/ingest/scrub.ts` functions the persist layer uses) — but a fixture captured by any other means (hand-copied via `curl`, a browser devtools export) is not, so scrub it yourself before committing.
 
@@ -47,7 +47,7 @@ The routine failure. Expect these weekly.
 
 1. **Triage by age.** `consecutiveFailures` ≤ 2 on a flaky source may self-resolve. Above 3, fix it.
 2. **Read `notes`** on the target config. Past-you may have already predicted this.
-3. **Get a fresh document.** Either assign the alert issue to Copilot (its `copilot-setup-steps.yml` job already captured a live snapshot of every target into `.runs/live/<targetId>/` before the agent started — see the "M3b repair tooling" block the alert issue's own body links to), or locally: `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page by hand.
+3. **Get a fresh document.** The alert itself is a plain notification — repair is always a decision you make, not something it triggers. Either assign the issue to Copilot (its `copilot-setup-steps.yml` job captures a live snapshot of every target into `.runs/live/<targetId>/` before the agent starts, so it never fetches the page itself), or capture locally: `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page by hand.
 4. **Diff old against new.** `npm run repair:diff -- --env <envId> <targetId>` diffs the _git-historical_ fixture (read with `git show` — no second copy is kept on disk; git history is the old/new pair) against the fresh one, per extractor, and writes `.runs/repair/<targetId>/context.md` with a ranked table of candidate replacement selectors/jsonPaths (`src/repair/relocate.ts` + `src/repair/score.ts`, docs/plans/m3-operability.md M3b).
 5. **Repair.** Either the `repair-selector` skill (`.claude/skills/repair-selector/SKILL.md`) does this end to end — via the Copilot cloud agent or locally in Claude Code — or hand-pick a selector from `context.md`'s table and confirm it with `npm run repair:verify -- --env <envId> <targetId> --extractor <key> --selector <v>` (nonzero exit means it doesn't pass). Either way it arrives as a PR, never a direct commit.
 6. **Test.** Copy the live capture over the committed fixture, then re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `tests/targets.baseline.test.ts` (M2a) then enforces it stays that way.
@@ -160,7 +160,11 @@ The ADR-001 test. Target: one afternoon (open question Q8).
 
 1. `config/<envId>.config.ts` — entities, sections, targets, extractors.
 2. Capture a fixture per target (`npm run fixture:capture -- --env <envId> <targetId>`), then bless its golden file (`npm run fixture:bless -- --env <envId> <targetId>`). `tests/targets.baseline.test.ts` is currently hardcoded to `config/bluecore.config.ts` (M2a scope — one environment), so it picks up every _new target added to that file_ automatically with no per-target test needed; a genuinely new environment (a second client, the real ADR-001 test per `07-ROADMAP.md`'s Deferred table) needs its own equivalent baseline test importing its own config.
-3. Set secrets for authenticated sources.
+3. Set secrets for authenticated sources — **both** stores, one command each, so a future repair of this source works through the Copilot cloud agent too (§2, §3):
+   ```
+   gh secret set <SOURCE>_API_KEY --body "$VALUE"              # Actions: ingest.yml, drift.yml, CI
+   gh secret set <SOURCE>_API_KEY --app agents --body "$VALUE" # Agents: copilot-setup-steps.yml
+   ```
 4. `npm run validate:config`.
 5. Dry run: `npm run ingest -- --env <envId> --dry` — writes nothing, prints what it would extract.
 6. Tune assertions from the dry run's real values rather than guesses.
