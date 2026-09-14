@@ -164,7 +164,7 @@ A `CHANGE_GUARD_TRIPPED` health alert's body includes a ready-to-paste ADR-012 a
 
 Scrapers cannot be tested against live sites — it's slow, rude, and non-deterministic.
 
-**Fixtures.** Every target keeps a captured response under `fixtures/<targetId>/`. Extractor unit tests run against fixtures, offline, in milliseconds. A repaired selector must pass against a _newly captured_ fixture, and the old one is kept — that pair is the regression test.
+**Fixtures.** Every target keeps a captured response under `fixtures/<targetId>/`. Extractor unit tests run against fixtures, offline, in milliseconds. A repaired selector must pass against a _newly captured_ fixture. No separate old-fixture copy is kept on disk (**amended, M3b**) — `scripts/repair-diff.ts` reads the fixture's prior content with `git show` instead, so git history itself is the old/new pair the repair is checked against.
 
 **Golden files.** Each fixture has an expected output file. Extraction changes show as a reviewable diff.
 

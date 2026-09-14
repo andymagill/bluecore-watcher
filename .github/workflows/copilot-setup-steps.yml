@@ -1,0 +1,72 @@
+# M3b (docs/plans/m3-operability.md): prepares Copilot's cloud agent
+# development environment for a repair task. The agent's own Bash tool sits
+# behind a network firewall (default allowlist only) and never sees a
+# secret directly other than what this job's own env exposes to it as an
+# Agents secret -- so the live-fetch step below runs here, in a setup step,
+# which the firewall does not apply to (github.com/en/copilot/how-tos/
+# use-copilot-agents/coding-agent/customize-the-agent-firewall), rather
+# than inside the agent's own turn. This is what
+# ".claude/skills/repair-selector/SKILL.md" step 2 means by "a live capture
+# already sitting in .runs/live/<targetId>/" -- the agent reads it, never
+# fetches it.
+#
+# The job name MUST be exactly "copilot-setup-steps" -- that's how Copilot
+# discovers this file. Only steps/permissions/runs-on/services/snapshot/
+# timeout-minutes may be customized on it; no `environment:` key (Copilot's
+# own secrets model -- repo Settings -> Secrets and variables -> Agents --
+# replaced the old per-repo Actions "copilot" environment; see
+# docs/06-OPS-RUNBOOK.md §2 and docs/plans/m3-operability.md's "Other
+# decisions").
+#
+# push/pull_request on this file's own path make it easy to validate the
+# steps still succeed via ordinary CI, without needing a live Copilot
+# session -- EIA_API_KEY is absent there (it's an Agents secret, not an
+# Actions one), so only the fixture:capture --all step's EIA target is
+# expected to fail; continue-on-error keeps that from failing the run.
+name: copilot-setup-steps
+
+on:
+  workflow_dispatch: {}
+  push:
+    branches: [main]
+    paths: [".github/workflows/copilot-setup-steps.yml"]
+  pull_request:
+    paths: [".github/workflows/copilot-setup-steps.yml"]
+
+jobs:
+  copilot-setup-steps:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      # So the agent's own `npm test` (which exercises
+      # src/gate/smoke-render.ts's real chromium.launch()) works without
+      # it needing network access to fetch a browser build.
+      - name: Install Chromium (for smoke-render tests)
+        run: npx playwright install --with-deps chromium
+
+      # Gives the agent a live snapshot of every target to work from,
+      # captured here (outside the firewall, with EIA_API_KEY available as
+      # an Agents secret) rather than by the agent fetching pages itself.
+      # continue-on-error: EIA_API_KEY isn't set on a plain Actions
+      # validation run (push/pull_request above), so that one target's
+      # capture is expected to fail there; every other target still
+      # succeeds and the step doesn't block the rest of setup either way.
+      - name: Capture a live snapshot of every target
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: npm run fixture:capture -- --env bluecore --all --out .runs/live
+        continue-on-error: true

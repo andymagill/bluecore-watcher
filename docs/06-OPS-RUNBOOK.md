@@ -31,6 +31,8 @@ Same-origin is satisfied trivially: data files are part of the build output, ser
 
 All GitHub Actions repository secrets. Never in config — config is committed, and a literal-secret pattern scan runs in CI (validation rule 11).
 
+**M3b addition — `EIA_API_KEY` must also exist as a repo-level _Agents_ secret** (`Settings → Secrets and variables → Agents`, not the Actions table above), so `.github/workflows/copilot-setup-steps.yml` can capture a live EIA snapshot for the Copilot cloud agent (see §3's one-time setup below). This is a real tradeoff, accepted deliberately for a free, low-value key: an Agents secret is exposed as an env var both to setup steps _and_ to the agent's own shell — masked in the agent's session logs, but visible to it in a way `EIA_API_KEY` in the Actions table above never is to ingestion's own agent-free jobs. Don't repeat this for a higher-value secret without reconsidering.
+
 A captured fixture is not automatically safe from this either: an authenticated source can echo its own key back in the response body (confirmed live against EIA's v2 API, which returns `request.params.api_key` verbatim). `npm run fixture:capture` scrubs the captured body against every active `secretEnv` value before writing to disk (the same `src/ingest/scrub.ts` functions the persist layer uses) — but a fixture captured by any other means (hand-copied via `curl`, a browser devtools export) is not, so scrub it yourself before committing.
 
 Error text and `rawText` are scrubbed against active secret values before being written to any committed file (`health.json` or a target file). A token echoed in a 401 body would otherwise land permanently in the Git history that serves as the audit trail.
@@ -45,13 +47,20 @@ The routine failure. Expect these weekly.
 
 1. **Triage by age.** `consecutiveFailures` ≤ 2 on a flaky source may self-resolve. Above 3, fix it.
 2. **Read `notes`** on the target config. Past-you may have already predicted this.
-3. **Capture a fresh fixture.** `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page. If the broken-selector case is itself worth keeping as a regression fixture, copy the old file aside under a different target id before capturing (no automated old/new fixture pairing exists yet).
-4. **Diff old fixture against new.** This shows what actually changed.
-5. **Repair.** Hand-write the selector, or run the LLM repair tool (ADR-003) to propose candidates. Either way it arrives as a PR.
-6. **Test.** Re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `tests/targets.baseline.test.ts` (M2a) then enforces it stays that way.
-7. **Merge.** The next scheduled run picks it up; force one with `workflow_dispatch` if it matters.
+3. **Get a fresh document.** Either assign the alert issue to Copilot (its `copilot-setup-steps.yml` job already captured a live snapshot of every target into `.runs/live/<targetId>/` before the agent started — see the "M3b repair tooling" block the alert issue's own body links to), or locally: `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page by hand.
+4. **Diff old against new.** `npm run repair:diff -- --env <envId> <targetId>` diffs the _git-historical_ fixture (read with `git show` — no second copy is kept on disk; git history is the old/new pair) against the fresh one, per extractor, and writes `.runs/repair/<targetId>/context.md` with a ranked table of candidate replacement selectors/jsonPaths (`src/repair/relocate.ts` + `src/repair/score.ts`, docs/plans/m3-operability.md M3b).
+5. **Repair.** Either the `repair-selector` skill (`.claude/skills/repair-selector/SKILL.md`) does this end to end — via the Copilot cloud agent or locally in Claude Code — or hand-pick a selector from `context.md`'s table and confirm it with `npm run repair:verify -- --env <envId> <targetId> --extractor <key> --selector <v>` (nonzero exit means it doesn't pass). Either way it arrives as a PR, never a direct commit.
+6. **Test.** Copy the live capture over the committed fixture, then re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `tests/targets.baseline.test.ts` (M2a) then enforces it stays that way.
+7. **Merge.** `ingest.yml`'s `config/**` push trigger (ADR-019) re-ingests immediately; the alert issue auto-closes on the next successful run rather than waiting for the next scheduled cron.
 
 **Prefer resilient selectors.** Match on a label cell, a `data-` attribute, or text content rather than `nth-child`. Positional selectors are the ones that break.
+
+**One-time operator setup (M3b) — not yet done as of this writing.** The repair tooling above needs, once per repo:
+
+- The GitHub Copilot cloud agent enabled for this repository.
+- `EIA_API_KEY` added as a repo-level **Agents** secret (§2) — not the older per-repo `copilot` Actions environment, which GitHub has replaced; any secret configured there previously would have been auto-migrated, but this repo never had one.
+- Nothing to change on the agent firewall — leave it at its default (recommended) allowlist. The live-fetch step that needs `EIA_API_KEY` runs in `copilot-setup-steps.yml`, which the firewall doesn't apply to at all, not in the agent's own turn.
+- "Approve and run workflows" still needs a manual click on any PR the agent opens, same as any other first-time contributor's PR, before CI will run on it.
 
 ---
 
