@@ -15,14 +15,16 @@ export function MarkdownBlock({
   targetId,
   block,
   ttlHours,
+  staleCeilingHours,
   now,
 }: {
   targetId: string;
   block: ScalarBlock;
   ttlHours: number;
+  staleCeilingHours?: number;
   now?: Date;
 }) {
-  const state = useFreshness(block, ttlHours, now);
+  const state = useFreshness(block, ttlHours, staleCeilingHours, now);
   const raw = typeof block.value === "string" ? block.value : "";
   const html = useMemo(
     () => DOMPurify.sanitize(marked.parse(raw, { async: false }) as string),

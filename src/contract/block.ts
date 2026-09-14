@@ -100,6 +100,15 @@ const BlockCommon = z.object({
   status: BlockStatus,
   unit: z.string().optional(),
   validation: Validation,
+  // M3c — how long this block has been `cached` (failing), independent of
+  // provenance.extractedAt (which freezes at the last successful
+  // extraction, so age alone can't tell "stale data" from "been broken for
+  // months"). Stamped once when a block first turns cached, carried forward
+  // unchanged on every subsequent failing run, reset to null on recovery.
+  // Feeds the failure-age path to `expired` in src/app/lib/freshness.ts
+  // (01-DATA-CONTRACT.md §5). Optional so a block committed before this
+  // field existed still validates.
+  failingSince: z.iso.datetime().nullable().optional(),
 });
 
 export const ScalarBlock = BlockCommon.extend({

@@ -93,6 +93,7 @@ Fetched first. Everything else is discovered from it.
   "label": "Port of Albany — Berth Capacity",
   "sourceUrl": "https://example.gov/port/capacity",
   "ttlHours": 72,
+  "staleCeilingHours": 216,
   "run": {
     "runId": "2026-09-11T06-00-00Z-a1b2c3d",
     "startedAt": "2026-09-11T06:00:04Z",
@@ -115,6 +116,8 @@ Fetched first. Everything else is discovered from it.
 | `failed_cached` | The run did not produce usable data. **The entire previous file is retained unchanged except `run`**, which records the failure. |
 
 A `failed_cached` run never destroys data. That is the single most important invariant in this contract.
+
+**`staleCeilingHours`** (M3c) is resolved server-side — `schedule.staleCeilingHours` (per-target override) or `environment.staleCeilingMultiplier × ttlHours` (the default) — and published so the freshness state machine (§5) doesn't re-derive it. Optional on the schema so a target file committed before this field existed still validates; §5's client falls back to the documented 3x default when it's absent.
 
 ---
 
@@ -168,6 +171,8 @@ A block is one rendered fact. Every block carries its own provenance — not inh
 **`delta`** is `null` only on first extraction. On every subsequent run it is present: when `contentHash` changed, it is recomputed against the previous value; when `contentHash` is unchanged, the entire object — including `changedAt` — is **carried forward untouched** from the prior committed file. `changedAt` is the extraction time at which the value _became_ its current value, and because it survives unchanged runs, it is what powers "unchanged for 34 days" (see `04-FRONTEND.md` §4). _(Corrected 2026-09-12 — this file previously said `delta` is null when `contentHash` is unchanged, which is incompatible with `changedAt` surviving unchanged runs, since `changedAt` lives inside `delta`. `03-INGESTION.md` §1 "diff" was already correct; this file was the bug.)_
 
 **`validation.warnings`** is non-empty when a change guard quarantined a candidate value. Each warning records the rejected candidate, the guard that rejected it, the retained value, and (**M3a/ADR-019**) the rejected candidate's `rejectedContentHash` — everything a human needs to adjudicate without re-fetching, including writing an ADR-012 acknowledgement entry (`contract/acknowledgements.ts`) directly from an alert issue's body rather than re-running ingestion locally to find the hash. Optional on the schema so a warning committed before this field existed still validates. See §6.
+
+**`failingSince`** (M3c) is set only while `status: "cached"`: the ISO instant the block first turned cached, carried forward unchanged on every subsequent failing run, reset to `null` on recovery. Independent of `provenance.extractedAt`, which freezes at the _last successful_ extraction — `failingSince` tracks how long _this specific failure_ has been going, which is what the failure-age path in §5 needs. `null` for every other status. Optional on the schema so a block committed before this field existed still validates.
 
 ### `status` (block level)
 
@@ -231,22 +236,24 @@ The block envelope in §4 assumes a scalar `value`. The `list` presenter (`multi
 
 Computed in browser memory at render time from `T_now`. Never baked into the data files — a cached build would otherwise lie about age.
 
-**Inputs:** `T_now`, `block.provenance.extractedAt`, `target.ttlHours`, `run.status`, `block.status`, `health.consecutiveFailures`.
+**Inputs:** `T_now`, `block.provenance.extractedAt`, `block.failingSince`, `target.ttlHours`, `target.staleCeilingHours`, `run.status`, `block.status`, `health.consecutiveFailures`.
 
-Let `age = T_now − extractedAt`, `ttl = ttlHours`, and `ceiling = ttl × 3` (overridable per target).
+Let `age = T_now − extractedAt`, `ttl = ttlHours`, and `ceiling = staleCeilingHours` (published per §3, resolved server-side from `schedule.staleCeilingHours` or `environment.staleCeilingMultiplier × ttlHours` — the 3x default — falling back to `ttl × 3` client-side when a target file predates the field).
 
-| State     | Condition                         | UI                                                                             |
-| --------- | --------------------------------- | ------------------------------------------------------------------------------ |
-| `never`   | No block, or `status: missing`    | Zero-state placeholder. No value shown.                                        |
-| `fresh`   | `age ≤ ttl` and `run.status = ok` | Value, neutral badge with relative age.                                        |
-| `stale`   | `ttl < age ≤ ceiling`             | Value, amber badge: "Updated 3 days ago".                                      |
-| `expired` | `age > ceiling`                   | **Value suppressed.** Shows "Last known value from 4 Aug" behind a disclosure. |
-| `failing` | `block.status = cached`           | Value, red badge, links to Health Modal. Age still shown.                      |
-| `flagged` | `block.status = flagged`          | Value, caution marker, links to the warning text.                              |
+| State     | Condition                                                                                                                                          | UI                                                                             |
+| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `never`   | No block, or `status: missing`                                                                                                                     | Zero-state placeholder. No value shown.                                        |
+| `fresh`   | `age ≤ ttl` and `run.status = ok`                                                                                                                  | Value, neutral badge with relative age.                                        |
+| `stale`   | `ttl < age ≤ ceiling`                                                                                                                              | Value, amber badge: "Updated 3 days ago".                                      |
+| `expired` | `age > ceiling`, **or** `block.status = cached` and the failure (per `failingSince`) has run longer than the failure-age ceiling (default 14 days) | **Value suppressed.** Shows "Last known value from 4 Aug" behind a disclosure. |
+| `failing` | `block.status = cached` and not yet past the failure-age ceiling                                                                                   | Value, red badge, links to Health Modal. Age still shown.                      |
+| `flagged` | `block.status = flagged`                                                                                                                           | Value, caution marker, links to the warning text.                              |
 
 `expired` is the answer to a specific failure: a source breaks quietly, nobody fixes it, and six weeks later an analyst reads a number as current. Past the ceiling the dashboard stops asserting the value and starts reporting a historical observation. The distinction matters legally as much as operationally.
 
-`failing` and `stale` can co-occur; `failing` takes display precedence.
+**M3c — the failure-age path.** `provenance.extractedAt` freezes at the _last successful_ extraction, so the `age > ceiling` condition above only fires `ttl × 3` after that last success — for a long-TTL target (`ttlHours: 2160`, i.e. 90 days) that's roughly 270 days before a permanently broken selector's stale value would ever be suppressed. `block.failingSince` (§4) is a second, independent clock that starts when the _failure itself_ began, not when the value was last extracted — a `cached` block failing for longer than the failure-age ceiling (default 14 days, overridable in code, not yet a config field) is `expired` regardless of `ttlHours`. A `cached` block with no `failingSince` (a target file committed before this field existed) behaves exactly as before: `failing` until the ttl-based ceiling, however long that takes.
+
+`failing` and `stale` can co-occur; `failing` takes display precedence. Once a failing block passes the failure-age ceiling it becomes `expired` instead, which already takes precedence over everything else.
 
 ---
 

@@ -43,6 +43,7 @@ export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: 
                 targetId={targetFile.targetId}
                 block={block}
                 ttlHours={targetFile.ttlHours}
+                staleCeilingHours={targetFile.staleCeilingHours}
                 now={now}
               />
             );
@@ -53,6 +54,7 @@ export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: 
                 targetId={targetFile.targetId}
                 block={block}
                 ttlHours={targetFile.ttlHours}
+                staleCeilingHours={targetFile.staleCeilingHours}
                 now={now}
               />
             );
@@ -63,6 +65,7 @@ export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: 
                 targetId={targetFile.targetId}
                 block={block}
                 ttlHours={targetFile.ttlHours}
+                staleCeilingHours={targetFile.staleCeilingHours}
                 now={now}
               />
             );
@@ -72,6 +75,7 @@ export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: 
               targetId={targetFile.targetId}
               block={block}
               ttlHours={targetFile.ttlHours}
+              staleCeilingHours={targetFile.staleCeilingHours}
               now={now}
             />
           );

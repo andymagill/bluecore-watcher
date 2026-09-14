@@ -152,6 +152,11 @@ export function computeFingerprint(
       label: tf.label,
       sourceUrl: tf.sourceUrl,
       ttlHours: tf.ttlHours,
+      // M3c — a config-only change to staleCeilingHours (schedule override
+      // or the environment multiplier it resolves from) must still produce
+      // a commit; otherwise the new ceiling would validate but silently not
+      // publish until something else changed first.
+      staleCeilingHours: tf.staleCeilingHours ?? null,
       runStatus: tf.run.status,
       blocks: tf.blocks.map((b) => ({
         key: b.key,
