@@ -180,18 +180,42 @@ export function computeFingerprint(
 }
 
 // ---- Loading previous state, for diffing against ----
+//
+// A StateReader resolves one data-dir-relative path ("manifest.json",
+// "sections/company/foo.json", ...) to its text content, or null if the
+// path doesn't exist at whatever "current state" the reader represents.
+// fsStateReader (the default -- every existing caller passes a dataDir
+// string, unchanged) reads the live working tree. M3a's alert-dispatch
+// (scripts/alert-dispatch.ts) instead passes a `git show <sha>:<path>`
+// reader, so the same loader can diff two *committed* states -- the state
+// before and after a squash-merge -- without ever touching the filesystem.
 
-export async function loadPreviousState(dataDir: string): Promise<{
+export type StateReader = (relPath: string) => Promise<string | null>;
+
+export function fsStateReader(dataDir: string): StateReader {
+  return async (relPath) => {
+    try {
+      return await readFile(join(dataDir, relPath), "utf-8");
+    } catch (err) {
+      if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
+      throw err;
+    }
+  };
+}
+
+export async function loadPreviousState(dataDirOrReader: string | StateReader): Promise<{
   manifest: Manifest | null;
   health: Health | null;
   targetFiles: Map<string, TargetFile>;
 }> {
-  const manifest = await readJsonOrNull(join(dataDir, "manifest.json"), Manifest);
-  const health = await readJsonOrNull(join(dataDir, "health.json"), Health);
+  const read =
+    typeof dataDirOrReader === "string" ? fsStateReader(dataDirOrReader) : dataDirOrReader;
+  const manifest = await readJsonOrNull(read, "manifest.json", Manifest);
+  const health = await readJsonOrNull(read, "health.json", Health);
   const targetFiles = new Map<string, TargetFile>();
   if (manifest) {
     for (const t of manifest.targets) {
-      const tf = await readJsonOrNull(join(dataDir, t.path), TargetFile);
+      const tf = await readJsonOrNull(read, t.path, TargetFile);
       if (tf) targetFiles.set(t.id, tf);
     }
   }
@@ -199,15 +223,13 @@ export async function loadPreviousState(dataDir: string): Promise<{
 }
 
 async function readJsonOrNull<T>(
-  path: string,
+  read: StateReader,
+  relPath: string,
   schema: { parse: (v: unknown) => T },
 ): Promise<T | null> {
-  try {
-    return schema.parse(JSON.parse(await readFile(path, "utf-8")));
-  } catch (err) {
-    if ((err as NodeJS.ErrnoException).code === "ENOENT") return null;
-    throw err;
-  }
+  const text = await read(relPath);
+  if (text === null) return null;
+  return schema.parse(JSON.parse(text));
 }
 
 // ---- Writing ----
