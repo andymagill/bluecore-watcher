@@ -403,6 +403,37 @@ describe("planAlerts — health alerts", () => {
     expect(actions[0]).toMatchObject({ severity: "critical" });
   });
 
+  it("a repairable errorClass (SELECTOR_NO_MATCH) gets a repair block pointing at the skill and repair:diff", () => {
+    const prev = state([], makeHealth([]));
+    const next = state(
+      [],
+      makeHealth([makeHealthEntry({ errorClass: "SELECTOR_NO_MATCH", consecutiveFailures: 1 })]),
+    );
+    const actions = planAlerts({ prev, next, config, existingIssues: [], now: NOW });
+    expect(actions).toHaveLength(1);
+    expect(actions[0]!.body).toContain("repair-selector");
+    expect(actions[0]!.body).toContain("npm run repair:diff -- --env test-env t1");
+  });
+
+  it("a non-repairable errorClass (NETWORK_ERROR) gets no repair block", () => {
+    const prev = state([], makeHealth([]));
+    const next = state(
+      [],
+      makeHealth([
+        makeHealthEntry({
+          errorClass: "NETWORK_ERROR",
+          message: "fetch failed",
+          failingSelector: null,
+          consecutiveFailures: 1,
+        }),
+      ]),
+    );
+    const actions = planAlerts({ prev, next, config, existingIssues: [], now: NOW });
+    expect(actions).toHaveLength(1);
+    expect(actions[0]!.body).not.toContain("repair-selector");
+    expect(actions[0]!.body).not.toContain("repair:diff");
+  });
+
   it("the guard-trip body includes a ready-to-paste acknowledgement snippet with the rejected hash", () => {
     const tf = makeTargetFile([
       scalarBlock({
@@ -437,5 +468,6 @@ describe("planAlerts — health alerts", () => {
     expect(actions).toHaveLength(1);
     expect(actions[0]!.body).toContain("sha256:deadbeef");
     expect(actions[0]!.body).toContain("acknowledgements.json");
+    expect(actions[0]!.body).not.toContain("repair-selector");
   });
 });

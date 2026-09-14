@@ -9,7 +9,7 @@
 // against real git history for testing.
 import type { CmieConfig, AlertDef } from "../config/schema.js";
 import type { Manifest } from "../contract/manifest.js";
-import type { Health, HealthEntry } from "../contract/health.js";
+import type { ErrorClass, Health, HealthEntry } from "../contract/health.js";
 import type { TargetFile } from "../contract/target-file.js";
 import type { Block } from "../contract/block.js";
 
@@ -204,7 +204,31 @@ function findAckSnippet(tf: TargetFile | undefined, entry: HealthEntry): string 
   ].join("\n");
 }
 
+// M3b: the errorClasses repair tooling can actually act on -- a selector
+// that no longer resolves (SELECTOR_NO_MATCH/SELECTOR_AMBIGUOUS) or a
+// response that no longer parses the way the extractor expects
+// (PARSE_ERROR). Everything else (network/auth/blocked/guard-tripped/
+// schema) isn't a relocation problem, so offering the repair skill there
+// would be a dead end, not a shortcut.
+const REPAIRABLE_ERROR_CLASSES: ReadonlySet<ErrorClass> = new Set([
+  "SELECTOR_NO_MATCH",
+  "SELECTOR_AMBIGUOUS",
+  "PARSE_ERROR",
+]);
+
+function formatRepairBlock(envId: string, targetId: string): string {
+  return [
+    "**Repair:** assign this issue to Copilot to run the `repair-selector` skill " +
+      "(`.claude/skills/repair-selector/`), or run it locally in Claude Code.",
+    "",
+    "```",
+    `npm run repair:diff -- --env ${envId} ${targetId}`,
+    "```",
+  ].join("\n");
+}
+
 function formatHealthAlertBody(
+  envId: string,
   targetId: string,
   tf: TargetFile | undefined,
   entries: readonly HealthEntry[],
@@ -226,6 +250,9 @@ function formatHealthAlertBody(
     const ack = findAckSnippet(tf, e);
     if (ack) lines.push("", ack);
     lines.push("");
+  }
+  if (entries.some((e) => REPAIRABLE_ERROR_CLASSES.has(e.errorClass))) {
+    lines.push(formatRepairBlock(envId, targetId), "");
   }
   lines.push("See `06-OPS-RUNBOOK.md` §3/§5/§6/§7 for the matching runbook entry.");
   lines.push("", marker(key, firedAt));
@@ -284,7 +311,7 @@ function planHealthAlerts(input: PlanAlertsInput): AlertAction[] {
       key,
       number: existing?.number,
       title: `Health: ${targetId}`,
-      body: formatHealthAlertBody(targetId, tf, nextEntries, key, nowIso),
+      body: formatHealthAlertBody(config.environment.id, targetId, tf, nextEntries, key, nowIso),
       severity,
     });
   }
