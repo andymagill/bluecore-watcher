@@ -87,6 +87,71 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
     ).not.toBeNull();
   });
 
+  // M3c gate risk (docs/plans/m3-operability.md M3c): a block suppressed via
+  // the new failure-age path to `expired` must still be counted by the
+  // smoke-render gate the same way a ttl-based `expired` block already is
+  // (src/gate/smoke-render.ts counts data-block-key nodes, not visible
+  // text) -- MetricBlock/MarkdownBlock render the suppressed value behind a
+  // <details> disclosure, not omit it.
+  it("a long-failing (cached) block past the failure-age ceiling still renders its data-block-key node, suppressed behind a disclosure", () => {
+    const longFailingTargetFile = TargetFile.parse({
+      ...makeTargetFile(),
+      ttlHours: 2160, // long TTL -- the ttl-based ceiling (270 days) is nowhere close
+      staleCeilingHours: 2160 * 3,
+      blocks: [
+        {
+          key: "latest_headline",
+          label: "Latest Headline",
+          type: "string",
+          presenter: "markdown",
+          status: "cached",
+          value: "BlueCore announces new milestone",
+          displayValue: "BlueCore announces new milestone",
+          provenance: {
+            sourceUrl: "https://www.bluecore.energy/news-insights",
+            anchor: ".bc-n-ctitle:first",
+            extractedAt: "2026-08-01T00:00:00Z",
+            rawText: "BlueCore announces new milestone",
+            contentHash: "sha256:aabbcc",
+          },
+          delta: null,
+          validation: { passed: false, warnings: [] },
+          failingSince: "2026-08-01T00:00:00Z", // 42 days before NOW -- past the default 14-day ceiling
+        },
+      ],
+    });
+    render(
+      <SectionPanel
+        section={{ id: "company", label: "Company Performance", order: 1 }}
+        manifestTargets={[
+          {
+            id: "bluecore-newsroom",
+            sectionId: "company",
+            entityId: "bluecore-energy",
+            label: longFailingTargetFile.label,
+            path: "sections/company/bluecore-newsroom.json",
+            ttlHours: 2160,
+            lastRunStatus: "partial",
+            lastSuccessAt: "2026-08-01T00:00:00Z",
+          },
+        ]}
+        targetFiles={new Map([["bluecore-newsroom", longFailingTargetFile]])}
+        now={NOW}
+      />,
+    );
+    // Still counted -- the gate risk this test guards against.
+    const blockNode = document.querySelector(
+      '[data-block-key="bluecore-newsroom.latest_headline"]',
+    );
+    expect(blockNode).not.toBeNull();
+    // And genuinely suppressed, not just present: the value sits behind a
+    // <details> summary rather than in the open, same as ttl-based expired.
+    expect(blockNode!.querySelector("details")).not.toBeNull();
+    const badge = blockNode!.querySelector('[data-freshness-state="expired"]');
+    expect(badge).not.toBeNull();
+    expect(badge!.textContent).toMatch(/Last known value from/);
+  });
+
   it("renders an explicit zero-state when the section has no targets (competitive/regulatory/market in M1)", () => {
     render(
       <SectionPanel

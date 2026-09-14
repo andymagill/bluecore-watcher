@@ -81,6 +81,29 @@ describe("computeFreshness -- the freshness state machine, driven by a fake cloc
     ).toBe("expired");
   });
 
+  it("expired: honours a published staleCeilingHours (M3c), independent of ttlHours", () => {
+    // A short absolute ceiling on a long-TTL target -- exactly the
+    // schedule.staleCeilingHours override case (02-CONFIG-SCHEMA.md).
+    const now = new Date(new Date(EXTRACTED_AT).getTime() + 49 * 3_600_000);
+    expect(
+      computeFreshness({ now, block: block(), ttlHours: TTL_HOURS, staleCeilingHours: 48 }),
+    ).toBe("expired");
+  });
+
+  it("staleCeilingHours takes precedence over staleCeilingMultiplier when both are given", () => {
+    // Multiplier alone (x2 => 336h) would call this stale, not expired.
+    const now = new Date(new Date(EXTRACTED_AT).getTime() + 49 * 3_600_000);
+    expect(
+      computeFreshness({
+        now,
+        block: block(),
+        ttlHours: TTL_HOURS,
+        staleCeilingHours: 48,
+        staleCeilingMultiplier: 2,
+      }),
+    ).toBe("expired");
+  });
+
   it("failing: block.status cached, still within ttl", () => {
     expect(
       computeFreshness({
@@ -103,6 +126,66 @@ describe("computeFreshness -- the freshness state machine, driven by a fake cloc
     expect(computeFreshness({ now, block: block({ status: "cached" }), ttlHours: TTL_HOURS })).toBe(
       "expired",
     );
+  });
+
+  // M3c -- the actual gap this workstream closes: a long-TTL target's
+  // provenance.extractedAt freezes at the last success, so the ttl-based
+  // ceiling above could otherwise take hundreds of days to fire. failingSince
+  // is a second, independent clock that starts when the failure itself began.
+  describe("M3c -- failure-age path to expired, independent of the ttl-based ceiling", () => {
+    const LONG_TTL_HOURS = 2160; // 90 days, matching a real long-TTL target's shape
+
+    it("failing: still failing, well under the default 14-day failure ceiling", () => {
+      const failingSince = EXTRACTED_AT;
+      const now = new Date(new Date(EXTRACTED_AT).getTime() + 5 * 24 * 3_600_000);
+      expect(
+        computeFreshness({
+          now,
+          block: block({ status: "cached", failingSince }),
+          ttlHours: LONG_TTL_HOURS,
+        }),
+      ).toBe("failing");
+    });
+
+    it("expired: past the default 14-day failure ceiling, even though the ttl-based ceiling (270 days) is nowhere close", () => {
+      const failingSince = EXTRACTED_AT;
+      const now = new Date(new Date(EXTRACTED_AT).getTime() + (14 * 24 + 1) * 3_600_000);
+      expect(
+        computeFreshness({
+          now,
+          block: block({ status: "cached", failingSince }),
+          ttlHours: LONG_TTL_HOURS,
+        }),
+      ).toBe("expired");
+    });
+
+    it("honours a custom failingCeilingDays override", () => {
+      const failingSince = EXTRACTED_AT;
+      const now = new Date(new Date(EXTRACTED_AT).getTime() + 3 * 24 * 3_600_000 + 1);
+      expect(
+        computeFreshness({
+          now,
+          block: block({ status: "cached", failingSince }),
+          ttlHours: LONG_TTL_HOURS,
+          failingCeilingDays: 3,
+        }),
+      ).toBe("expired");
+    });
+
+    it("a cached block with no failingSince (older committed data) never trips the failure-age path -- only the ttl-based ceiling can expire it", () => {
+      // Backward compat: failingSince is optional on the Block contract, so
+      // a block committed before this field existed must keep behaving
+      // exactly as before -- "failing" until the ttl-based ceiling, however
+      // long that takes.
+      const now = new Date(new Date(EXTRACTED_AT).getTime() + 100 * 24 * 3_600_000);
+      expect(
+        computeFreshness({
+          now,
+          block: block({ status: "cached", failingSince: undefined }),
+          ttlHours: LONG_TTL_HOURS,
+        }),
+      ).toBe("failing");
+    });
   });
 
   it("flagged: block.status flagged", () => {

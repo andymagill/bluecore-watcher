@@ -40,11 +40,17 @@ describe("orchestrator — end-to-end against the synthetic config", () => {
       expect(totalBlocks).toBe(5);
       for (const tf of result.targetFiles) {
         expect(tf.run.status).toBe("ok");
+        // M3c — resolved from environment.staleCeilingMultiplier (3, and no
+        // target in this config overrides it via schedule.staleCeilingHours)
+        // x ttlHours, published so the freshness state machine doesn't have
+        // to re-derive it.
+        expect(tf.staleCeilingHours).toBe(tf.ttlHours * 3);
         for (const block of tf.blocks) {
           expect(block.status).toBe("ok");
           expect(block.provenance).not.toBeNull();
           expect(block.provenance!.sourceUrl).toBe(tf.sourceUrl);
           expect(block.provenance!.extractedAt).toBeTruthy();
+          expect(block.failingSince).toBeNull();
         }
       }
 
