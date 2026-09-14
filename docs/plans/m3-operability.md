@@ -18,8 +18,8 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 
 | Workstream                          | Status      | PR                                                            |
 | ----------------------------------- | ----------- | ------------------------------------------------------------- |
-| M3a — Alerting                      | In review   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
-| M3b — Repair tooling                | Not started | —                                                             |
+| M3a — Alerting                      | Delivered   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
+| M3b — Repair tooling                | Next        | —                                                             |
 | M3c — Analyst-facing health UX (Q4) | Not started | —                                                             |
 | M3d — Drill, ops report, close-out  | Not started | —                                                             |
 
@@ -61,7 +61,7 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 
 ## M3a — Alerting
 
-**In review** — [PR #16](https://github.com/andymagill/bluecore-watcher/pull/16). Delivered once it merges to `main`. See the PR / commit history for the implementation; this section is a pointer, not a spec — the spec lived in the planning conversation and is captured by ADR-019 in `00-DECISIONS.md` plus the rewritten `03-INGESTION.md` §4.
+**Delivered** — [PR #16](https://github.com/andymagill/bluecore-watcher/pull/16), merged 2026-09-14. See the PR / commit history for the implementation; this section is a pointer, not a spec — the spec lived in the planning conversation and is captured by ADR-019 in `00-DECISIONS.md` plus the rewritten `03-INGESTION.md` §4.
 
 Summary of what ships:
 
