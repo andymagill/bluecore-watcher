@@ -16,12 +16,12 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 
 ## Status
 
-| Workstream                          | Status      | PR                                                            |
-| ----------------------------------- | ----------- | ------------------------------------------------------------- |
-| M3a — Alerting                      | Delivered   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
-| M3b — Repair tooling                | Delivered   | [#18](https://github.com/andymagill/bluecore-watcher/pull/18) |
-| M3c — Analyst-facing health UX (Q4) | Next        | —                                                             |
-| M3d — Drill, ops report, close-out  | Not started | —                                                             |
+| Workstream                                 | Status      | PR                                                            |
+| ------------------------------------------ | ----------- | ------------------------------------------------------------- |
+| M3a — Alerting                             | Delivered   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
+| M3b — Repair tooling                       | Delivered   | [#18](https://github.com/andymagill/bluecore-watcher/pull/18) |
+| M3c — Failing-data safety (Q4 safety half) | Next        | —                                                             |
+| M3d — Drill, ops report, close-out         | Not started | —                                                             |
 
 ## Context / findings (all of M3)
 
@@ -96,29 +96,21 @@ Summary of what ships:
 
 **Prerequisites to start M3c:** none from M3a/M3b (independent), but sequence after them so the health-entry shape used in M3c stays stable against what M3a/M3b already ship.
 
-## M3c — Analyst-facing health UX (Q4 + modal copy)
+## M3c — Failing-data safety (Q4 safety half)
+
+**Re-scoped 2026-09-14.** The original design below bundled a real code-level safety gap with an analyst-facing UX pass (copy, an outage banner, a modal rewrite) for an audience — dashboard-visible analysts — that doesn't exist until M4 auth ships, and that contributes nothing to M3's own exit test (an operator taking a selector break from alert to merged fix). The analyst-UX half is moved to `07-ROADMAP.md`'s Deferred table (Q4 SLA/UX half); the original spec for it is preserved verbatim at the bottom of this file under "Deferred: analyst-facing health UX" so a future conversation can pick it up cold. What's left here is the one thing that's a genuine bug regardless of audience:
+
+**The gap.** `computeFreshness` (`src/app/lib/freshness.ts`) only reaches `expired` (value suppressed) via `age > ttlHours × 3`. A `cached` (failing) block is exempted from that check — it renders `failing` (red, "N days ago", value still shown) no matter how long it's been broken, so the ceiling that actually matters for a long-TTL target is `3 × ttlHours` of elapsed _time_, not of _failure_. At `bluecore-form-d`'s `ttlHours: 2160`, that's 270 days before a permanently-broken selector's stale value would even be suppressed — the exact "six-weeks-broken" failure Q4 asked about, just with a bigger number (`eia-ca-industrial-price` at `ttlHours: 1440` is 180 days). Separately, `schedule.staleCeilingHours` and `environment.staleCeilingMultiplier` already validate in the config schema (`src/config/schema.ts:29,44`) but are never published to `TargetFile`, so every target silently uses the 3× default regardless of what's configured — the same class of no-op field ADR-018 closed for `assert`.
 
 **Prerequisites:** none from M3a/M3b (independent), but sequenced after them so the health-entry shape is stable. Read `01-DATA-CONTRACT.md` §5 (freshness) and §7 (`health.json`) before starting.
 
-- **Config/contract:** `TargetDef.outage?: { note: string }` (non-empty, ≤280 chars), published as `TargetFile.outage` in `src/ingest/orchestrate.ts`, included in `computeFingerprint` (so editing the note produces a commit). Run `schema:gen`.
-- **`src/app/lib/outage.ts`** (pure, fake-clock testable). `computeOutage(now, healthEntry)` → `none | brief (<3d) | ongoing (3–14d) | prolonged (>14d)`, keyed on `firstSeenAt`, for `status: failed` entries. A `flagged` entry older than 3 days reads "awaiting review since {date}", not as an outage.
-- **`src/app/lib/health-copy.ts`.** An exhaustive `Record<ErrorClass, string>` of analyst sentences (a new `ErrorClass` becomes a type error):
-  - `SELECTOR_*`/`PARSE_ERROR` → "The source page changed structure"
-  - `NETWORK_ERROR`/`TIMEOUT`/`HTTP_ERROR` → "The source site couldn't be reached"
-  - `BLOCKED` → "The source site refused our request"
-  - `AUTH_ERROR` → "Our access to this source needs renewing"
-  - `ASSERTION_FAILED` → "The source returned a value that failed our sanity checks"
-  - `CHANGE_GUARD_TRIPPED` → "A large change is awaiting verification"
-  - `SCHEMA_INVALID`/`UNKNOWN` → "An internal error on our side"
-- **Health reaches blocks:** thread a `healthByKey` map (`targetId.extractorKey`) through `AppShell.tsx` → `SectionGrid` → `TargetCard.tsx` → the block components.
-  - `TargetCard`: a banner when any failed entry exists (tier text, "since {date}", outage note); replace the developer-facing `RUN_STATUS_LABEL` with analyst copy.
-  - Blocks: at the `prolonged` tier, suppress the value behind the same disclosure `expired` already uses.
-  - Precedence: `prolonged` > `expired` > `failing` > `flagged` > `stale` > `fresh`.
-- **`HealthModal.tsx`:** group by target label (from the manifest); use block labels, not keys; one analyst sentence per entry with dates, a text tier badge, and the outage note; put errorClass/selector/HTTP status/stack behind a "Technical details" disclosure. `HeaderBar` needs to pass the manifest and target files. Review `HealthPill` copy too.
-- **Gate risk to verify:** the smoke render counts rendered blocks (`src/gate/smoke-render.ts`) — a suppressed prolonged-outage block must still count, the same way `expired` does today.
-- **Tests:** `tests/app/outage.test.ts` (tier boundaries), `tests/app/health-modal.test.tsx` (analyst copy visible, technical details collapsed); extend `tests/app/section-panel.test.tsx` and `tests/smoke-render.test.ts` for a prolonged block.
-- **Docs:** `04-FRONTEND.md` §3/§6, `01-DATA-CONTRACT.md`/`02-CONFIG-SCHEMA.md` for `outage`, a new ADR resolving Q4.
-- **Verify:** `npm run dev` with a hand-edited, **uncommitted** `health.json` whose `firstSeenAt` values straddle 3 and 14 days — check the banner, the suppressed value, and the modal copy; `npm run gate` still passes against a local build.
+- **Publish `staleCeilingMultiplier`/`staleCeilingHours`** from config to `TargetFile` (`src/ingest/orchestrate.ts`) instead of leaving them config-schema-only dead weight; `computeFreshness` already accepts an override, it just never receives one. Run `schema:gen`.
+- **Add a failure-age ceiling.** `computeFreshness` needs a second, independent path to `expired`: a `cached` block whose underlying health entry has been failing (via `firstSeenAt`) for longer than a configurable window (default 14 days, matching the M3d drill's own 30-minute-fix expectation and the existing `flagged` "awaiting review" framing) suppresses the value the same way an age-based `expired` does today — regardless of `ttlHours`. This needs the health entry's `firstSeenAt` reaching `computeFreshness`, not just `block.status`; thread it through the same path `servingCachedFrom` already takes (`src/ingest/persist.ts:111`) rather than adding a new `healthByKey` map through the component tree.
+- **Precedence stays what it is today** (`expired` checked first, regardless of cause) — a long-failing block and a long-stale block both land on the same suppressed state and label; no new UI state is introduced, just a second way to reach the existing one.
+- **Gate risk to verify:** the smoke render counts rendered blocks (`src/gate/smoke-render.ts`) — a suppressed long-failing block must still count, the same way `expired` does today.
+- **Tests:** extend `tests/app/freshness.test.ts` (failure-age boundary at the default window, `staleCeilingMultiplier`/`staleCeilingHours` actually changing behavior end to end from config), `tests/smoke-render.test.ts` for a long-failing block.
+- **Docs:** `01-DATA-CONTRACT.md` §5 (add the failure-age path to the state machine table), `02-CONFIG-SCHEMA.md` (note `staleCeilingHours`/`staleCeilingMultiplier` are now live, not just validated), a new ADR resolving Q4's safety half only.
+- **Verify:** `npm run dev` with a hand-edited, **uncommitted** `health.json` whose `firstSeenAt` is >14 days ago on a long-TTL target — confirm the value suppresses even though `age < ttlHours`; `npm run gate` still passes against a local build.
 
 ## M3d — Drill, ops report, close-out
 
@@ -146,3 +138,32 @@ Summary of what ships:
 - Claude/Codex via GitHub Agent HQ — not needed; availability depends on Copilot plan tier.
 - Webhook/email alert channels.
 - Client-facing alerts (ADR-009 — blocked on M4 auth).
+- Analyst-facing health UX (Q4 SLA/UX half) — moved out of M3c 2026-09-14, see below and `07-ROADMAP.md` Deferred.
+
+---
+
+## Deferred: analyst-facing health UX (Q4 SLA/UX half)
+
+**Moved out of M3c on 2026-09-14** — not dropped, just not part of M3. Pick this up once M4 auth has shipped and there's an actual analyst audience to design copy and disclosure tiers for; see `07-ROADMAP.md`'s Deferred table entry. This is the original M3c design verbatim, preserved so a future conversation can start here cold rather than re-deriving it. It assumes the M3c safety half above (failure-age ceiling, published `staleCeiling*`) is already merged.
+
+**Prerequisites:** M3c (failing-data safety) merged, so the health-entry shape and the failure-age `expired` path are stable. M4 auth shipped, so there's a real analyst audience. Read `01-DATA-CONTRACT.md` §5 (freshness) and §7 (`health.json`) before starting.
+
+- **Config/contract:** `TargetDef.outage?: { note: string }` (non-empty, ≤280 chars), published as `TargetFile.outage` in `src/ingest/orchestrate.ts`, included in `computeFingerprint` (so editing the note produces a commit). Run `schema:gen`.
+- **`src/app/lib/outage.ts`** (pure, fake-clock testable). `computeOutage(now, healthEntry)` → `none | brief (<3d) | ongoing (3–14d) | prolonged (>14d)`, keyed on `firstSeenAt`, for `status: failed` entries. A `flagged` entry older than 3 days reads "awaiting review since {date}", not as an outage.
+- **`src/app/lib/health-copy.ts`.** An exhaustive `Record<ErrorClass, string>` of analyst sentences (a new `ErrorClass` becomes a type error):
+  - `SELECTOR_*`/`PARSE_ERROR` → "The source page changed structure"
+  - `NETWORK_ERROR`/`TIMEOUT`/`HTTP_ERROR` → "The source site couldn't be reached"
+  - `BLOCKED` → "The source site refused our request"
+  - `AUTH_ERROR` → "Our access to this source needs renewing"
+  - `ASSERTION_FAILED` → "The source returned a value that failed our sanity checks"
+  - `CHANGE_GUARD_TRIPPED` → "A large change is awaiting verification"
+  - `SCHEMA_INVALID`/`UNKNOWN` → "An internal error on our side"
+- **Health reaches blocks:** thread a `healthByKey` map (`targetId.extractorKey`) through `AppShell.tsx` → `SectionGrid` → `TargetCard.tsx` → the block components.
+  - `TargetCard`: a banner when any failed entry exists (tier text, "since {date}", outage note); replace the developer-facing `RUN_STATUS_LABEL` with analyst copy.
+  - Blocks: at the `prolonged` tier, suppress the value behind the same disclosure `expired` already uses (by M3c, this disclosure already fires for the failure-age case — this tier is about _copy_, not a new suppression mechanism).
+  - Precedence: `prolonged` > `expired` > `failing` > `flagged` > `stale` > `fresh`.
+- **`HealthModal.tsx`:** group by target label (from the manifest); use block labels, not keys; one analyst sentence per entry with dates, a text tier badge, and the outage note; put errorClass/selector/HTTP status/stack behind a "Technical details" disclosure. `HeaderBar` needs to pass the manifest and target files. Review `HealthPill` copy too.
+- **Gate risk to verify:** the smoke render counts rendered blocks (`src/gate/smoke-render.ts`) — a suppressed prolonged-outage block must still count, the same way `expired` does today.
+- **Tests:** `tests/app/outage.test.ts` (tier boundaries), `tests/app/health-modal.test.tsx` (analyst copy visible, technical details collapsed); extend `tests/app/section-panel.test.tsx` and `tests/smoke-render.test.ts` for a prolonged block.
+- **Docs:** `04-FRONTEND.md` §3/§6, `01-DATA-CONTRACT.md`/`02-CONFIG-SCHEMA.md` for `outage`, a new ADR resolving Q4's remaining SLA/UX half.
+- **Verify:** `npm run dev` with a hand-edited, **uncommitted** `health.json` whose `firstSeenAt` values straddle 3 and 14 days — check the banner, the suppressed value, and the modal copy; `npm run gate` still passes against a local build.
