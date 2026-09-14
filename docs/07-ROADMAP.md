@@ -89,19 +89,42 @@ The milestone that decides whether this is maintainable by one person. Delivered
 - Failing-data safety valve: a long-outage value stops rendering as current past a configurable ceiling, regardless of TTL (Q4 safety half). ✅ M3c — ADR-020.
 - Maintenance cost measured against the `06-OPS-RUNBOOK.md` §7 estimate.
 
-**Re-scoped 2026-09-14.** M3c originally bundled a code-level safety gap with analyst-facing UX (copy, an outage banner, a modal rewrite) for an audience — analysts with dashboard access — that doesn't exist until M4 auth ships, and that does nothing for M3's own exit test (an operator fixing a selector). Split: the safety gap (a `cached` block can render "3 days ago" in red for up to `3 × ttlHours` — 270 days at `bluecore-form-d`'s TTL — before the `expired` disclosure ever kicks in) stayed in M3c, scoped down to just that fix. The analyst-copy half moved to Deferred, below. See `docs/plans/m3-operability.md` M3c for the full writeup and the preserved original spec.
+**Re-scoped 2026-09-14.** M3c originally bundled a code-level safety gap with analyst-facing UX (copy, an outage banner, a modal rewrite) for an audience — analysts with dashboard access — that doesn't exist until auth ships, and that does nothing for M3's own exit test (an operator fixing a selector). Split: the safety gap (a `cached` block can render "3 days ago" in red for up to `3 × ttlHours` — 270 days at `bluecore-form-d`'s TTL — before the `expired` disclosure ever kicks in) stayed in M3c, scoped down to just that fix. The analyst-copy half moved to Deferred, below. See `docs/plans/m3-operability.md` M3c for the full writeup and the preserved original spec.
 
 **Exit:** a selector break goes from alert to merged fix in under 30 minutes.
 
 ---
 
-## M4 — Access control
+## M4 — Source quality: content-depth
 
-Whole-site magic-link auth (ADR-004).
+Upgrade three existing source types to extract substantive content alongside volume metrics, and reconfigure one dashboard-occupying source as alert-only. Builds on M2's verified baseline extractors.
 
-**Gates the first real client deliverable.** Until this lands the deployment is public, which constrains what can be ingested at all.
+**Scope:**
 
-Near-zero cost points to edge middleware plus signed cookies rather than a hosted identity vendor. Needs its own design pass.
+- **Federal Register sources** (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`): Extract the title, publication agency, and date of the most recent document matching each filter, alongside the existing count. A regulatory signal moves from "NRC attention is 56 documents" to "NRC published a [specific] rulemaking on [date]".
+- **SEC submissions** (`oklo-sec-filings`, `nuscale-sec-filings`): Extract the filing's `items` field or a link to the primary document from the most recent 8-K, not just the form code and date. Turns "Oklo filed an 8-K on Tuesday" into "Oklo [filed a partnership agreement / announced financing]".
+- **BlueCore Form D** (`bluecore-form-d`): Reconfigure as an alert-only target. The companion `bluecore-sec-filings` already detects new filings; the Form D's dollar amounts are relevant once but static between filings. Frees dashboard real estate for higher-signal sources.
+
+**Testing approach:** Per ADR-001, extractors are tested against generalized, entity-agnostic fixtures (`example-regulatory-api` for FR sources, `example-sec-submissions` for SEC) in vitest. Entity configs verified via `npm run fixture:verify` against `bluecore-*` and competitor config (ADR-021). No entity names in test requirements.
+
+**Exit:** Dry run produces correct delta chips and provenance popovers for the new extractor shapes. All four dashboard sections display substantive content (not just counts or dates). Standard verification passes.
+
+---
+
+## M5 — Source quality: new source types
+
+Add sources that expose regulatory and procurement content currently unavailable through the public web dashboard, exercising the additive handler pattern (ADR-010).
+
+**Scope:**
+
+- **SAM.gov FPDS contract awards**: Triage and configure at least one target in the Market Conditions or Regulatory & Policy section (per `docs/05-SOURCES.md` method) filtering for nuclear power generation (`naics_code`) and California (`place_of_performance.state`). Extract award amount, recipient, and agency.
+- **MARAD / Coast Guard maritime regulatory**: Triage one docket or regulatory guidance source relevant to floating power plants and port operations. Maritime regulatory approval is the actual path for BlueCore's Long Beach deployment; the dashboard has no source currently covering this.
+
+**Testing approach:** Same as M4 — generalized `example-contracts-api` and `example-maritime-regulatory` fixtures in vitest; entity configs verified via `npm run fixture:verify`.
+
+**Exit:** All four dashboard sections display ≥1 source extracting substantive, non-numeric content (title, description, agency, vendor). The regulatory gap (no maritime sources in M2) is closed. Standard verification passes.
+
+**Impact on source inventory:** M4 + M5 complete `docs/05-SOURCES.md` across all four sections with sources exposing content, not just volume. This completes the source-quality gate for the first client deliverable (M5 exit = source quality ≥ threshold).
 
 ---
 
@@ -113,10 +136,11 @@ Near-zero cost points to edge middleware plus signed cookies rather than a hoste
 | PDF extraction                                          | A triaged source (M0) is actually a PDF — write the handler per `02-CONFIG-SCHEMA.md` §7. No longer a stack question (ADR-010).                                                                                                                                                                                                                                                                                                                                                                                                     |
 | Edge relay validation                                   | A source actually returns `BLOCKED` (ADR-006)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Time-series charts                                      | A client asks; the data model already supports it                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| Client-facing alerts                                    | After M4 — an alert carrying a value is a disclosure                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| Access control                                          | Whole-site magic-link auth (ADR-004). Required before charging a client.                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| Client-facing alerts                                    | After auth (ADR-004) — an alert carrying a value is a disclosure                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
 | Git retention policy                                    | ~2,000 commits (Q7)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| robots.txt / ToS enforcement (Q6)                       | Before any client deliverable, deferred to M3/M4 by decision                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Analyst-facing health UX (Q4 SLA/UX half)               | Before first client deliverable, after M4 auth. Rewritten health-modal copy, a tiered outage banner, an operator-written `outage.note` config field. **Re-scoped out of M3c 2026-09-14** — needs an actual analyst audience to design for; the full original spec is preserved in `docs/plans/m3-operability.md`'s M3c section.                                                                                                                                                                                                     |
+| robots.txt / ToS enforcement (Q6)                       | Before any client deliverable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
+| Analyst-facing health UX (Q4 SLA/UX half)               | Before first client deliverable, after auth (ADR-004). Rewritten health-modal copy, a tiered outage banner, an operator-written `outage.note` config field. **Re-scoped out of M3c 2026-09-14** — needs an actual analyst audience to design for; the full original spec is preserved in `docs/plans/m3-operability.md`'s M3c section.                                                                                                                                                                                              |
 | `extractedAt` means "last changed", not "last verified" | If TTL/freshness tuning surfaces confusion. The ADR-011 fingerprint deliberately excludes timestamps, so a no-op re-verification still advances `extractedAt` (`src/ingest/process-extractor.ts`) — but a run that skips the commit entirely never publishes that advance, so a long-unchanged-but-still-passing value's displayed age can lag its true last-checked time. Noticed while investigating the Q4 safety half; not itself a defect, just a naming/documentation gap between Invariant 7's wording and what's published. |
 
 ---
@@ -125,8 +149,12 @@ Near-zero cost points to edge middleware plus signed cookies rather than a hoste
 
 ```
 M0.5 (engine spine) ──────────┐
-                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► first client
+                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► M5 ──► first client (source quality gate)
 Q1 (source triage, M0) ────────┘
+
+Auth (ADR-004, Deferred) ─────► required before charging a client
 ```
 
 **Corrected 2026-09-12** — the original diagram chained `Q1 ──► M0 ──► M1` and read "everything hangs off Q1." That was wrong on the engine's own terms: ADR-001 requires the engine to work without knowledge of any specific client's sources, so an engine that cannot be built until the source list exists would be a defect, not a sequencing fact. M0.5 and M0/Q1 run **concurrently**; M1 is gated on the later of the two finishing. Q1 still gates M0, M1, M2, and the client deliverable — it was never optional, only mis-sequenced against the spine.
+
+**2026-09-14 update:** M4 and M5 gate the first client deliverable (source quality: all four sections have substantive, non-metric sources). Auth (ADR-004) is deferred to Backlog; it is required before charging, not a pipeline prerequisite.

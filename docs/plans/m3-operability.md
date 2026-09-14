@@ -100,7 +100,7 @@ Summary of what ships:
 
 **Delivered** — [PR #20](https://github.com/andymagill/bluecore-watcher/pull/20), ADR-020. See the PR / commit history for the implementation; this section (plus ADR-020 in `00-DECISIONS.md`) is the spec.
 
-**Re-scoped 2026-09-14.** The original design below bundled a real code-level safety gap with an analyst-facing UX pass (copy, an outage banner, a modal rewrite) for an audience — dashboard-visible analysts — that doesn't exist until M4 auth ships, and that contributes nothing to M3's own exit test (an operator taking a selector break from alert to merged fix). The analyst-UX half is moved to `07-ROADMAP.md`'s Deferred table (Q4 SLA/UX half); the original spec for it is preserved verbatim at the bottom of this file under "Deferred: analyst-facing health UX" so a future conversation can pick it up cold. What's left here is the one thing that's a genuine bug regardless of audience:
+**Re-scoped 2026-09-14.** The original design below bundled a real code-level safety gap with an analyst-facing UX pass (copy, an outage banner, a modal rewrite) for an audience — dashboard-visible analysts — that doesn't exist until auth ships, and that contributes nothing to M3's own exit test (an operator taking a selector break from alert to merged fix). The analyst-UX half is moved to `07-ROADMAP.md`'s Deferred table (Q4 SLA/UX half); the original spec for it is preserved verbatim at the bottom of this file under "Deferred: analyst-facing health UX" so a future conversation can pick it up cold. What's left here is the one thing that's a genuine bug regardless of audience:
 
 **The gap.** `computeFreshness` (`src/app/lib/freshness.ts`) only reaches `expired` (value suppressed) via `age > ttlHours × 3`. A `cached` (failing) block is exempted from that check — it renders `failing` (red, "N days ago", value still shown) no matter how long it's been broken, so the ceiling that actually matters for a long-TTL target is `3 × ttlHours` of elapsed _time_, not of _failure_. At `bluecore-form-d`'s `ttlHours: 2160`, that's 270 days before a permanently-broken selector's stale value would even be suppressed — the exact "six-weeks-broken" failure Q4 asked about, just with a bigger number (`eia-ca-industrial-price` at `ttlHours: 1440` is 180 days). Separately, `schedule.staleCeilingHours` and `environment.staleCeilingMultiplier` already validate in the config schema (`src/config/schema.ts:29,44`) but are never published to `TargetFile`, so every target silently uses the 3× default regardless of what's configured — the same class of no-op field ADR-018 closed for `assert`.
 
@@ -137,20 +137,20 @@ Summary of what ships:
 
 ## Out of scope for all of M3
 
-- Q6 (robots.txt/ToS position) — moved to M4.
+- Q6 (robots.txt/ToS position) — moved to Deferred.
 - Auto-assigning the repair agent (needs a user PAT).
 - Claude/Codex via GitHub Agent HQ — not needed; availability depends on Copilot plan tier.
 - Webhook/email alert channels.
-- Client-facing alerts (ADR-009 — blocked on M4 auth).
+- Client-facing alerts (ADR-009 — blocked on auth (ADR-004)).
 - Analyst-facing health UX (Q4 SLA/UX half) — moved out of M3c 2026-09-14, see below and `07-ROADMAP.md` Deferred.
 
 ---
 
 ## Deferred: analyst-facing health UX (Q4 SLA/UX half)
 
-**Moved out of M3c on 2026-09-14** — not dropped, just not part of M3. Pick this up once M4 auth has shipped and there's an actual analyst audience to design copy and disclosure tiers for; see `07-ROADMAP.md`'s Deferred table entry. This is the original M3c design verbatim, preserved so a future conversation can start here cold rather than re-deriving it. It assumes the M3c safety half above (failure-age ceiling, published `staleCeiling*`) is already merged.
+**Moved out of M3c on 2026-09-14** — not dropped, just not part of M3. Pick this up once auth (ADR-004) has shipped and there's an actual analyst audience to design copy and disclosure tiers for; see `07-ROADMAP.md`'s Deferred table entry. This is the original M3c design verbatim, preserved so a future conversation can start here cold rather than re-deriving it. It assumes the M3c safety half above (failure-age ceiling, published `staleCeiling*`) is already merged.
 
-**Prerequisites:** M3c (failing-data safety) merged, so the health-entry shape and the failure-age `expired` path are stable. M4 auth shipped, so there's a real analyst audience. Read `01-DATA-CONTRACT.md` §5 (freshness) and §7 (`health.json`) before starting.
+**Prerequisites:** M3c (failing-data safety) merged, so the health-entry shape and the failure-age `expired` path are stable. Auth (ADR-004) shipped, so there's a real analyst audience. Read `01-DATA-CONTRACT.md` §5 (freshness) and §7 (`health.json`) before starting.
 
 - **Config/contract:** `TargetDef.outage?: { note: string }` (non-empty, ≤280 chars), published as `TargetFile.outage` in `src/ingest/orchestrate.ts`, included in `computeFingerprint` (so editing the note produces a commit). Run `schema:gen`.
 - **`src/app/lib/outage.ts`** (pure, fake-clock testable). `computeOutage(now, healthEntry)` → `none | brief (<3d) | ongoing (3–14d) | prolonged (>14d)`, keyed on `firstSeenAt`, for `status: failed` entries. A `flagged` entry older than 3 days reads "awaiting review since {date}", not as an outage.
