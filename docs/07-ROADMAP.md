@@ -86,10 +86,10 @@ The milestone that decides whether this is maintainable by one person. Delivered
 
 - Alerting live (GitHub Issues, operator-only). ✅ M3a — [PR #16](https://github.com/andymagill/bluecore-watcher/pull/16), ADR-019.
 - Repair tooling: fixture capture, selector diff, LLM-proposed repair PRs (ADR-003). ✅ M3b — [PR #18](https://github.com/andymagill/bluecore-watcher/pull/18).
-- Failing-data safety valve: a long-outage value stops rendering as current past a configurable ceiling, regardless of TTL (Q4 safety half — **re-scoped 2026-09-14**, see below).
+- Failing-data safety valve: a long-outage value stops rendering as current past a configurable ceiling, regardless of TTL (Q4 safety half). ✅ M3c — ADR-020.
 - Maintenance cost measured against the `06-OPS-RUNBOOK.md` §7 estimate.
 
-**Re-scoped 2026-09-14.** M3c originally bundled a code-level safety gap with analyst-facing UX (copy, an outage banner, a modal rewrite) for an audience — analysts with dashboard access — that doesn't exist until M4 auth ships, and that does nothing for M3's own exit test (an operator fixing a selector). Split: the safety gap (a `cached` block can render "3 days ago" in red for up to `3 × ttlHours` — 270 days at `bluecore-form-d`'s TTL — before the `expired` disclosure ever kicks in) stays in M3c, scoped down to just that fix. The analyst-copy half moves to Deferred, below. See `docs/plans/m3-operability.md` M3c for the full writeup and the preserved original spec.
+**Re-scoped 2026-09-14.** M3c originally bundled a code-level safety gap with analyst-facing UX (copy, an outage banner, a modal rewrite) for an audience — analysts with dashboard access — that doesn't exist until M4 auth ships, and that does nothing for M3's own exit test (an operator fixing a selector). Split: the safety gap (a `cached` block can render "3 days ago" in red for up to `3 × ttlHours` — 270 days at `bluecore-form-d`'s TTL — before the `expired` disclosure ever kicks in) stayed in M3c, scoped down to just that fix. The analyst-copy half moved to Deferred, below. See `docs/plans/m3-operability.md` M3c for the full writeup and the preserved original spec.
 
 **Exit:** a selector break goes from alert to merged fix in under 30 minutes.
 

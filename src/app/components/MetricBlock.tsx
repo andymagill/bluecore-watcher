@@ -13,14 +13,16 @@ export function MetricBlock({
   targetId,
   block,
   ttlHours,
+  staleCeilingHours,
   now,
 }: {
   targetId: string;
   block: ScalarBlock;
   ttlHours: number;
+  staleCeilingHours?: number;
   now?: Date;
 }) {
-  const state = useFreshness(block, ttlHours, now);
+  const state = useFreshness(block, ttlHours, staleCeilingHours, now);
 
   if (block.status === "missing" || !block.provenance) {
     return (

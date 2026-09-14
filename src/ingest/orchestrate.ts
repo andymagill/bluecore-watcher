@@ -51,6 +51,7 @@ async function runOneTarget(
   ctx: RunContext,
   previousTargetFile: TargetFile | undefined,
   acknowledgements: AcknowledgementStore,
+  staleCeilingMultiplier: number,
 ): Promise<{ targetFile: TargetFile; healthDrafts: HealthEntryDraft[]; consumedCount: number }> {
   const nowIso = ctx.now().toISOString();
   const previousBlocks = new Map<string, Block>(
@@ -85,7 +86,11 @@ async function runOneTarget(
       const prev = previousBlocks.get(extractor.key);
       blocks.push(
         prev
-          ? { ...prev, status: "cached" }
+          ? // M3c — failingSince carries forward once stamped, and stamps
+            // fresh on first failure (prev.failingSince is null when prev
+            // wasn't already cached). Mirrors process-extractor.ts's
+            // cachedBlock, for the whole-target-failure path.
+            { ...prev, status: "cached", failingSince: prev.failingSince ?? nowIso }
           : ({
               key: extractor.key,
               label: extractor.label,
@@ -98,6 +103,7 @@ async function runOneTarget(
               provenance: null,
               delta: null,
               validation: { passed: false, warnings: [] },
+              failingSince: null,
             } as Block),
       );
       healthDrafts.push({
@@ -157,6 +163,12 @@ async function runOneTarget(
     label: target.label,
     sourceUrl: target.url,
     ttlHours: target.schedule.ttlHours,
+    // M3c — schedule.staleCeilingHours (per-target) overrides the resolved
+    // environment.staleCeilingMultiplier x ttlHours default; either way this
+    // is the number the freshness state machine actually needs, resolved
+    // once here instead of re-derived on every render.
+    staleCeilingHours:
+      target.schedule.staleCeilingHours ?? target.schedule.ttlHours * staleCeilingMultiplier,
     run: {
       runId: ctx.runId,
       startedAt: nowIso,
@@ -193,6 +205,7 @@ export async function runIngestion(opts: RunOptions): Promise<RunResult> {
       ctx,
       previous.targetFiles.get(target.id),
       acknowledgements,
+      opts.config.environment.staleCeilingMultiplier,
     );
     targetFiles.push(targetFile);
     allHealthDrafts.push(...healthDrafts);

@@ -61,7 +61,7 @@ Implements the state machine in `01-DATA-CONTRACT.md` §5. Computed at render fr
 
 `stale` and `flagged` intentionally share a colour, as do `expired` and `fresh` (differing only in opacity) — the label text distinguishes them, which is what "never encoded by colour alone" (§7) actually requires. See `ADR-016` for the token set (`00-DECISIONS.md`).
 
-`expired` is the important one. Past the stale ceiling the UI stops presenting the value as current and presents it as a historical observation with a date. An analyst should not be able to misread a six-week-old number as today's, and the interface — not a footnote — is what enforces that.
+`expired` is the important one. Past the stale ceiling the UI stops presenting the value as current and presents it as a historical observation with a date. An analyst should not be able to misread a six-week-old number as today's, and the interface — not a footnote — is what enforces that. **M3c** added a second path into `expired`: a `failing` block that's been broken longer than the failure-age ceiling (default 14 days), independent of `ttlHours` — see `01-DATA-CONTRACT.md` §5 for why the ttl-based ceiling alone isn't enough for a long-TTL target.
 
 Recompute on an interval (60s) and on tab focus, so a dashboard left open overnight ages correctly rather than freezing at its load-time state.
 
