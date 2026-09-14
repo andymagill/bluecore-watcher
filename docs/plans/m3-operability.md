@@ -20,7 +20,7 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 | ------------------------------------------ | ----------- | ------------------------------------------------------------- |
 | M3a — Alerting                             | Delivered   | [#16](https://github.com/andymagill/bluecore-watcher/pull/16) |
 | M3b — Repair tooling                       | Delivered   | [#18](https://github.com/andymagill/bluecore-watcher/pull/18) |
-| M3c — Failing-data safety (Q4 safety half) | Delivered   | PR_LINK_PLACEHOLDER                                           |
+| M3c — Failing-data safety (Q4 safety half) | Delivered   | [#20](https://github.com/andymagill/bluecore-watcher/pull/20) |
 | M3d — Drill, ops report, close-out         | Not started | —                                                             |
 
 ## Context / findings (all of M3)
@@ -98,7 +98,7 @@ Summary of what ships:
 
 ## M3c — Failing-data safety (Q4 safety half)
 
-**Delivered** — PR_LINK_PLACEHOLDER, ADR-020. See the PR / commit history for the implementation; this section (plus ADR-020 in `00-DECISIONS.md`) is the spec.
+**Delivered** — [PR #20](https://github.com/andymagill/bluecore-watcher/pull/20), ADR-020. See the PR / commit history for the implementation; this section (plus ADR-020 in `00-DECISIONS.md`) is the spec.
 
 **Re-scoped 2026-09-14.** The original design below bundled a real code-level safety gap with an analyst-facing UX pass (copy, an outage banner, a modal rewrite) for an audience — dashboard-visible analysts — that doesn't exist until M4 auth ships, and that contributes nothing to M3's own exit test (an operator taking a selector break from alert to merged fix). The analyst-UX half is moved to `07-ROADMAP.md`'s Deferred table (Q4 SLA/UX half); the original spec for it is preserved verbatim at the bottom of this file under "Deferred: analyst-facing health UX" so a future conversation can pick it up cold. What's left here is the one thing that's a genuine bug regardless of audience:
 
