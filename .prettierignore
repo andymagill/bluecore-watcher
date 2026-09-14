@@ -8,10 +8,10 @@ schemas/
 # fights the semantic-change detection and creates ingest-diff noise.
 public/data/
 
-# Captured HTML/JSON responses used as golden fixtures (tests/*.test.ts).
-# Extraction tests assert exact selector/whitespace behavior against the
-# real captured bytes -- reformatting silently breaks those assertions
-# without touching any test file (see bluecore-newsroom.integration.test.ts).
+# Captured HTML/JSON responses used as golden fixtures (npm run
+# fixture:verify, scripts/fixture-verify.ts). Extraction asserts exact
+# selector/whitespace behavior against the real captured bytes --
+# reformatting silently breaks that without touching the script itself.
 fixtures/
 
 dist/

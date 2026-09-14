@@ -1,40 +1,50 @@
 // docs/plans/m3-operability.md M3b. Exercises src/repair/relocate.ts and
-// src/repair/score.ts against the REAL config/bluecore.config.ts and its
-// real fixtures, mutated in memory to simulate a redesign -- the same
-// pattern tests/drift.test.ts uses for checkTargetDrift, so a finding here
-// means the real repair tooling would see the same thing.
+// src/repair/score.ts against synthetic targets and fixtures, mutated in
+// memory to simulate a redesign (ADR-021 — tests stay entity-agnostic; the
+// same pattern tests/drift.test.ts uses for checkTargetDrift). A finding
+// here means the real repair tooling, run through scripts/repair-diff.ts
+// against whatever config an operator points it at, would see the same
+// thing — relocateHtml/relocateApi/scoreCandidates take no config-specific
+// input beyond a TargetDef/ExtractorDef.
 import { describe, expect, it } from "vitest";
-import { readFile } from "node:fs/promises";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
 import * as cheerio from "cheerio";
 import { CmieConfig, type TargetDef, type ExtractorDef } from "../src/config/schema.js";
-import { config as bluecoreConfig } from "../config/bluecore.config.js";
 import { getHandler } from "../src/ingest/extract/registry.js";
 import { extractOne, type ScalarCandidate } from "../src/ingest/extract/pipeline.js";
 import type { Block, ScalarBlock } from "../src/contract/block.js";
 import { locatorOf, relocateApi, relocateHtml } from "../src/repair/relocate.js";
 import { scoreCandidates } from "../src/repair/score.js";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const config = CmieConfig.parse(bluecoreConfig);
 const NOW = new Date("2026-09-14T00:00:00.000Z");
 
-function realTarget(id: string): TargetDef {
-  const target = config.targets.find((t) => t.id === id);
-  if (!target) throw new Error(`no such target in config/bluecore.config.ts: ${id}`);
-  return target;
+function targetWith(kind: "html" | "api", extractors: unknown[]): TargetDef {
+  return CmieConfig.parse({
+    schemaVersion: 1,
+    environment: {
+      id: "t",
+      displayName: "T",
+      entities: [{ id: "p", name: "P", role: "primary" }],
+    },
+    sections: [{ id: "s", label: "S", order: 1 }],
+    targets: [
+      {
+        id: "target-1",
+        label: "Target 1",
+        entityId: "p",
+        sectionId: "s",
+        kind,
+        url: "https://example.test/page",
+        schedule: { cron: "0 6 * * *", ttlHours: 48 },
+        extractors,
+      },
+    ],
+  }).targets[0]!;
 }
 
-function realExtractor(target: TargetDef, key: string): ExtractorDef {
+function extractorOf(target: TargetDef, key: string): ExtractorDef {
   const extractor = target.extractors.find((e) => e.key === key);
   if (!extractor) throw new Error(`no such extractor "${key}" on target "${target.id}"`);
   return extractor;
-}
-
-async function fixtureBody(targetId: string, ext: "html" | "json"): Promise<string> {
-  return readFile(join(root, "fixtures", targetId, `response.${ext}`), "utf-8");
 }
 
 // A previous block built from a real (unmutated) candidate -- exactly what
@@ -61,13 +71,51 @@ function blockFromScalarCandidate(candidate: ScalarCandidate, extractor: Extract
   return block;
 }
 
-describe("src/repair — newsroom (html, class rename)", () => {
-  const target = realTarget("bluecore-newsroom");
-  const extractor = realExtractor(target, "latest_headline");
+describe("src/repair — html (card list, class rename)", () => {
+  const target = targetWith("html", [
+    {
+      key: "latest_headline",
+      label: "Latest Headline",
+      presenter: "markdown",
+      kind: "html",
+      selector: ".card:first .ctitle",
+      type: "string",
+      required: true,
+    },
+    {
+      key: "latest_category",
+      label: "Latest Category",
+      presenter: "status",
+      kind: "html",
+      selector: ".card:first .cat-key",
+      type: "enum",
+      enumValues: ["Press Release", "Insights"],
+      required: false,
+    },
+  ]);
+  const extractor = extractorOf(target, "latest_headline");
   const handler = getHandler("html");
 
+  function cardListDoc(cards: string[]): string {
+    return `<html><body><div class="list-grid">${cards.join("")}</div></body></html>`;
+  }
+  function card(headline: string, category: string): string {
+    return (
+      `<a class="card"><div class="cat-key">${category}</div>` +
+      `<div class="ctitle">${headline}</div></a>`
+    );
+  }
+
   it("relocates by the old rawText and ranks the class-based candidate above the positional one", async () => {
-    const originalHtml = await fixtureBody("bluecore-newsroom", "html");
+    // Both cards share the same category text so the preceding-sibling-text
+    // relocation candidate (`*:contains("Press Release") + .ctitle-v2`)
+    // resolves to matchCount 2, not 1 -- it's a real candidate the scorer
+    // considers, it just shouldn't beat the ancestor-scoped one on a page
+    // where the label text isn't unique to one card.
+    const originalHtml = cardListDoc([
+      card("First post", "Press Release"),
+      card("Second post", "Press Release"),
+    ]);
     const originalDoc = handler.parse({
       body: originalHtml,
       httpStatus: 200,
@@ -82,9 +130,9 @@ describe("src/repair — newsroom (html, class rename)", () => {
     const previousBlock = blockFromScalarCandidate(originalCandidate, extractor);
 
     // Simulate a redesign: the field's class is renamed everywhere, exactly
-    // like a real Webflow republish would (06-OPS-RUNBOOK.md §3's routine
+    // like a real CMS republish would (06-OPS-RUNBOOK.md §3's routine
     // failure).
-    const mutatedHtml = originalHtml.replace(/\bbc-n-ctitle\b/g, "bc-n-ctitle-v2");
+    const mutatedHtml = originalHtml.replace(/\bctitle\b/g, "ctitle-v2");
     const mutatedDoc = handler.parse({
       body: mutatedHtml,
       httpStatus: 200,
@@ -113,7 +161,7 @@ describe("src/repair — newsroom (html, class rename)", () => {
     });
 
     expect(scored[0]?.status).toBe("pass");
-    expect(scored[0]?.patch).toEqual({ selector: ".bc-n-card:first .bc-n-ctitle-v2" });
+    expect(scored[0]?.patch).toEqual({ selector: ".card:first .ctitle-v2" });
     expect(scored[0]?.value).toBe(originalCandidate.value);
 
     const positionalIndex = scored.findIndex((s) => /nth-of-type/.test(locatorOf(s.patch)));
@@ -121,9 +169,12 @@ describe("src/repair — newsroom (html, class rename)", () => {
   });
 
   it("rejects a candidate that fails its shape assertions, ranking it below a passing one", async () => {
-    const categoryExtractor = realExtractor(target, "latest_post_category");
+    const categoryExtractor = extractorOf(target, "latest_category");
     if (categoryExtractor.kind !== "html") throw new Error("expected an html extractor");
-    const originalHtml = await fixtureBody("bluecore-newsroom", "html");
+    const originalHtml = cardListDoc([
+      card("First post", "Press Release"),
+      card("Second post", "Insights"),
+    ]);
     const doc = handler.parse({
       body: originalHtml,
       httpStatus: 200,
@@ -132,7 +183,7 @@ describe("src/repair — newsroom (html, class rename)", () => {
 
     const candidates = [
       // The headline text isn't one of the category's enumValues.
-      { patch: { selector: ".bc-n-card:first .bc-n-ctitle" }, basis: "wrong node (title text)" },
+      { patch: { selector: ".card:first .ctitle" }, basis: "wrong node (title text)" },
       { patch: { selector: categoryExtractor.selector }, basis: "original (still works)" },
     ];
 
@@ -148,14 +199,17 @@ describe("src/repair — newsroom (html, class rename)", () => {
 
     expect(scored[0]?.status).toBe("pass");
     expect(scored[0]?.patch).toEqual({ selector: categoryExtractor.selector });
-    const failing = scored.find((s) => locatorOf(s.patch) === ".bc-n-card:first .bc-n-ctitle");
+    const failing = scored.find((s) => locatorOf(s.patch) === ".card:first .ctitle");
     expect(failing?.status).toBe("assertion-failed");
     expect(failing?.detail).toContain("enumValues");
     expect(scored.indexOf(failing!)).toBeGreaterThan(0);
   });
 
   it("returns no candidates and nothing passes when the old value is gone entirely", async () => {
-    const originalHtml = await fixtureBody("bluecore-newsroom", "html");
+    const originalHtml = cardListDoc([
+      card("First post", "Press Release"),
+      card("Second post", "Insights"),
+    ]);
     const doc = handler.parse({
       body: originalHtml,
       httpStatus: 200,
@@ -178,13 +232,23 @@ describe("src/repair — newsroom (html, class rename)", () => {
   });
 });
 
-describe("src/repair — eia (api, moved key)", () => {
-  const target = realTarget("eia-ca-industrial-price");
-  const extractor = realExtractor(target, "retail_price_industrial");
+describe("src/repair — api (moved key)", () => {
+  const target = targetWith("api", [
+    {
+      key: "retail_price",
+      label: "Retail Price",
+      presenter: "metric",
+      kind: "api",
+      jsonPath: "$.response.data[0].price",
+      type: "number",
+      required: true,
+    },
+  ]);
+  const extractor = extractorOf(target, "retail_price");
   const handler = getHandler("api");
 
   it("relocates a moved jsonPath key by its value and scores it as a pass", async () => {
-    const originalJson = JSON.parse(await fixtureBody("eia-ca-industrial-price", "json"));
+    const originalJson = { response: { data: [{ price: 42.5, period: "2026-08" }] } };
     const originalCandidate = (await extractOne(
       handler,
       originalJson,
@@ -192,11 +256,13 @@ describe("src/repair — eia (api, moved key)", () => {
       target,
     )) as ScalarCandidate;
 
-    // Simulate a redesign: the API nests price/period under a new "values"
+    // Simulate a redesign: the API nests price under a new "values"
     // envelope instead of directly on the data-row object.
-    const mutated = structuredClone(originalJson);
-    const row = mutated.response.data[0];
-    row.values = { price: row.price };
+    const mutated = structuredClone(originalJson) as {
+      response: { data: { price?: number; values?: { price: number } }[] };
+    };
+    const row = mutated.response.data[0]!;
+    row.values = { price: row.price! };
     delete row.price;
 
     const candidates = relocateApi(mutated, extractor, originalCandidate.rawText);

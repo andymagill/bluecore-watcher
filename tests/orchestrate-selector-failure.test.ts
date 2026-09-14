@@ -1,34 +1,71 @@
-// End-to-end against the REAL bluecore.config.ts's bluecore-newsroom target
-// and its real captured fixture -- not the synthetic example config
-// M0.5's orchestrate.integration.test.ts uses. Proves two of M1's exit
-// criteria (docs/07-ROADMAP.md M1) against real config/data, at the level
-// this can be tested without a live deployed pipeline (that proof is
-// Phase 6's post-merge live verification):
+// Proves two of M1's exit criteria (docs/07-ROADMAP.md M1) through the real
+// runAndPersist pipeline, with a synthetic single-target config (ADR-021 —
+// tests stay entity-agnostic; the same style as
+// tests/orchestrate-fetch-failure.test.ts's whole-target fetch-failure
+// proof, but for a *required-extractor selector* failure, a different code
+// path per that file's own comment):
 //
-//   - "A deliberately broken selector produces a health entry, retains
-//     the cached value, and does not reach production."
+//   - "A deliberately broken selector produces a health entry, retains the
+//     cached value, and does not reach production."
 //   - "A value change produces a correct delta chip, including the
 //     unchanged case" -- exercised at the diff/persist level here; the
-//     DeltaChip *rendering* of these exact shapes is covered separately
-//     by tests/app/delta.test.ts.
+//     DeltaChip *rendering* of these exact shapes is covered separately by
+//     tests/app/delta.test.ts (display layer only, no persist path).
 import { describe, expect, it } from "vitest";
-import { readFile, mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, rm, readFile } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 import { CmieConfig, type TargetDef } from "../src/config/schema.js";
-import { config as bluecoreConfig } from "../config/bluecore.config.js";
 import { runAndPersist } from "../src/ingest/orchestrate.js";
 import type { Fetcher, FetchResult, RunContext } from "../src/ingest/fetch/types.js";
 import type { TargetFile } from "../src/contract/target-file.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, "..");
-const schemasDir = join(root, "schemas");
+const schemasDir = join(__dirname, "..", "schemas");
 
-const REAL_HEADLINE =
-  "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach";
-const NEW_HEADLINE = "BlueCore Energy Announces Expanded Port of Long Beach Berth Allocation";
+const ORIGINAL_HEADLINE = "Original headline";
+const NEW_HEADLINE = "Updated headline";
+
+function singleTargetConfig(mutate?: (target: TargetDef) => TargetDef) {
+  const parsed = CmieConfig.parse({
+    schemaVersion: 1,
+    environment: {
+      id: "t",
+      displayName: "T",
+      entities: [{ id: "p", name: "P", role: "primary" }],
+    },
+    sections: [{ id: "s", label: "S", order: 1 }],
+    targets: [
+      {
+        id: "target-1",
+        label: "Target 1",
+        entityId: "p",
+        sectionId: "s",
+        kind: "html",
+        url: "https://example.test/page",
+        schedule: { cron: "0 6 * * *", ttlHours: 48 },
+        extractors: [
+          {
+            key: "latest_headline",
+            label: "Latest Headline",
+            presenter: "markdown",
+            kind: "html",
+            selector: ".card:first .ctitle",
+            type: "string",
+            required: true,
+          },
+        ],
+      },
+    ],
+  });
+  if (!mutate) return parsed;
+  return { ...parsed, targets: [mutate(parsed.targets[0]!)] };
+}
+
+function doc(headline: string): string {
+  return `<html><body><div class="card"><div class="ctitle">${headline}</div></div></body></html>`;
+}
 
 class BodyFetcher implements Fetcher {
   constructor(private readonly getBody: () => string) {}
@@ -37,52 +74,46 @@ class BodyFetcher implements Fetcher {
   }
 }
 
-function newsroomOnlyConfig(mutate?: (target: TargetDef) => TargetDef) {
-  const full = CmieConfig.parse(bluecoreConfig);
-  const target = full.targets.find((t) => t.id === "bluecore-newsroom");
-  if (!target) throw new Error("bluecore-newsroom missing from config/bluecore.config.ts");
-  return { ...full, targets: [mutate ? mutate(target) : target] };
-}
-
 function getBlock(tf: TargetFile, key: string) {
   const block = tf.blocks.find((b) => b.key === key);
   if (!block) throw new Error(`block "${key}" not found`);
   return block;
 }
 
-describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
-  it("a genuinely broken required selector retains the entire prior file, with a health entry, per Invariant 1", async () => {
-    const realHtml = await readFile(
-      join(root, "fixtures", "bluecore-newsroom", "response.html"),
-      "utf-8",
-    );
-    const dataDir = await mkdtemp(join(tmpdir(), "cmie-newsroom-"));
+describe("a required extractor's selector breaking -- synthetic single target, real pipeline", () => {
+  it("retains the entire prior file, with a health entry, per Invariant 1", async () => {
+    const dataDir = await mkdtemp(join(tmpdir(), "cmie-selector-fail-"));
     try {
-      const ctx = { runId: "run-1", now: () => new Date("2026-09-08T13:00:00Z") };
       const opts = {
-        config: newsroomOnlyConfig(),
         dataDir,
-        fixturesDir: join(root, "fixtures"),
+        fixturesDir: join(dataDir, "unused-fixtures"),
         acknowledgementsPath: join(dataDir, "acknowledgements.json"),
-        runId: ctx.runId,
-        now: ctx.now,
-        fetcher: new BodyFetcher(() => realHtml),
       };
 
-      // Run 1: the real page, the real config -- establishes a known-good state.
-      const first = await runAndPersist(opts, false, schemasDir);
+      // Run 1: the selector matches -- establishes a known-good state.
+      const first = await runAndPersist(
+        {
+          ...opts,
+          config: singleTargetConfig(),
+          runId: "run-1",
+          now: () => new Date("2026-09-08T13:00:00Z"),
+          fetcher: new BodyFetcher(() => doc(ORIGINAL_HEADLINE)),
+        },
+        false,
+        schemasDir,
+      );
       expect(first.gate?.passed).toBe(true);
       const goodTargetFile = first.targetFiles[0]!;
-      expect(getBlock(goodTargetFile, "latest_headline").value).toBe(REAL_HEADLINE);
+      expect(getBlock(goodTargetFile, "latest_headline").value).toBe(ORIGINAL_HEADLINE);
       expect(goodTargetFile.run.status).toBe("ok");
 
       // Run 2: latest_headline's selector (required: true) stops matching --
-      // e.g. a page redesign. Everything else about the page is unchanged.
-      const brokenConfig = newsroomOnlyConfig((target) => ({
+      // e.g. a page redesign. The page itself is unchanged otherwise.
+      const brokenConfig = singleTargetConfig((target) => ({
         ...target,
         extractors: target.extractors.map((ex) =>
           ex.key === "latest_headline" && ex.kind === "html"
-            ? { ...ex, selector: ".bc-n-ctitle-DOES-NOT-EXIST:first" }
+            ? { ...ex, selector: ".ctitle-DOES-NOT-EXIST" }
             : ex,
         ),
       }));
@@ -92,6 +123,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
           config: brokenConfig,
           runId: "run-2",
           now: () => new Date("2026-09-09T13:00:00Z"),
+          fetcher: new BodyFetcher(() => doc(ORIGINAL_HEADLINE)),
         },
         false,
         schemasDir,
@@ -109,7 +141,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // different partial-run case (some non-required extractor fails while
       // others in the *same* run still get fresh values).
       expect(brokenTargetFile.run.status).toBe("failed_cached");
-      expect(getBlock(brokenTargetFile, "latest_headline").value).toBe(REAL_HEADLINE);
+      expect(getBlock(brokenTargetFile, "latest_headline").value).toBe(ORIGINAL_HEADLINE);
       expect(getBlock(brokenTargetFile, "latest_headline").status).toBe("ok");
 
       const healthEntry = second.health.entries.find((e) => e.extractorKey === "latest_headline");
@@ -120,10 +152,10 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // production" is about the *broken* value, not about withholding the
       // failure record itself (which is exactly what the health entry is for).
       const onDisk = JSON.parse(
-        await readFile(join(dataDir, "sections", "company", "bluecore-newsroom.json"), "utf-8"),
+        await readFile(join(dataDir, "sections", "s", "target-1.json"), "utf-8"),
       );
       expect(onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline").value).toBe(
-        REAL_HEADLINE,
+        ORIGINAL_HEADLINE,
       );
     } finally {
       await rm(dataDir, { recursive: true, force: true });
@@ -131,20 +163,13 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
   });
 
   it("a value change produces delta.changedAt at the moment it changed, then carries it forward untouched while unchanged", async () => {
-    const realHtml = await readFile(
-      join(root, "fixtures", "bluecore-newsroom", "response.html"),
-      "utf-8",
-    );
-    const updatedHtml = realHtml.replace(REAL_HEADLINE, NEW_HEADLINE);
-    expect(updatedHtml).not.toBe(realHtml); // sanity: the replace actually matched
-
-    const dataDir = await mkdtemp(join(tmpdir(), "cmie-newsroom-delta-"));
+    const dataDir = await mkdtemp(join(tmpdir(), "cmie-selector-delta-"));
     try {
-      const config = newsroomOnlyConfig();
+      const config = singleTargetConfig();
       const baseOpts = {
         config,
         dataDir,
-        fixturesDir: join(root, "fixtures"),
+        fixturesDir: join(dataDir, "unused-fixtures"),
         acknowledgementsPath: join(dataDir, "acknowledgements.json"),
       };
 
@@ -154,7 +179,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
           ...baseOpts,
           runId: "r1",
           now: () => new Date("2026-09-08T13:00:00Z"),
-          fetcher: new BodyFetcher(() => realHtml),
+          fetcher: new BodyFetcher(() => doc(ORIGINAL_HEADLINE)),
         },
         false,
         schemasDir,
@@ -167,7 +192,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
           ...baseOpts,
           runId: "r2",
           now: () => new Date("2026-09-11T13:00:00Z"),
-          fetcher: new BodyFetcher(() => updatedHtml),
+          fetcher: new BodyFetcher(() => doc(NEW_HEADLINE)),
         },
         false,
         schemasDir,
@@ -184,7 +209,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
           ...baseOpts,
           runId: "r3",
           now: () => new Date("2026-09-15T13:00:00Z"),
-          fetcher: new BodyFetcher(() => updatedHtml),
+          fetcher: new BodyFetcher(() => doc(NEW_HEADLINE)),
         },
         false,
         schemasDir,
@@ -194,7 +219,7 @@ describe("bluecore-newsroom -- real config, real fixture, end to end", () => {
       // Confirm what's actually committed on disk still reflects run 2's
       // changedAt -- this is exactly what powers "unchanged for N days".
       const onDisk = JSON.parse(
-        await readFile(join(dataDir, "sections", "company", "bluecore-newsroom.json"), "utf-8"),
+        await readFile(join(dataDir, "sections", "s", "target-1.json"), "utf-8"),
       );
       const onDiskBlock = onDisk.blocks.find((b: { key: string }) => b.key === "latest_headline");
       expect(onDiskBlock.delta.changedAt).toBe("2026-09-11T13:00:00.000Z");

@@ -54,5 +54,8 @@ jobs:
           npm run validate:config -- --env bluecore
           npm run validate:config -- --env example
 
+      - name: Verify fixtures against golden files (ADR-021 — real-config regression check, not a vitest test)
+        run: npm run fixture:verify -- --env bluecore
+
       - name: Test
         run: npm run test

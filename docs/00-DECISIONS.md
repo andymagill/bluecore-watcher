@@ -271,6 +271,23 @@ Because `checkShapeAssertions` needed a clock for `maxFutureDays`, it now takes 
 
 ---
 
+### ADR-021 — ADR-001 purity extends to `tests/`, not just `src/`
+
+**Decision.** `tests/adr001-no-bluecore.test.ts` mechanically enforces ADR-001 for `src/` — no engine file may mention "bluecore" (case-insensitive). That guard now also scans `tests/`. No test file may import `config/bluecore.config.ts`, a real target's fixture, or otherwise reference "bluecore" in code, strings, or comments. Real-config/real-fixture validation moves entirely to the ops layer — scripts that already run in CI outside `vitest run` (`npm run validate:config`, `npm run drift`, `npm run ingest -- --dry`, and a new `npm run fixture:verify`) — rather than living in the unit test suite.
+
+**Rationale.** As the project moved from M0.5 (engine spine, proven against a synthetic `config/example.config.ts`) into M1–M3, five test files started importing the real `config/bluecore.config.ts` directly — `targets.baseline.test.ts`, `bluecore-newsroom.integration.test.ts`, `drift.test.ts`, `repair.test.ts`, `config-coverage.test.ts` — and two more leaked "bluecore" into mock data or comments as flavor text. None of the underlying concerns are source-specific: selector-failure handling, drift-shape detection, repair scoring, and config-completeness rules are all generic engine behavior that happened to get coupled to the real config for expedience. That coupling is exactly what ADR-001 already forbids in `src/`; this closes the same gap in `tests/`.
+
+**Consequences.**
+
+- `config-coverage.test.ts` is deleted — its entity-resolution check duplicated `config-schema.test.ts`'s generic Rule 2 coverage; its fixture-existence check is absorbed by the new `fixture:verify` script below (a missing golden file is still a hard failure, just reported there instead); its section-completeness check ("every section has ≥1 target") was a one-time-per-deployment fact, not a general invariant (zero-state sections are explicitly supported — `SPEC.md` Part 4 §1), and moves to a manual onboarding step in `06-OPS-RUNBOOK.md` §10.
+- `targets.baseline.test.ts` is deleted from `vitest`; both of its checks (a golden file exists and its extraction matches) become `scripts/fixture-verify.ts` / `npm run fixture:verify`, parameterized by `--env` like every other ops script, run as its own CI step.
+- `drift.test.ts` and `repair.test.ts` are rewritten to use synthetic fixtures shaped like the real edge cases (a key removed, a type changed, a class renamed) instead of the real config/fixtures — the same treatment `orchestrate-fetch-failure.test.ts` and `alerts.test.ts` already give comparable engine logic.
+- `bluecore-newsroom.integration.test.ts` is deleted; the two invariants it proved that existed nowhere else (required-selector-failure retention per Invariant 1, and `delta.changedAt` persist-layer lifecycle) move to a new synthetic-config test, `orchestrate-selector-failure.test.ts`.
+- **Exception:** `resolve-preview-url.test.ts` stays excluded from the guard. It asserts against the real, committed `wrangler.jsonc` and hardcodes the literal Worker/repo name `bluecore-watcher` — that's this repo's own deployment identity (one Worker per repo, like `package.json`'s `name` field), not multi-tenant source/client configuration, and a different axis from what ADR-001 governs.
+- Onboarding a second environment (`06-OPS-RUNBOOK.md` §10, the real ADR-001 test) now needs zero new or modified test files — every test in `tests/` already runs against whatever config an implementer points the ops scripts at.
+
+---
+
 ## Open
 
 | #   | Question                                                                                                                                                                                                                                                                                                                                                                                                                                          | Blocks                                                                                                            | Owner              |

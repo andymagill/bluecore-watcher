@@ -50,7 +50,7 @@ The routine failure. Expect these weekly.
 3. **Get a fresh document.** The alert itself is a plain notification — repair is always a decision you make, not something it triggers. Either assign the issue to Copilot (its `copilot-setup-steps.yml` job captures a live snapshot of every target into `.runs/live/<targetId>/` before the agent starts, so it never fetches the page itself), or capture locally: `npm run fixture:capture -- --env <envId> <targetId>` overwrites `fixtures/<targetId>/response.<ext>` in place — do not fix a selector against the live page by hand.
 4. **Diff old against new.** `npm run repair:diff -- --env <envId> <targetId>` diffs the _git-historical_ fixture (read with `git show` — no second copy is kept on disk; git history is the old/new pair) against the fresh one, per extractor, and writes `.runs/repair/<targetId>/context.md` with a ranked table of candidate replacement selectors/jsonPaths (`src/repair/relocate.ts` + `src/repair/score.ts`, docs/plans/m3-operability.md M3b).
 5. **Repair.** Either the `repair-selector` skill (`.claude/skills/repair-selector/SKILL.md`) does this end to end — via the Copilot cloud agent or locally in Claude Code — or hand-pick a selector from `context.md`'s table and confirm it with `npm run repair:verify -- --env <envId> <targetId> --extractor <key> --selector <v>` (nonzero exit means it doesn't pass). Either way it arrives as a PR, never a direct commit.
-6. **Test.** Copy the live capture over the committed fixture, then re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `tests/targets.baseline.test.ts` (M2a) then enforces it stays that way.
+6. **Test.** Copy the live capture over the committed fixture, then re-bless the golden file (`npm run fixture:bless -- --env <envId> <targetId>`) and review the diff before committing — `npm run fixture:verify -- --env <envId>` (ADR-021, run in CI) then enforces it stays that way.
 7. **Merge.** `ingest.yml`'s `config/**` push trigger (ADR-019) re-ingests immediately; the alert issue auto-closes on the next successful run rather than waiting for the next scheduled cron.
 
 **Prefer resilient selectors.** Match on a label cell, a `data-` attribute, or text content rather than `nth-child`. Positional selectors are the ones that break.
@@ -159,16 +159,17 @@ The drift check (`03-INGESTION.md` §5) is what keeps this number from growing: 
 The ADR-001 test. Target: one afternoon (open question Q8).
 
 1. `config/<envId>.config.ts` — entities, sections, targets, extractors.
-2. Capture a fixture per target (`npm run fixture:capture -- --env <envId> <targetId>`), then bless its golden file (`npm run fixture:bless -- --env <envId> <targetId>`). `tests/targets.baseline.test.ts` is currently hardcoded to `config/bluecore.config.ts` (M2a scope — one environment), so it picks up every _new target added to that file_ automatically with no per-target test needed; a genuinely new environment (a second client, the real ADR-001 test per `07-ROADMAP.md`'s Deferred table) needs its own equivalent baseline test importing its own config.
-3. Set secrets for authenticated sources — **both** stores, one command each, so a future repair of this source works through the Copilot cloud agent too (§2, §3):
+2. Capture a fixture per target (`npm run fixture:capture -- --env <envId> <targetId>`), then bless its golden file (`npm run fixture:bless -- --env <envId> <targetId>`). `npm run fixture:verify -- --env <envId>` (ADR-021) then enforces every target keeps a golden file and keeps matching it — parameterized by `--env`, so a genuinely new environment gets this check for free with no new test file to write.
+3. Confirm every declared section has at least one target — `npm run validate:config` doesn't check this (an empty section is a legitimate zero-state, not an error — SPEC.md Part 4 §1), so it's a manual read of the config against `environment`/`sections` before calling an environment "done" (ADR-021; this used to be an automated `tests/config-coverage.test.ts` check, retired because it was a one-time-per-deployment fact, not a general invariant).
+4. Set secrets for authenticated sources — **both** stores, one command each, so a future repair of this source works through the Copilot cloud agent too (§2, §3):
    ```
    gh secret set <SOURCE>_API_KEY --body "$VALUE"              # Actions: ingest.yml, drift.yml, CI
    gh secret set <SOURCE>_API_KEY --app agents --body "$VALUE" # Agents: copilot-setup-steps.yml
    ```
-4. `npm run validate:config`.
-5. Dry run: `npm run ingest -- --env <envId> --dry` — writes nothing, prints what it would extract.
-6. Tune assertions from the dry run's real values rather than guesses.
-7. Enable the cron; watch the first three runs.
+5. `npm run validate:config`.
+6. Dry run: `npm run ingest -- --env <envId> --dry` — writes nothing, prints what it would extract.
+7. Tune assertions from the dry run's real values rather than guesses.
+8. Enable the cron; watch the first three runs.
 
 If any step requires touching application code, ADR-001 is violated and the schema needs to absorb the difference.
 
