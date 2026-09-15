@@ -387,4 +387,149 @@ describe("CmieConfig validation rules", () => {
       expect(CmieConfig.safeParse(cfg).success).toBe(true);
     });
   });
+
+  // ADR-022 — a composite api location (fields + template, optionally
+  // index) is a second shape for "kind: api" alongside the original
+  // jsonPath. All of these replace the base html extractor with an api
+  // target/extractor so `apiConfig()` composes cleanly with each override.
+  describe("rule 13 (ADR-022): composite/indexed api locations", () => {
+    function apiConfig(extractorOverrides: Record<string, unknown>): CmieConfigInput {
+      const cfg = baseConfig();
+      cfg.targets[0]!.kind = "api";
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "markdown",
+        kind: "api",
+        type: "markdown",
+        ...extractorOverrides,
+      } as CmieConfigInput["targets"][number]["extractors"][number];
+      return cfg;
+    }
+
+    it("accepts a valid composite location", () => {
+      const cfg = apiConfig({
+        index: { jsonPath: '$.rows.form[?(@ === "B")]~', pick: "first" },
+        fields: { a: { jsonPath: "$.rows.a[{index}]" } },
+        template: "{a}",
+      });
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects a location with both jsonPath and fields+template", () => {
+      const cfg = apiConfig({
+        jsonPath: "$.x",
+        fields: { a: { jsonPath: "$.rows.a[0]" } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a location with neither jsonPath nor fields+template", () => {
+      const cfg = apiConfig({});
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects fields without template", () => {
+      const cfg = apiConfig({ fields: { a: { jsonPath: "$.rows.a[0]" } } });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects template without fields", () => {
+      const cfg = apiConfig({ template: "{a}" });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it('rejects a field named "index"', () => {
+      const cfg = apiConfig({
+        fields: { index: { jsonPath: "$.rows.a[0]" } },
+        template: "{index}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a template referencing an unknown field", () => {
+      const cfg = apiConfig({
+        fields: { a: { jsonPath: "$.rows.a[0]" } },
+        template: "{a} {b}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a field that's never used in the template", () => {
+      const cfg = apiConfig({
+        fields: { a: { jsonPath: "$.rows.a[0]" }, b: { jsonPath: "$.rows.b[0]" } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects index set when no field jsonPath contains {index}", () => {
+      const cfg = apiConfig({
+        index: { jsonPath: '$.rows.form[?(@ === "B")]~', pick: "first" },
+        fields: { a: { jsonPath: "$.rows.a[0]" } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a field using {index} when no index is configured", () => {
+      const cfg = apiConfig({
+        fields: { a: { jsonPath: "$.rows.a[{index}]" } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects join without split", () => {
+      const cfg = apiConfig({
+        fields: { a: { jsonPath: "$.rows.a[0]", join: "; " } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it('rejects a composite location without presenter "markdown"', () => {
+      const cfg = apiConfig({
+        presenter: "metric",
+        type: "number",
+        fields: { a: { jsonPath: "$.rows.a[0]" } },
+        template: "{a}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+  });
 });

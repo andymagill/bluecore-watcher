@@ -284,3 +284,46 @@ describe("src/repair — api (moved key)", () => {
     expect(best?.value).toBe(originalCandidate.value);
   });
 });
+
+// ADR-022 — a composite/indexed api location has no single locator to
+// relocate by value match or patch onto; both relocate.ts and score.ts
+// decline rather than silently producing an invalid, mutually-exclusive
+// extractor shape (a jsonPath patched onto an extractor that still carries
+// fields/template/index).
+describe("src/repair — composite/indexed api locations are unsupported (ADR-022)", () => {
+  const target = targetWith("api", [
+    {
+      key: "latest_b",
+      label: "Latest B",
+      presenter: "markdown",
+      kind: "api",
+      type: "markdown",
+      index: { jsonPath: '$.rows.form[?(@ === "B")]~', pick: "first" },
+      fields: { amount: { jsonPath: "$.rows.amount[{index}]" } },
+      template: "{amount}",
+    },
+  ]);
+  const extractor = extractorOf(target, "latest_b");
+  const handler = getHandler("api");
+
+  it("relocateApi declines to propose candidates", () => {
+    const doc = { rows: { form: ["A", "B"], amount: [1, 2] } };
+    expect(relocateApi(doc, extractor, "2")).toEqual([]);
+  });
+
+  it("scoreCandidates reports an explicit unsupported status instead of scoring a patch", async () => {
+    const doc = { rows: { form: ["A", "B"], amount: [1, 2] } };
+    const scored = await scoreCandidates({
+      target,
+      extractor,
+      handler,
+      newDoc: doc,
+      candidates: [],
+      previousBlock: null,
+      now: NOW,
+    });
+    expect(scored).toHaveLength(1);
+    expect(scored[0]?.status).toBe("unsupported");
+    expect(scored[0]?.detail).toMatch(/composite\/indexed api location/);
+  });
+});

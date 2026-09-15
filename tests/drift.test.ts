@@ -235,6 +235,56 @@ describe("checkTargetDrift — api (synthetic envelopes)", () => {
     );
     expect(result.signals.some((s) => s.code === "STRUCTURE_CHANGED")).toBe(true);
   });
+
+  // ADR-022 — a composite location's TYPE_CHANGED check re-resolves `index`
+  // (and so each field's `{index}`-substituted path) independently against
+  // baseline and live, same as a real run resolves it fresh each time.
+  const compositeTarget = baseTarget("api", [
+    {
+      key: "latest_b",
+      label: "Latest B",
+      presenter: "markdown",
+      kind: "api",
+      type: "markdown",
+      index: { jsonPath: '$.rows.form[?(@ === "B")]~', pick: "first" },
+      fields: { amount: { jsonPath: "$.rows.amount[{index}]" } },
+      template: "{amount}",
+    },
+  ]);
+  const compositeBaseline = JSON.stringify({
+    rows: { form: ["A", "B"], amount: [1, 2] },
+  });
+
+  it("a composite field's resolved value changes from number to string: TYPE_CHANGED", async () => {
+    const parsed = JSON.parse(compositeBaseline) as { rows: { amount: unknown[] } };
+    parsed.rows.amount[1] = "2"; // still index 1 ("B" unmoved) -- just a type change
+    const live = JSON.stringify(parsed);
+    const result = await checkTargetDrift(
+      compositeTarget,
+      asFetchResult(compositeBaseline),
+      asFetchResult(live),
+    );
+    expect(
+      result.signals.some(
+        (s) =>
+          s.code === "TYPE_CHANGED" &&
+          s.extractorKey === "latest_b" &&
+          s.message.includes('field "amount"'),
+      ),
+    ).toBe(true);
+  });
+
+  it("a composite field stays the same JS type even when the index moves: clean", async () => {
+    // "B" moves from index 1 to index 0 -- the resolved path changes, but the
+    // underlying value's JS type (number) doesn't, so this isn't drift.
+    const live = JSON.stringify({ rows: { form: ["B", "A"], amount: [2, 1] } });
+    const result = await checkTargetDrift(
+      compositeTarget,
+      asFetchResult(compositeBaseline),
+      asFetchResult(live),
+    );
+    expect(isDrifting(result)).toBe(false);
+  });
 });
 
 describe("fetchFailedResult / isDrifting", () => {
