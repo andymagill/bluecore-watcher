@@ -11,6 +11,16 @@ export interface LocateResult {
   resolvedAnchors: string[];
   /** Always returned, even for `multiple: true` — SELECTOR_AMBIGUOUS is enforced centrally, not per handler. */
   matchCount: number;
+  /**
+   * ADR-022 — the text regex/coercion should actually narrow, when it
+   * differs from what gets stored as `rawText`/hashed as `contentHash`. A
+   * composite api location uses this: `rawTexts` carries the raw,
+   * pre-transform field values (so a relabeling doesn't fake a content
+   * change), while `texts` carries the already-composed markdown string.
+   * Defaults to `rawTexts` when absent — every existing handler is
+   * unaffected.
+   */
+  texts?: string[];
 }
 
 export interface ExtractHandler<TDoc = unknown> {

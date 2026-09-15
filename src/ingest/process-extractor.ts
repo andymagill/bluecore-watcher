@@ -21,6 +21,7 @@ import {
 } from "./validate.js";
 import { computeScalarDelta, computeSetDelta } from "./diff.js";
 import type { AcknowledgementStore } from "./acknowledgements.js";
+import { extractorLocatorOf } from "./extract/locator.js";
 
 export interface HealthEntryDraft {
   targetId: string;
@@ -168,7 +169,7 @@ export async function processExtractor<TDoc>(
       previousBlock,
       "ASSERTION_FAILED",
       shapeFailures.map((f) => `${f.rule}: ${f.message}`).join("; "),
-      extractor.kind === "html" ? extractor.selector : extractor.jsonPath,
+      extractorLocatorOf(extractor),
       httpStatus,
       nowIso,
     );

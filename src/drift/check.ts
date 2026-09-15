@@ -16,6 +16,7 @@ import type { ExtractorDef, TargetDef } from "../config/schema.js";
 import type { FetchResult } from "../ingest/fetch/types.js";
 import { getHandler } from "../ingest/extract/registry.js";
 import { extractOne, type Candidate } from "../ingest/extract/pipeline.js";
+import { resolveApiPaths } from "../ingest/extract/api-handler.js";
 import { IngestError } from "../ingest/errors.js";
 import { htmlSkeleton, jsonShape, jaccardSimilarity, setDiff } from "./structure.js";
 
@@ -152,17 +153,30 @@ async function checkExtractorDrift(
   }
 
   if (extractor.kind === "api" && extractor.presenter !== "list") {
-    const baselineType = rawJsonPathType(baselineDoc, extractor.jsonPath);
-    const liveType = rawJsonPathType(liveDoc, extractor.jsonPath);
-    if (baselineType !== liveType) {
-      return [
-        {
+    // ADR-022: a composite location resolves one jsonPath per field (with
+    // `{index}` re-resolved independently against each doc, exactly what a
+    // real run does for the fixture and the live response separately) — a
+    // simple location resolves to the single entry "value", so this loop
+    // covers both shapes uniformly.
+    const baselinePaths = resolveApiPaths(baselineDoc, extractor);
+    const livePaths = resolveApiPaths(liveDoc, extractor);
+    const signals: DriftSignal[] = [];
+    for (const name of Object.keys(baselinePaths)) {
+      const baselinePath = baselinePaths[name];
+      const livePath = livePaths[name];
+      if (baselinePath === undefined || livePath === undefined) continue;
+      const baselineType = rawJsonPathType(baselineDoc, baselinePath);
+      const liveType = rawJsonPathType(liveDoc, livePath);
+      if (baselineType !== liveType) {
+        const label = name === "value" ? `\`${livePath}\`` : `field "${name}" (\`${livePath}\`)`;
+        signals.push({
           code: "TYPE_CHANGED",
           extractorKey: extractor.key,
-          message: `\`${extractor.jsonPath}\` resolved to a JS ${baselineType} in the fixture, ${liveType} live`,
-        },
-      ];
+          message: `${label} resolved to a JS ${baselineType} in the fixture, ${liveType} live`,
+        });
+      }
     }
+    return signals;
   }
   return [];
 }

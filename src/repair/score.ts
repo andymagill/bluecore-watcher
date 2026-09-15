@@ -26,7 +26,8 @@ import { guardComparisonValue } from "../ingest/process-extractor.js";
 import { IngestError } from "../ingest/errors.js";
 import { locatorOf, type LocationPatch, type RelocationCandidate } from "./relocate.js";
 
-export type CandidateStatus = "pass" | "extract-failed" | "assertion-failed" | "guard-tripped";
+export type CandidateStatus =
+  "pass" | "extract-failed" | "assertion-failed" | "guard-tripped" | "unsupported";
 
 export interface ScoredCandidate {
   patch: LocationPatch;
@@ -95,7 +96,11 @@ function lastPathSegment(jsonPath: string): string | null {
 // more trustworthy than one that landed on a differently-named field with
 // a coincidentally equal value.
 function apiKeyMatchRank(extractor: ExtractorDef, patch: LocationPatch): number {
-  if (extractor.kind !== "api" || !("jsonPath" in patch)) return 1;
+  // extractor.jsonPath is undefined for a composite/indexed location (ADR-022);
+  // scoreCandidates already short-circuits those before ranking is ever
+  // reached, but the type no longer guarantees it, so guard here too.
+  if (extractor.kind !== "api" || extractor.jsonPath === undefined || !("jsonPath" in patch))
+    return 1;
   const oldKey = lastPathSegment(extractor.jsonPath);
   const newKey = lastPathSegment(patch.jsonPath);
   return oldKey !== null && oldKey === newKey ? 0 : 1;
@@ -139,6 +144,33 @@ export async function scoreCandidates<TDoc>(
   params: ScoreCandidatesParams<TDoc>,
 ): Promise<ScoredCandidate[]> {
   const { target, extractor, handler, newDoc, candidates, previousBlock, now } = params;
+
+  // ADR-022 — a composite (fields+template) or indexed api location has no
+  // single locator to relocate automatically; relocate.ts already declines
+  // to propose candidates for these, but a hand-supplied one (e.g.
+  // `repair:verify --json-path`) shouldn't be silently patched into an
+  // extractor that would then carry both a `jsonPath` and `fields`/`index`
+  // — an invalid, mutually-exclusive shape per config rule 13. Surface the
+  // limitation explicitly instead.
+  if (
+    extractor.kind === "api" &&
+    (extractor.fields !== undefined || extractor.index !== undefined)
+  ) {
+    return [
+      {
+        patch: { jsonPath: "(unsupported — composite/indexed api location)" },
+        basis: "unsupported",
+        status: "unsupported",
+        matchCount: null,
+        value: null,
+        displayValue: null,
+        detail:
+          `extractor "${extractor.key}" uses a composite/indexed api location ` +
+          "(fields+template or index) — automatic relocation isn't supported for these; " +
+          "repair config/*.config.ts by hand (ADR-022).",
+      },
+    ];
+  }
 
   const scored: { result: ScoredCandidate; key: readonly number[] }[] = [];
 

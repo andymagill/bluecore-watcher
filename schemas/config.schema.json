@@ -609,6 +609,75 @@
                     "jsonPath": {
                       "type": "string",
                       "minLength": 1
+                    },
+                    "index": {
+                      "type": "object",
+                      "properties": {
+                        "jsonPath": {
+                          "type": "string",
+                          "minLength": 1
+                        },
+                        "pick": {
+                          "type": "string",
+                          "const": "first"
+                        }
+                      },
+                      "required": [
+                        "jsonPath",
+                        "pick"
+                      ],
+                      "additionalProperties": false
+                    },
+                    "fields": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "jsonPath": {
+                            "type": "string",
+                            "minLength": 1
+                          },
+                          "strip": {
+                            "type": "string"
+                          },
+                          "split": {
+                            "type": "string"
+                          },
+                          "valueMap": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          },
+                          "join": {
+                            "type": "string"
+                          },
+                          "escape": {
+                            "default": "markdown",
+                            "type": "string",
+                            "enum": [
+                              "markdown",
+                              "url",
+                              "none"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "jsonPath",
+                          "escape"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "template": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "required": [
@@ -620,8 +689,7 @@
                     "trim",
                     "type",
                     "locale",
-                    "kind",
-                    "jsonPath"
+                    "kind"
                   ],
                   "additionalProperties": false
                 }

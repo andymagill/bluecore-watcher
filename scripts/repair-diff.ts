@@ -13,6 +13,7 @@
 import { join } from "node:path";
 import { mkdir, writeFile } from "node:fs/promises";
 import { extractOne } from "../src/ingest/extract/pipeline.js";
+import { extractorLocatorOf } from "../src/ingest/extract/locator.js";
 import { IngestError } from "../src/ingest/errors.js";
 import { htmlSkeleton, jsonShape, setDiff } from "../src/drift/structure.js";
 import { relocate, type RelocationCandidate } from "../src/repair/relocate.js";
@@ -90,7 +91,7 @@ async function main() {
 
   for (const extractor of target.extractors) {
     const previousBlock = previousTargetFile?.blocks.find((b) => b.key === extractor.key) ?? null;
-    const oldLocator = extractor.kind === "html" ? extractor.selector : extractor.jsonPath;
+    const oldLocator = extractorLocatorOf(extractor);
 
     let stillExtracts = true;
     let errorDetail: string | null = null;
