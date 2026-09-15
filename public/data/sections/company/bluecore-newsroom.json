@@ -3,13 +3,14 @@
     {
       "delta": null,
       "displayValue": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
+      "failingSince": null,
       "key": "latest_headline",
       "label": "Latest Headline",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(2)",
         "contentHash": "sha256:2bb00c8ddb95e10ee5e09632a01b459f1a885f3627e7748fea27d76ac623fa48",
-        "extractedAt": "2026-09-13T20:57:00.631Z",
+        "extractedAt": "2026-09-15T13:13:58.538Z",
         "rawText": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -24,13 +25,14 @@
     {
       "delta": null,
       "displayValue": "8 Sep 2026",
+      "failingSince": null,
       "key": "latest_post_date",
       "label": "Latest Post Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86",
-        "extractedAt": "2026-09-13T20:57:00.633Z",
+        "extractedAt": "2026-09-15T13:13:58.540Z",
         "rawText": "September 8, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -45,13 +47,14 @@
     {
       "delta": null,
       "displayValue": "Press Release",
+      "failingSince": null,
       "key": "latest_post_category",
       "label": "Latest Post Category",
       "presenter": "status",
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(1)",
         "contentHash": "sha256:180c9abd7392671b20a7438ab3b9fe55dfbe981f3f783de7757dd0b203894e2c",
-        "extractedAt": "2026-09-13T20:57:00.634Z",
+        "extractedAt": "2026-09-15T13:13:58.540Z",
         "rawText": "Press Release",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -67,17 +70,18 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-09-13T20:57:00.634Z",
-    "durationMs": 286,
+    "completedAt": "2026-09-15T13:13:58.541Z",
+    "durationMs": 591,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-13T20-56-59-853Z-670fb31",
-    "startedAt": "2026-09-13T20:57:00.348Z",
+    "runId": "2026-09-15T13-13-57-143Z-56a9c25",
+    "startedAt": "2026-09-15T13:13:57.950Z",
     "status": "ok"
   },
   "schemaVersion": 1,
   "sectionId": "company",
   "sourceUrl": "https://www.bluecore.energy/news-insights",
+  "staleCeilingHours": 504,
   "targetId": "bluecore-newsroom",
   "ttlHours": 168
 }

@@ -3,13 +3,14 @@
     {
       "delta": null,
       "displayValue": "76 documents",
+      "failingSince": null,
       "key": "smr_mention_count",
       "label": "SMR Document Count",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
         "contentHash": "sha256:f74efabef12ea619e30b79bddef89cffa9dda494761681ca862cff2871a85980",
-        "extractedAt": "2026-09-13T20:57:04.309Z",
+        "extractedAt": "2026-09-15T13:14:02.136Z",
         "rawText": "76",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
       },
@@ -26,17 +27,18 @@
   "entityId": "bluecore-energy",
   "label": "Federal Register — SMR Mentions (All Agencies)",
   "run": {
-    "completedAt": "2026-09-13T20:57:04.310Z",
-    "durationMs": 202,
+    "completedAt": "2026-09-15T13:14:02.136Z",
+    "durationMs": 484,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-13T20-56-59-853Z-670fb31",
-    "startedAt": "2026-09-13T20:57:04.108Z",
+    "runId": "2026-09-15T13-13-57-143Z-56a9c25",
+    "startedAt": "2026-09-15T13:14:01.652Z",
     "status": "ok"
   },
   "schemaVersion": 1,
   "sectionId": "competitive",
   "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest",
+  "staleCeilingHours": 504,
   "targetId": "fr-smr-mentions",
   "ttlHours": 168
 }
