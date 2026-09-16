@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
         "contentHash": "sha256:498a5992a45cccadc5248e2877cd367d7a457e547d0d0658f58b558705f0b070",
-        "extractedAt": "2026-09-15T13:14:01.652Z",
+        "extractedAt": "2026-09-16T13:12:45.694Z",
         "rawText": "4/A",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -32,7 +32,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:d31fac478f875d3f8fa95a8a9a30f31d7f5d90946da706c50a45be42524934ba",
-        "extractedAt": "2026-09-15T13:14:01.652Z",
+        "extractedAt": "2026-09-16T13:12:45.694Z",
         "rawText": "2026-09-11",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -48,12 +48,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-09-15T13:14:01.652Z",
-    "durationMs": 1989,
+    "completedAt": "2026-09-16T13:12:45.694Z",
+    "durationMs": 1987,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-15T13-13-57-143Z-56a9c25",
-    "startedAt": "2026-09-15T13:13:59.663Z",
+    "runId": "2026-09-16T13-12-41-148Z-7851bd7",
+    "startedAt": "2026-09-16T13:12:43.707Z",
     "status": "ok"
   },
   "schemaVersion": 1,

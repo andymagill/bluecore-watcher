@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
         "contentHash": "sha256:02d20bbd7e394ad5999a4cebabac9619732c343a4cac99470c03e23ba2bdc2bc",
-        "extractedAt": "2026-09-15T13:14:02.797Z",
+        "extractedAt": "2026-09-16T13:12:46.811Z",
         "rawText": "55",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
       },
@@ -27,12 +27,12 @@
   "entityId": "bluecore-energy",
   "label": "Federal Register — NRC SMR Documents",
   "run": {
-    "completedAt": "2026-09-15T13:14:02.798Z",
-    "durationMs": 662,
+    "completedAt": "2026-09-16T13:12:46.812Z",
+    "durationMs": 699,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-15T13-13-57-143Z-56a9c25",
-    "startedAt": "2026-09-15T13:14:02.136Z",
+    "runId": "2026-09-16T13-12-41-148Z-7851bd7",
+    "startedAt": "2026-09-16T13:12:46.113Z",
     "status": "ok"
   },
   "schemaVersion": 1,
