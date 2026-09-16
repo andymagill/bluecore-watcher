@@ -97,17 +97,18 @@ The milestone that decides whether this is maintainable by one person. Delivered
 
 ## M4 — Source quality: content-depth
 
-Upgrade three existing source types to extract substantive content alongside volume metrics, and reconfigure one dashboard-occupying source as alert-only. Builds on M2's verified baseline extractors.
+Upgrade three existing source types to extract substantive content alongside volume metrics, and reconfigure one dashboard-occupying source as alert-only. Builds on M2's verified baseline extractors. Delivered across three sequential workstreams — see [`docs/plans/m4-source-quality.md`](plans/m4-source-quality.md) for the plan, decisions, and status.
 
 **Scope:**
 
-- **Federal Register sources** (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`): Extract the title, publication agency, and date of the most recent document matching each filter, alongside the existing count. A regulatory signal moves from "NRC attention is 56 documents" to "NRC published a [specific] rulemaking on [date]".
-- **SEC submissions** (`oklo-sec-filings`, `nuscale-sec-filings`): Extract the filing's `items` field or a link to the primary document from the most recent 8-K, not just the form code and date. Turns "Oklo filed an 8-K on Tuesday" into "Oklo [filed a partnership agreement / announced financing]".
-- **BlueCore Form D** (`bluecore-form-d`): Reconfigure as an alert-only target. The companion `bluecore-sec-filings` already detects new filings; the Form D's dollar amounts are relevant once but static between filings. Frees dashboard real estate for higher-signal sources.
+- **Engine:** a composite/indexed `api` location (ADR-022) — SEC's `filings.recent` is parallel arrays with no stable index for "the latest 8-K," which a plain `jsonPath` can't bind across arrays. ✅ M4a.
+- **Federal Register sources** (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`): Extract the title, publication agency, and date of the most recent document matching each filter, alongside the existing count. A regulatory signal moves from "NRC attention is 56 documents" to "NRC published a [specific] rulemaking on [date]". M4b.
+- **SEC submissions** (`oklo-sec-filings`, `nuscale-sec-filings`): Extract the filing's `items` field or a link to the primary document from the most recent 8-K, not just the form code and date, using M4a's composite location. Turns "Oklo filed an 8-K on Tuesday" into "Oklo [filed a partnership agreement / announced financing]". M4b.
+- **BlueCore Form D** (`bluecore-form-d`): Retire the target — the companion `bluecore-sec-filings` already detects new filings, and M4b's `bluecore-sec-filings` upgrade absorbs the primary-document link Form D existed partly to surface. The XML target's dollar amounts were relevant once (the seed filing) but static between filings; frees dashboard real estate for higher-signal sources. M4c.
 
-**Testing approach:** Per ADR-001, extractors are tested against generalized, entity-agnostic fixtures (`example-regulatory-api` for FR sources, `example-sec-submissions` for SEC) in vitest. Entity configs verified via `npm run fixture:verify` against `bluecore-*` and competitor config (ADR-021). No entity names in test requirements.
+**Testing approach:** Per ADR-001, the engine feature (M4a) is proven against synthetic fixtures directly in vitest (`tests/api-composite.test.ts`), not `config/example.config.ts` — the real bluecore config (`npm run fixture:verify`) already proves it doesn't disturb any existing target. FR/SEC extractors (M4b) are tested against generalized, entity-agnostic fixtures (`example-regulatory-api`, `example-sec-submissions`) in vitest. Entity configs verified via `npm run fixture:verify` against `bluecore-*` and competitor config (ADR-021). No entity names in test requirements.
 
-**Exit:** Dry run produces correct delta chips and provenance popovers for the new extractor shapes. All four dashboard sections display substantive content (not just counts or dates). Standard verification passes.
+**Exit:** Dry run produces correct delta chips and provenance popovers for the new extractor shapes. Company, Competitive, and Regulatory sections display substantive content (not just counts or dates) — Market Conditions' turn is M5, which already carries the "all four sections" exit criterion. Standard verification passes.
 
 ---
 

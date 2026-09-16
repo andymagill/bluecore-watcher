@@ -145,10 +145,30 @@ interface ExtractorBase {
 // One member per handler. v1 ships exactly these two.
 type LocationDef =
   | { kind: "html"; selector: string; attr?: string; multiple?: boolean }
-  | { kind: "api"; jsonPath: string };
+  | { kind: "api"; jsonPath: string } // simple — one value, one jsonPath
+  | {
+      // composite (ADR-022) — several jsonPaths, one row, one markdown string
+      kind: "api";
+      index?: { jsonPath: string; pick: "first" };
+      fields: Record<string, ApiFieldDef>;
+      template: string;
+    };
+
+interface ApiFieldDef {
+  jsonPath: string; // may contain a literal "{index}" token
+  strip?: string; // regex source; every match removed
+  split?: string; // literal separator (String.prototype.split)
+  valueMap?: Record<string, string>;
+  join?: string; // default ", " — requires split
+  escape?: "markdown" | "url" | "none"; // default "markdown"
+}
 ```
 
 `kind` here mirrors `TargetDef.kind` (§2) — a config validation rule (see §5) requires them to match, since one target's extractors all share its fetch/parse family. `multiple` declares intent for `html`; a selector matching more than one node without it is `SELECTOR_AMBIGUOUS`, not a silent first match. `api` extractors are inherently single-valued per `jsonPath`; a `list` presenter over an `api` target maps a `jsonPath` that resolves to an array.
+
+**A composite `api` location (ADR-022)** exists for a source whose facts live in parallel arrays with no stable index — SEC's `filings.recent.form[i]`/`.items[i]`/`.filingDate[i]`, where the row you want (the latest 8-K) usually isn't at index 0 and JSONPath alone can't join a filter match on one array to a sibling array by position. `index.jsonPath` resolves one row (v1 ships only `pick: "first"` — declared intent, like html's `:first`; document the real ordering assumption in the target's `notes`, same convention `02-CONFIG-SCHEMA.md`'s `notes` field already asks for). Every occurrence of `{index}` in a field's `jsonPath` is substituted with that row before the field's own JSONPath runs. Each field then reads exactly one value and narrows it: `strip` (a regex, every match removed) → `split` (a literal separator; empty tokens dropped) → `valueMap` (every remaining token must have an entry — an unmapped token is `PARSE_ERROR`, same strictness as `enumValues`) → `join` (only meaningful after `split`) → `escape` (markdown-escapes, URL-encodes, or leaves the joined string alone). `template` fills `{name}` placeholders from the transformed field values (and `{index}` itself, when `index` is set) into one markdown string — which is why a composite location is always `presenter: "markdown"` / `type: "markdown"`; it doesn't produce a typed scalar the other presenter/type pairs would coerce meaningfully. See ADR-022 and `01-DATA-CONTRACT.md` §4 for what this means for `provenance.rawText`/`contentHash` (the raw pre-transform field values, not the composed text — so relabeling a `valueMap` entry never fakes a content change).
+
+Repair (`06-OPS-RUNBOOK.md` §3, ADR-003) doesn't cover a composite/indexed location — there's no single locator to relocate a value to. A broken one needs a human (or an agent reading the target's `notes`) to hand-edit the config.
 
 **Adding a source kind is additive, not a schema rewrite.** See §7.
 
@@ -236,6 +256,7 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
 12. **(M3a/ADR-019)** `alert.thresholdPct` follows rule 8's no-op-field principle: it's rejected unless `alert.on` is `"threshold"`, against a numeric type or `presenter: "list"` (compared against item count, same applicability as `maxChangePct`/`maxChangeAbs`) — and `alert.on: "threshold"` itself requires `thresholdPct` to be set. `alerting.channel` is restricted to `"github-issue"`; `"webhook"`/`"email"` are rejected until a dispatcher for either exists (§4).
+13. **(ADR-022)** An `api` location has exactly one of `jsonPath` (simple) or `fields` + `template` (composite) — never both, never neither. For a composite location: every `template` placeholder is either `"index"` (only when `index` is set) or a name in `fields`, and every name in `fields` appears in `template`; no field may be named `"index"`; a field's `jsonPath` contains `"{index}"` if and only if `index` is configured; a field's `join` requires `split`; and the extractor's own `presenter`/`type` must be `"markdown"`/`"markdown"`.
 
 ---
 

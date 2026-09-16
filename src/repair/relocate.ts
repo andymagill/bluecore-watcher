@@ -253,6 +253,12 @@ export function relocateApi(
   oldRawText: string | string[],
 ): RelocationCandidate[] {
   if (extractor.kind !== "api") return [];
+  // ADR-022 — a composite/indexed location has no single jsonPath to
+  // relocate by value match, and `oldRawText` for one is the raw-field JSON
+  // blob, not a value that would ever appear verbatim in a redesigned
+  // response. score.ts surfaces the "repair manually" guidance for these;
+  // this just declines to propose candidates that couldn't mean anything.
+  if (extractor.fields !== undefined || extractor.index !== undefined) return [];
   const targets = Array.isArray(oldRawText) ? oldRawText : [oldRawText];
   const primary = targets[0];
   if (primary === undefined) return [];

@@ -63,6 +63,8 @@ Per extractor, in config order:
 
 Extractor failures are isolated. One broken extractor among ten produces `run.status: partial`, not a lost target — unless it is `required: true`.
 
+**A composite `api` location (ADR-022)** — `fields` + `template`, optionally `index` — folds into the same seven steps rather than adding a parallel path: "locate" resolves `index` then every field's jsonPath (zero/ambiguous matches fail the same way, naming the field); "capture `rawText`" is a stable-key JSON snapshot of the _raw_, pre-transform field values (what gets hashed into `contentHash`); the field-level strip/split/valueMap/join/escape transforms and the `template` fill happen in place of step 4's regex, producing the text that steps 5-6 actually coerce/format. The result is the composed markdown string as `value`/`displayValue`, with `rawText`/`contentHash` still keyed on the untransformed facts — so relabeling a `valueMap` entry changes what's displayed without looking like the source data moved.
+
 ### validate
 
 Per `01-DATA-CONTRACT.md` §6:

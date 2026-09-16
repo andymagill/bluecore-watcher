@@ -67,10 +67,147 @@ export const HtmlLocation = z.object({
   multiple: z.boolean().optional(),
 });
 
-export const ApiLocation = z.object({
-  kind: z.literal("api"),
+// ADR-022 — a field within a composite api location. `jsonPath` may contain
+// a literal `{index}` token, substituted from `ApiIndexDef` before this
+// field's own JSONPath runs. Transforms apply in this order: strip -> split
+// -> valueMap -> join -> escape (src/ingest/extract/compose.ts).
+export const ApiFieldDef = z.object({
   jsonPath: z.string().min(1),
+  strip: z.string().optional(), // regex source; every match removed
+  split: z.string().optional(), // literal separator (String.prototype.split)
+  valueMap: z.record(z.string(), z.string()).optional(),
+  join: z.string().optional(), // default ", " — requires split (rule 13)
+  escape: z.enum(["markdown", "url", "none"]).default("markdown"),
 });
+export type ApiFieldDef = z.infer<typeof ApiFieldDef>;
+
+// Resolves which "row" a composite location's fields read from — e.g. the
+// first index where a parallel array field equals a given value (SEC's
+// `filings.recent.form[?(@ === "8-K")]~`). `pick: "first"` is declared
+// intent, like html's `:first` — source ordering is documented in `notes`,
+// same convention as ADR-018/html anchors.
+export const ApiIndexDef = z.object({
+  jsonPath: z.string().min(1),
+  pick: z.literal("first"),
+});
+export type ApiIndexDef = z.infer<typeof ApiIndexDef>;
+
+// ADR-022 — an "api" location is either simple (`jsonPath`, unchanged since
+// v1) or composite (`fields` + `template`, optionally `index`): resolve one
+// value per field via JSONPath, transform each, then fill a markdown
+// template. Both shapes stay on one object (rather than a nested
+// discriminated union) because `kind: "api"` is already the discriminant
+// LocationDef keys on, and z.discriminatedUnion forbids two branches sharing
+// one discriminant value — mutual exclusivity is enforced below instead
+// (rule 13).
+export const ApiLocation = z
+  .object({
+    kind: z.literal("api"),
+    jsonPath: z.string().min(1).optional(),
+    index: ApiIndexDef.optional(),
+    fields: z.record(z.string(), ApiFieldDef).optional(),
+    template: z.string().min(1).optional(),
+  })
+  .check((ctx) => {
+    const v = ctx.value;
+    const hasSimple = v.jsonPath !== undefined;
+    const hasComposite = v.fields !== undefined || v.template !== undefined;
+
+    if (hasSimple && hasComposite) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'an "api" location has exactly one of jsonPath (simple) or fields+template ' +
+          "(composite) (rule 13, ADR-022)",
+        path: [],
+      });
+      return;
+    }
+    if (!hasSimple && !hasComposite) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message: 'an "api" location requires either jsonPath or fields+template (rule 13, ADR-022)',
+        path: [],
+      });
+      return;
+    }
+    if (!hasComposite) return; // simple location — nothing further to check here.
+
+    if (v.fields === undefined || v.template === undefined) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message: 'a composite "api" location requires both fields and template (rule 13, ADR-022)',
+        path: [],
+      });
+      return;
+    }
+    if ("index" in v.fields) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a field may not be named "index" — it collides with the {index} template ' +
+          "variable (rule 13, ADR-022)",
+        path: ["fields", "index"],
+      });
+    }
+
+    const fieldNames = Object.keys(v.fields);
+    const templateNames = [...v.template.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+    for (const name of templateNames) {
+      if (name !== "index" && !fieldNames.includes(name)) {
+        ctx.issues.push({
+          code: "custom",
+          input: v,
+          message: `template references unknown field "{${name}}" (rule 13, ADR-022)`,
+          path: ["template"],
+        });
+      }
+    }
+    for (const name of fieldNames) {
+      if (!templateNames.includes(name)) {
+        ctx.issues.push({
+          code: "custom",
+          input: v,
+          message: `field "${name}" is never used in template (rule 13, ADR-022)`,
+          path: ["fields", name],
+        });
+      }
+    }
+
+    const anyFieldUsesIndex = Object.values(v.fields).some((f) => f.jsonPath.includes("{index}"));
+    if (v.index && !anyFieldUsesIndex) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message: 'index is set but no field jsonPath contains "{index}" (rule 13, ADR-022)',
+        path: ["index"],
+      });
+    }
+    if (!v.index && anyFieldUsesIndex) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a field jsonPath contains "{index}" but no index is configured (rule 13, ADR-022)',
+        path: ["index"],
+      });
+    }
+
+    for (const [name, field] of Object.entries(v.fields)) {
+      if (field.join !== undefined && field.split === undefined) {
+        ctx.issues.push({
+          code: "custom",
+          input: v,
+          message: `field "${name}": join requires split (rule 13, ADR-022)`,
+          path: ["fields", name, "join"],
+        });
+      }
+    }
+  });
 
 export const LocationDef = z.discriminatedUnion("kind", [HtmlLocation, ApiLocation]);
 export type LocationDef = z.infer<typeof LocationDef>;
@@ -285,6 +422,24 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
         'alert.on "threshold" only applies to a numeric type, or presenter "list" ' +
         "(compared against item count) (rule 8)",
       path: ["alert", "on"],
+    });
+  }
+
+  // Rule 13 (ADR-022) — a composite api location (fields+template) always
+  // composes a markdown string; it doesn't produce a typed scalar the other
+  // presenter/type pairs would coerce meaningfully.
+  if (
+    ex.kind === "api" &&
+    ex.fields !== undefined &&
+    (ex.presenter !== "markdown" || ex.type !== "markdown")
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'a composite "api" location (fields+template) requires presenter "markdown" and ' +
+        'type "markdown" (rule 13, ADR-022)',
+      path: ["presenter"],
     });
   }
 

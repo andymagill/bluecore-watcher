@@ -6,6 +6,7 @@ import { IngestError } from "../errors.js";
 import { coerce, formatDisplayValue, type CoercedValue } from "./coerce.js";
 import { hashRawText } from "./provenance.js";
 import type { ExtractHandler } from "./types.js";
+import { extractorLocatorOf } from "./locator.js";
 
 export interface ScalarCandidate {
   presenter: "metric" | "markdown" | "status";
@@ -28,7 +29,7 @@ export interface ListCandidate {
 export type Candidate = ScalarCandidate | ListCandidate;
 
 function failingSelectorOf(extractor: ExtractorDef): string {
-  return extractor.kind === "html" ? extractor.selector : extractor.jsonPath;
+  return extractorLocatorOf(extractor);
 }
 
 function applyRegex(rawText: string, extractor: ExtractorDef): string {
@@ -79,7 +80,12 @@ export async function extractOne<TDoc>(
     }
     const rawText = located.rawTexts[0] ?? "";
     const anchor = located.resolvedAnchors[0] ?? "";
-    const narrowed = applyRegex(rawText, extractor);
+    // ADR-022: `texts` is what a composite api location's already-composed
+    // markdown string lives in — narrow/coerce that, but keep `rawText`
+    // (the raw pre-transform field values) as what's stored and hashed
+    // below. Every other handler leaves `texts` unset, so this is a no-op.
+    const startText = located.texts?.[0] ?? rawText;
+    const narrowed = applyRegex(startText, extractor);
     const value = coerce(narrowed, extractor);
     const displayValue = formatDisplayValue(value, extractor);
     return {
