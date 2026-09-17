@@ -1,0 +1,64 @@
+{
+  "metadata": {
+    "targetId": "example-rss-feed",
+    "description": "Example RSS feed for testing XML handler (ADR-026). Tests that <link> void-element bug in HTML mode is fixed by XML mode, and that namespace elements (dc:creator) are accessible."
+  },
+  "blocks": [
+    {
+      "key": "rss_title_simple",
+      "value": "First Article",
+      "provenance": {
+        "selector": "channel > item:nth-of-type(1) > title",
+        "contentHash": "abc123"
+      }
+    },
+    {
+      "key": "rss_link_simple",
+      "value": "https://example.com/article-1",
+      "provenance": {
+        "selector": "channel > item:nth-of-type(1) > link",
+        "contentHash": "def456"
+      }
+    },
+    {
+      "key": "rss_date_simple",
+      "value": "Mon, 15 Jan 2024 10:00:00 GMT",
+      "provenance": {
+        "selector": "channel > item:nth-of-type(1) > pubDate",
+        "contentHash": "ghi789"
+      }
+    },
+    {
+      "key": "rss_creator_namespace",
+      "value": "Alice Smith",
+      "provenance": {
+        "selector": "channel > item:nth-of-type(1) > dc\\:creator",
+        "contentHash": "jkl012"
+      }
+    },
+    {
+      "key": "rss_list_titles",
+      "value": [
+        "First Article",
+        "Second Article",
+        "Third Article"
+      ],
+      "provenance": {
+        "selector": "channel > item > title",
+        "contentHash": "mno345"
+      }
+    },
+    {
+      "key": "rss_list_links",
+      "value": [
+        "https://example.com/article-1",
+        "https://example.com/article-2",
+        "https://example.com/article-3"
+      ],
+      "provenance": {
+        "selector": "channel > item > link",
+        "contentHash": "pqr678"
+      }
+    }
+  ]
+}

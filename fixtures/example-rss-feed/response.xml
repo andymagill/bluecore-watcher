@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:dc="http://purl.org/dc/elements/1.1/">
+  <channel>
+    <title>Example RSS Feed</title>
+    <link>https://example.com</link>
+    <description>An example RSS feed for testing XML extraction</description>
+    <item>
+      <title>First Article</title>
+      <link>https://example.com/article-1</link>
+      <pubDate>Mon, 15 Jan 2024 10:00:00 GMT</pubDate>
+      <dc:creator>Alice Smith</dc:creator>
+      <description>Content of the first article</description>
+    </item>
+    <item>
+      <title>Second Article</title>
+      <link>https://example.com/article-2</link>
+      <pubDate>Tue, 16 Jan 2024 09:30:00 GMT</pubDate>
+      <dc:creator>Bob Johnson</dc:creator>
+      <description>Content of the second article</description>
+    </item>
+    <item>
+      <title>Third Article</title>
+      <link>https://example.com/article-3</link>
+      <pubDate>Wed, 17 Jan 2024 14:15:00 GMT</pubDate>
+      <dc:creator>Charlie Brown</dc:creator>
+      <description>Content of the third article</description>
+    </item>
+  </channel>
+</rss>
