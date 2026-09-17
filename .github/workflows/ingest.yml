@@ -24,6 +24,18 @@
 # per run. The `push` trigger on `config/**` exists so a merged repair PR
 # (M3b) re-ingests immediately and its alert can auto-close, rather than
 # waiting for the next scheduled cron.
+#
+# ADR-023 -- preview mode. schedule/push always target `main` (prod), but a
+# manual `workflow_dispatch` can be run "from" any branch. `env.PREVIEW`
+# (true whenever the dispatched ref isn't `main`) checks that branch's own
+# tip out, runs the full fetch -> extract -> validate -> diff -> gate
+# pipeline against a real Cloudflare preview exactly as prod does, and stops
+# there: it never squash-merges into `main` and never opens/closes/comments
+# on a GitHub Issue (`--issues` is only ever passed in prod mode; without it
+# alert-dispatch.ts's normal mode just prints the plan, and its
+# --pipeline-failure mode makes no GitHub API call at all). This is how a
+# branch like an ingestion-changing PR gets a real end-to-end run -- gate
+# included -- before it ever touches `main`. See docs/06-OPS-RUNBOOK.md §12.
 name: Ingest
 
 on:
@@ -35,8 +47,12 @@ on:
   workflow_dispatch: {}
 
 concurrency:
-  group: ingest
-  cancel-in-progress: false
+  # Preview runs (one group per branch) never queue behind or block prod's
+  # `ingest-main` group, and a stale preview run for the same branch is
+  # cancelled by a newer one; prod stays serialized and never cancelled
+  # (ADR-005 -- each run must fork from the current `main`).
+  group: ingest-${{ github.ref_name }}
+  cancel-in-progress: ${{ github.ref_name != 'main' }}
 
 permissions:
   contents: write
@@ -46,11 +62,13 @@ permissions:
 jobs:
   ingest:
     runs-on: ubuntu-latest
+    env:
+      PREVIEW: ${{ github.ref_name != 'main' }}
     steps:
-      - name: Checkout main (shallow)
+      - name: Checkout target ref (shallow)
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: ${{ github.ref_name }}
           fetch-depth: 1
 
       - name: Setup Node
@@ -97,15 +115,18 @@ jobs:
             echo "changed=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # No --issues in preview mode (env.PREVIEW) -- alert-dispatch.ts's
+      # --pipeline-failure mode makes no GitHub API call at all without it,
+      # so a broken branch just fails the run red, same as any other CI
+      # failure, with no issue opened against a branch that isn't `main`.
       - name: Offline gate failed -- dispatch a pipeline alert and stop
         if: steps.ingest.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          npx tsx scripts/alert-dispatch.ts \
-            --pipeline-failure offline \
-            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --issues
+          ARGS=(--pipeline-failure offline --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}")
+          [ "$PREVIEW" = "true" ] || ARGS+=(--issues)
+          npx tsx scripts/alert-dispatch.ts "${ARGS[@]}"
           exit 1
 
       - name: No semantic change -- nothing to do
@@ -118,7 +139,12 @@ jobs:
         if: steps.changes.outputs.changed == 'true'
         id: branch
         run: |
-          BRANCH="ingest/${{ steps.meta.outputs.run_id }}"
+          if [ "$PREVIEW" = "true" ]; then
+            SAFE_REF=$(echo "${{ github.ref_name }}" | tr -c 'a-zA-Z0-9_.-' '-')
+            BRANCH="ingest-preview/$SAFE_REF/${{ steps.meta.outputs.run_id }}"
+          else
+            BRANCH="ingest/${{ steps.meta.outputs.run_id }}"
+          fi
           echo "branch=$BRANCH" >> "$GITHUB_OUTPUT"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
@@ -154,7 +180,7 @@ jobs:
       # receives changes that passed all three gate checks; it just isn't
       # routed through a PR to do it.
       - name: Gate passed -- squash-merge into main
-        if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success'
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success' && env.PREVIEW != 'true'
         id: merge
         run: |
           git checkout main
@@ -173,7 +199,7 @@ jobs:
       # and never reached main would be worse than not alerting
       # (03-INGESTION.md §4).
       - name: Dispatch alerts for the merged diff
-        if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success'
+        if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'success' && env.PREVIEW != 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           # Defense in depth for alert-dispatch's own secret-scrub pass
@@ -187,15 +213,40 @@ jobs:
             --to "${{ steps.merge.outputs.sha }}" \
             --issues
 
+      # Preview's stand-in for the two prod-only steps above: same alert
+      # plan (--to the pushed preview branch's own commit, since there's no
+      # merge commit) and the same gate result, but printed to the run
+      # summary instead of GitHub Issues -- nothing is ever created,
+      # commented on, or closed against a non-`main` run.
+      - name: Preview summary
+        if: steps.changes.outputs.changed == 'true' && env.PREVIEW == 'true'
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: |
+          {
+            echo "### Ingestion preview -- \`${{ github.ref_name }}\`"
+            echo ""
+            echo "- Branch pushed: \`${{ steps.branch.outputs.branch }}\`"
+            echo "- Preview URL: ${{ steps.preview.outputs.url }}"
+            echo "- Gate: \`${{ steps.gate.outcome }}\`"
+            echo ""
+            echo "#### public/data diff"
+            echo '```'
+            git diff --stat "${{ steps.meta.outputs.base_sha }}" "${{ steps.branch.outputs.sha }}" -- public/data
+            echo '```'
+            echo ""
+            echo "#### Alerts that would fire (not dispatched -- preview mode)"
+            echo '```'
+            npx tsx scripts/alert-dispatch.ts --env bluecore --from "${{ steps.meta.outputs.base_sha }}" --to "${{ steps.branch.outputs.sha }}"
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Gate failed -- leave the branch, dispatch a pipeline alert
         if: steps.changes.outputs.changed == 'true' && steps.gate.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          npx tsx scripts/alert-dispatch.ts \
-            --pipeline-failure gate \
-            --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" \
-            --branch "${{ steps.branch.outputs.branch }}" \
-            --preview-url "${{ steps.preview.outputs.url }}" \
-            --issues
+          ARGS=(--pipeline-failure gate --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}" --branch "${{ steps.branch.outputs.branch }}" --preview-url "${{ steps.preview.outputs.url }}")
+          [ "$PREVIEW" = "true" ] || ARGS+=(--issues)
+          npx tsx scripts/alert-dispatch.ts "${ARGS[@]}"
           exit 1
