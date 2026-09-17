@@ -140,7 +140,7 @@ jobs:
         id: branch
         run: |
           if [ "$PREVIEW" = "true" ]; then
-            SAFE_REF=$(echo "${{ github.ref_name }}" | tr -c 'a-zA-Z0-9_.-' '-')
+            SAFE_REF=$(printf '%s' "${{ github.ref_name }}" | tr -c 'a-zA-Z0-9_.-' '-')
             BRANCH="ingest-preview/$SAFE_REF/${{ steps.meta.outputs.run_id }}"
           else
             BRANCH="ingest/${{ steps.meta.outputs.run_id }}"
