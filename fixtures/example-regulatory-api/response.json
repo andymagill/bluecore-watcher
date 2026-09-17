@@ -1,0 +1,18 @@
+{
+  "description": "Documents of Example Agency",
+  "count": 42,
+  "total_pages": 1,
+  "next_page_url": null,
+  "results": [
+    {
+      "title": "Example Rule on Widget Safety (Amendment) [Revised]",
+      "type": "Notice",
+      "abstract": "An example abstract, not exercised by any extractor.",
+      "document_number": "2026-90001",
+      "html_url": "https://example.test/documents/2026/07/15/2026-90001/example-rule-on-widget-safety",
+      "pdf_url": "https://example.test/pdf/2026-90001.pdf",
+      "publication_date": "2026-07-15",
+      "agencies": [{ "raw_name": "EXAMPLE REGULATORY AGENCY", "name": "Example Regulatory Agency" }]
+    }
+  ]
+}
