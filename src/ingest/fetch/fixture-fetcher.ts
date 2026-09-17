@@ -14,6 +14,7 @@ import type { Fetcher, FetchResult, RunContext } from "./types.js";
 export const EXTENSION_BY_KIND: Record<TargetDef["kind"], string> = {
   html: "html",
   api: "json",
+  xml: "xml",
 };
 
 export class FixtureFetcher implements Fetcher {
