@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0002125928.json#$.filings.recent.form[0]",
         "contentHash": "sha256:3f39d5c348e5b79d06e842c114e6cc571583bbf44e4b0ebfda1a01ec05745d43",
-        "extractedAt": "2026-09-17T13:19:50.512Z",
+        "extractedAt": "2026-09-17T14:49:01.864Z",
         "rawText": "D",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0002125928.json"
       },
@@ -32,7 +32,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0002125928.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:ec00d6c3e1a390cb687d96168d38fbb1c79e6fcd9e3d1193448e5bc2dea06efa",
-        "extractedAt": "2026-09-17T13:19:50.513Z",
+        "extractedAt": "2026-09-17T14:49:01.866Z",
         "rawText": "2026-09-04",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0002125928.json"
       },
@@ -54,7 +54,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0002125928.json#form:$.filings.recent.form[0] date:$.filings.recent.filingDate[0] acc:$.filings.recent.accessionNumber[0] doc:$.filings.recent.primaryDocument[0]",
         "contentHash": "sha256:840c0f712729e756521f37c3ef245dcdb7ec002df2f58ee8b7f8ed07d3d182bd",
-        "extractedAt": "2026-09-17T13:19:50.522Z",
+        "extractedAt": "2026-09-17T14:49:01.880Z",
         "rawText": "{\"acc\":\"0002125928-26-000003\",\"date\":\"2026-09-04\",\"doc\":\"xslFormDX01/primary_doc.xml\",\"form\":\"D\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0002125928.json"
       },
@@ -70,12 +70,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-09-17T13:19:50.523Z",
-    "durationMs": 202,
+    "completedAt": "2026-09-17T14:49:01.881Z",
+    "durationMs": 304,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T13-19-49-861Z-1cbad33",
-    "startedAt": "2026-09-17T13:19:50.321Z",
+    "runId": "2026-09-17T14-49-01-541Z-1a609a1",
+    "startedAt": "2026-09-17T14:49:01.577Z",
     "status": "ok"
   },
   "schemaVersion": 1,
