@@ -584,9 +584,15 @@ export const config: CmieConfigInput = {
           type: "string",
           // Only meaningful here — fr-nrc-smr/fr-doe-nuclear already filter
           // to one agency, so this would be a constant there. Eight distinct
-          // agencies[0].name values observed live across this query's own
-          // 76 results; string, not enum, since that set can grow.
-          jsonPath: "$.results[0].agencies[0].name",
+          // agency lists observed live across this query's own 76 results;
+          // string, not enum, since that set can grow. `[-1:]`, not `[0]`:
+          // FR lists a sub-agency's document as [parent department,
+          // sub-agency] (verified live 2026-09-17 — e.g. [Transportation
+          // Department, Maritime Administration], [Commerce Department,
+          // International Trade Administration]), so `[0]` named the parent
+          // department instead of the publishing agency. The slice always
+          // yields exactly one match, so it can't go SELECTOR_AMBIGUOUS.
+          jsonPath: "$.results[0].agencies[-1:].name",
           assert: { notEmpty: true, maxLength: 120 },
         },
       ],
