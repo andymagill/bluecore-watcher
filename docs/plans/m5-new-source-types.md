@@ -22,7 +22,7 @@ design only, for a future conversation to pick up cold. Each workstream:
 | Workstream                                               | Status    | PR  |
 | -------------------------------------------------------- | --------- | --- |
 | M5a — `viewUrl` (ADR-024) + USAspending contracts target | Delivered | #30 |
-| M5b — Maritime FR target, M5 close-out                   | Next      | —   |
+| M5b — Maritime FR target, M5 close-out                   | Delivered | —   |
 
 ## Context / findings (all of M5, live-verified 2026-09-17)
 
@@ -226,7 +226,24 @@ though the maritime target itself is a plain GET and won't need to set `viewUrl`
 
 ## M5b — Maritime FR target, M5 close-out
 
-**Not started.**
+**Delivered 2026-09-17.**
+
+Two findings during implementation, beyond what triage above anticipated:
+
+- **`agencies[0].name` is the parent department, not the publishing agency, for any document filed
+  under a multi-level agency.** Live-verified: FR lists a sub-agency's document as `[parent
+department, sub-agency]` (e.g. `[Transportation Department, Maritime Administration]`,
+  `[Homeland Security Department, Coast Guard]`). The plan's `agencies[0].name` above would have
+  named the department for every Coast Guard/MARAD document — i.e. always wrong for this target's
+  entire purpose. Fixed by using `agencies[-1:].name` instead (always exactly one match, so it
+  can't go `SELECTOR_AMBIGUOUS`). The same bug was live in the already-shipped `fr-smr-mentions`
+  (6 of its 76 documents are sub-agency filings under Transportation/Commerce) — fixed there too,
+  in its own commit, since it's the same root cause and this target's design surfaced it.
+- **`isRetryable` already retries a bare Federal Register 5xx.** `NETWORK_ERROR`/`TIMEOUT` retry
+  unconditionally and `HTTP_ERROR` retries for any `httpStatus >= 500`
+  (`src/ingest/fetch/http-fetcher.ts`), covered by an existing test
+  (`tests/http-fetcher.test.ts:85`, "retries a 500 and succeeds on a later attempt"). No engine
+  change needed — the open question from triage resolves to "already handled."
 
 ### Target: `fr-maritime-reactor` (Regulatory & Policy)
 
@@ -272,9 +289,16 @@ though the maritime target itself is a plain GET and won't need to set `viewUrl`
 4. Note the interaction with M4c (`bluecore-form-d` retirement, not started as of this writing):
    the final target count in `05-SOURCES.md` depends on whether M4c has landed — call out whichever
    is true at the time M5b actually ships rather than hardcoding a number here.
+   **Resolved:** checked 2026-09-17 — M4c had not landed at ship time, so `05-SOURCES.md`'s count
+   is 12 (10 pre-M5 + `usaspending-advanced-reactor-awards` + `fr-maritime-reactor`), including
+   `bluecore-form-d`. Whoever picks up M4c should re-check that count when it lands.
 
 **Verification (M5b specifically, beyond the standard set):**
 `npm run fixture:verify -- --env bluecore` reports the new target passing with zero drift on every
 existing one; `npm run validate:config -- --env bluecore` passes; a fresh `npm run ingest -- --dry`
 run shows a populated `latest_award`/`latest_document_title` block for both new targets, not just
-counts.
+counts. All confirmed 2026-09-17 (12 targets ok, zero drift on the 11 pre-existing; 12 targets/39
+extractors valid; dry run shows populated title/type/date/agency blocks for `fr-maritime-reactor`
+and a populated award composite for `usaspending-advanced-reactor-awards`). A real ADR-023
+preview-mode ingestion (`gh workflow run ingest.yml --ref m5b-maritime-fr-target`) also confirmed
+the target live against a deployed Cloudflare preview before merge, per `06-OPS-RUNBOOK.md` §12.

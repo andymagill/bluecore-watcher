@@ -36,7 +36,7 @@
     "value": "Nuclear Regulatory Commission",
     "displayValue": "Nuclear Regulatory Commission",
     "rawText": "Nuclear Regulatory Commission",
-    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].agencies[0].name",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].agencies[-1:].name",
     "contentHash": "sha256:9b0c2c9921d455a0f1e92ed30b6c41dd3bb9a4c67712119127abd1807b049598"
   }
 }

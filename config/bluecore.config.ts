@@ -584,9 +584,15 @@ export const config: CmieConfigInput = {
           type: "string",
           // Only meaningful here — fr-nrc-smr/fr-doe-nuclear already filter
           // to one agency, so this would be a constant there. Eight distinct
-          // agencies[0].name values observed live across this query's own
-          // 76 results; string, not enum, since that set can grow.
-          jsonPath: "$.results[0].agencies[0].name",
+          // agency lists observed live across this query's own 76 results;
+          // string, not enum, since that set can grow. `[-1:]`, not `[0]`:
+          // FR lists a sub-agency's document as [parent department,
+          // sub-agency] (verified live 2026-09-17 — e.g. [Transportation
+          // Department, Maritime Administration], [Commerce Department,
+          // International Trade Administration]), so `[0]` named the parent
+          // department instead of the publishing agency. The slice always
+          // yields exactly one match, so it can't go SELECTOR_AMBIGUOUS.
+          jsonPath: "$.results[0].agencies[-1:].name",
           assert: { notEmpty: true, maxLength: 120 },
         },
       ],
@@ -735,6 +741,106 @@ export const config: CmieConfigInput = {
           type: "date",
           jsonPath: "$.results[0].publication_date",
           assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2015-01-01" },
+        },
+      ],
+    },
+
+    // Closes the maritime-regulatory gap named in the roadmap's M5 exit
+    // criterion. Filters on two agencies (Coast Guard, Maritime
+    // Administration) with term=reactor: `nuclear` alone on Coast Guard is
+    // 185 documents dominated by unrelated marine security zones, while a
+    // quoted "small modular reactor" is only 1 document — too narrow to
+    // ever move again. `reactor` is the middle ground that stayed genuinely
+    // on-topic across all 15 live results while still moving as recently as
+    // 2026-05-07 (see fixtures/plan doc for the live triage). Don't "fix"
+    // this back to `nuclear` or a quoted phrase without re-checking that
+    // tradeoff.
+    {
+      id: "fr-maritime-reactor",
+      label: "Federal Register — Maritime/Coast Guard Reactor Documents",
+      entityId: "bluecore-energy",
+      sectionId: "regulatory",
+      kind: "api",
+      url: "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest",
+      schedule: { cron: "0 15 * * *", ttlHours: 168 },
+      notes:
+        "Live-verified 2026-09-17: 15 documents total, newest a 2026-05-07 MARAD Notice directly " +
+        "on point for BlueCore's floating-power-plant concept (\"Request for Information: " +
+        "Development of a Commercially Viable System-Centric Small Modular Reactor Concept for " +
+        'Deployment..."); the rest are genuine maritime/nuclear content (NS Savannah ' +
+        "decommissioning, Pilgrim/Maine Yankee security zones), not noise. No M2b-style backfill " +
+        "exists yet for this query, unlike fr-nrc-smr/fr-doe-nuclear/fr-smr-mentions — " +
+        "min/max/maxChangeAbs below are a first-observation sanity band (15 seen, generous " +
+        "headroom both directions), not derived from historical movement; revisit once weekly " +
+        "drift data accumulates. Coverage gap, explicitly out of scope: USCG guidance that never " +
+        "reaches the Federal Register (NVICs, CG-ENG/MSC policy letters, docket attachments) isn't " +
+        "caught by this target. latest_document_agency's jsonPath is `agencies[-1:]`, not `[0]` — " +
+        "this query spans two multi-level agencies (Coast Guard and Maritime Administration are " +
+        "both listed under their parent department first, e.g. [Transportation Department, " +
+        "Maritime Administration]), same fix applied to fr-smr-mentions in this milestone.",
+      extractors: [
+        {
+          key: "maritime_reactor_document_count",
+          label: "Maritime Reactor Document Count",
+          presenter: "metric",
+          kind: "api",
+          jsonPath: "$.count",
+          type: "number",
+          unit: "documents",
+          assert: { min: 5, max: 150, maxChangeAbs: 10 },
+        },
+        {
+          key: "latest_document_title",
+          label: "Latest Document",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          fields: {
+            title: { jsonPath: "$.results[0].title" },
+            url: { jsonPath: "$.results[0].html_url", escape: "none" },
+          },
+          template: "[{title}]({url})",
+          assert: { notEmpty: true, maxLength: 1000 },
+        },
+        {
+          key: "latest_document_type",
+          label: "Latest Document Type",
+          presenter: "status",
+          kind: "api",
+          type: "enum",
+          jsonPath: "$.results[0].type",
+          // Same five-value vocabulary as the other fr-* targets; all three
+          // of Notice/Proposed Rule/Rule observed live for this query.
+          enumValues: [
+            "Rule",
+            "Proposed Rule",
+            "Notice",
+            "Presidential Document",
+            "Uncategorized Document",
+          ],
+          assert: { notEmpty: true },
+        },
+        {
+          key: "latest_document_date",
+          label: "Latest Document Date",
+          presenter: "metric",
+          kind: "api",
+          type: "date",
+          jsonPath: "$.results[0].publication_date",
+          assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2015-01-01" },
+        },
+        {
+          key: "latest_document_agency",
+          label: "Latest Document Agency",
+          presenter: "markdown",
+          kind: "api",
+          type: "string",
+          // Included (unlike fr-nrc-smr/fr-doe-nuclear, which filter to one
+          // agency): this query spans two, so which one published the
+          // latest document is itself signal. `[-1:]`, not `[0]` — see
+          // notes above.
+          jsonPath: "$.results[0].agencies[-1:].name",
+          assert: { notEmpty: true, maxLength: 120 },
         },
       ],
     },

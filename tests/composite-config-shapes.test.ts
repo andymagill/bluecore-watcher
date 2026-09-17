@@ -142,6 +142,17 @@ function buildDocumentLinkTarget(): TargetDef {
             ],
             assert: { notEmpty: true },
           },
+          {
+            key: "latest_document_agency",
+            label: "Latest Document Agency",
+            presenter: "markdown",
+            kind: "api",
+            type: "string",
+            // Last element, not [0] — a sub-agency's document lists its
+            // parent department first.
+            jsonPath: "$.results[0].agencies[-1:].name",
+            assert: { notEmpty: true, maxLength: 120 },
+          },
         ],
       },
     ],
@@ -331,6 +342,43 @@ describe("composite config shapes — single-row document link (mirrors latest_d
     expect(block.status).toBe("missing");
     expect(healthEntryDraft?.errorClass).toBe("ASSERTION_FAILED");
     expect(healthEntryDraft?.message).toContain("enumValues");
+  });
+
+  it("names the publishing agency — the last listed — for single- and parent/sub-agency documents", async () => {
+    const handler = new ApiHandler();
+    const acks = await emptyAcks();
+    const target = buildDocumentLinkTarget();
+    const agencyExtractor = target.extractors[2]!;
+    const cases: [unknown, string][] = [
+      [await loadFixture("example-regulatory-api"), "Example Regulatory Agency"],
+      [
+        {
+          results: [
+            {
+              agencies: [
+                { name: "Example Parent Department", parent_id: null },
+                { name: "Example Sub-Agency", parent_id: 1 },
+              ],
+            },
+          ],
+        },
+        "Example Sub-Agency",
+      ],
+    ];
+    for (const [doc, expected] of cases) {
+      const { block } = await processExtractor({
+        handler,
+        doc,
+        extractor: agencyExtractor,
+        target,
+        previousBlock: null,
+        acknowledgements: acks,
+        now: new Date("2026-09-17T00:00:00.000Z"),
+        httpStatus: 200,
+      });
+      expect(block.status).toBe("ok");
+      expect(block.value).toBe(expected);
+    }
   });
 });
 
