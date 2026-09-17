@@ -137,15 +137,26 @@ interface ExtractorBase {
   locale?: string; // default "en-US"
   dateFormat?: string; // when the source is unparseable by Date
   enumValues?: string[]; // type: "enum"; anything else → ASSERTION_FAILED
+  limit?: number; // ADR-025 — required on a composite list, meaningless elsewhere
 
   // ---- Validation ----
   assert?: AssertDef;
   alert?: AlertDef;
 }
 
-// One member per handler. v1 ships exactly these two.
+// One member per handler. v1 shipped the first two; ADR-025 (M6a) added
+// html's composite row-list shape.
 type LocationDef =
-  | { kind: "html"; selector: string; attr?: string; multiple?: boolean }
+  | { kind: "html"; selector: string; attr?: string; multiple?: boolean } // simple
+  | {
+      // composite row list (ADR-025) — selector+multiple pick the row
+      // nodes, fields+template compose each of the first `limit` rows
+      kind: "html";
+      selector: string;
+      multiple: true;
+      fields: Record<string, HtmlFieldDef>;
+      template: string;
+    }
   | { kind: "api"; jsonPath: string } // simple — one value, one jsonPath
   | {
       // composite (ADR-022) — several jsonPaths, one row, one markdown string
@@ -155,21 +166,37 @@ type LocationDef =
       template: string;
     };
 
-interface ApiFieldDef {
-  jsonPath: string; // may contain a literal "{index}" token
+// Shared by every composite location's fields (ADR-022/ADR-025). Order:
+// strip -> split -> valueMap -> join -> format -> truncate -> escape.
+interface FieldTransformDef {
   strip?: string; // regex source; every match removed
   split?: string; // literal separator (String.prototype.split)
   valueMap?: Record<string, string>;
   join?: string; // default ", " — requires split
-  escape?: "markdown" | "url" | "none"; // default "markdown"
+  format?: "date"; // normalizes free-text dates to one display convention
+  truncate?: number; // display-only length cap; the stored raw value is unaffected
+  escape?: "markdown" | "url" | "none" | "href"; // default "markdown"
+}
+
+interface ApiFieldDef extends FieldTransformDef {
+  jsonPath: string; // may contain a literal "{index}" token
+}
+
+interface HtmlFieldDef extends FieldTransformDef {
+  selector?: string; // omitted -> the row node itself
+  attr?: string; // omitted -> the matched node's text
 }
 ```
 
 `kind` here mirrors `TargetDef.kind` (§2) — a config validation rule (see §5) requires them to match, since one target's extractors all share its fetch/parse family. `multiple` declares intent for `html`; a selector matching more than one node without it is `SELECTOR_AMBIGUOUS`, not a silent first match. `api` extractors are inherently single-valued per `jsonPath`; a `list` presenter over an `api` target maps a `jsonPath` that resolves to an array.
 
-**A composite `api` location (ADR-022)** exists for a source whose facts live in parallel arrays with no stable index — SEC's `filings.recent.form[i]`/`.items[i]`/`.filingDate[i]`, where the row you want (the latest 8-K) usually isn't at index 0 and JSONPath alone can't join a filter match on one array to a sibling array by position. `index.jsonPath` resolves one row (v1 ships only `pick: "first"` — declared intent, like html's `:first`; document the real ordering assumption in the target's `notes`, same convention `02-CONFIG-SCHEMA.md`'s `notes` field already asks for). Every occurrence of `{index}` in a field's `jsonPath` is substituted with that row before the field's own JSONPath runs. Each field then reads exactly one value and narrows it: `strip` (a regex, every match removed) → `split` (a literal separator; empty tokens dropped) → `valueMap` (every remaining token must have an entry — an unmapped token is `PARSE_ERROR`, same strictness as `enumValues`) → `join` (only meaningful after `split`) → `escape` (markdown-escapes, URL-encodes, or leaves the joined string alone). `template` fills `{name}` placeholders from the transformed field values (and `{index}` itself, when `index` is set) into one markdown string — which is why a composite location is always `presenter: "markdown"` / `type: "markdown"`; it doesn't produce a typed scalar the other presenter/type pairs would coerce meaningfully. See ADR-022 and `01-DATA-CONTRACT.md` §4 for what this means for `provenance.rawText`/`contentHash` (the raw pre-transform field values, not the composed text — so relabeling a `valueMap` entry never fakes a content change).
+**A composite `api` location (ADR-022)** exists for a source whose facts live in parallel arrays with no stable index — SEC's `filings.recent.form[i]`/`.items[i]`/`.filingDate[i]`, where the row you want (the latest 8-K) usually isn't at index 0 and JSONPath alone can't join a filter match on one array to a sibling array by position. `index.jsonPath` resolves one row (v1 ships only `pick: "first"` — declared intent, like html's `:first`; document the real ordering assumption in the target's `notes`, same convention `02-CONFIG-SCHEMA.md`'s `notes` field already asks for). Every occurrence of `{index}` in a field's `jsonPath` is substituted with that row before the field's own JSONPath runs. Each field then reads exactly one value and narrows it through the shared `FieldTransformDef` pipeline below. `template` fills `{name}` placeholders from the transformed field values (and `{index}` itself, when `index` is set) into one markdown string — which is why a composite `api` location is always `presenter: "markdown"` / `type: "markdown"`; it doesn't produce a typed scalar the other presenter/type pairs would coerce meaningfully. See ADR-022 and `01-DATA-CONTRACT.md` §4 for what this means for `provenance.rawText`/`contentHash` (the raw pre-transform field values, not the composed text — so relabeling a `valueMap` entry never fakes a content change).
 
-Repair (`06-OPS-RUNBOOK.md` §3, ADR-003) doesn't cover a composite/indexed location — there's no single locator to relocate a value to. A broken one needs a human (or an agent reading the target's `notes`) to hand-edit the config.
+**A composite `html` row list (ADR-025)** exists for the same "several facts, several rows" shape a plain `list` (`multiple: true`) can't express: `bluecore-newsroom`'s news-card grid is `N` rows, each with a title, a link, a category, and a date — a plain list can only repeat one selector's text, not compose several fields per row. `selector`+`multiple: true` pick the row nodes exactly as a plain list would; `fields` are then **row-relative** (`row.find(field.selector)`, or the row node itself when `selector` is omitted — needed when the row node itself carries the value, e.g. an `<a>` row's own `href`) and compose per row into `template`, same shape as the api composite above. `limit` (on `ExtractorBase`, shared with a future composite `api` list) bounds how many of the matched rows are resolved, applied **before** field resolution — a malformed row past the window can't fail extraction for a well-formed one inside it — and is required on any composite list (rejected everywhere else). A composite `html` location is always `presenter: "list"` / `type: "markdown"`; a plain (non-composite) `list` stays `type: "string"`.
+
+**The shared field-transform pipeline** (`FieldTransformDef`, used by both composite shapes): `strip` (a regex, every match removed) → `split` (a literal separator; empty tokens dropped) → `valueMap` (every remaining token must have an entry — an unmapped token is `PARSE_ERROR`, same strictness as `enumValues`) → `join` (only meaningful after `split`) → `format: "date"` (runs the joined text through the same date-coercion/display path `type: "date"` uses, so `"September 8, 2026"` and `"AUG 6, 2026"` both normalize to `08 Sep 2026`) → `truncate` (display-only; the stored/hashed raw value keeps its full length) → `escape` (`markdown` escapes markdown-significant characters; `url` percent-encodes the whole value; `none` leaves it alone; `href`, ADR-025, resolves it against `target.url` when relative, rejects a non-`http(s)` scheme as `PARSE_ERROR`, and percent-encodes parens/whitespace so the composed `[text](url)` link syntax can't break).
+
+Repair (`06-OPS-RUNBOOK.md` §3, ADR-003) doesn't cover a composite/indexed location, of either kind — there's no single locator to relocate a value to. A broken one needs a human (or an agent reading the target's `notes`) to hand-edit the config.
 
 **Adding a source kind is additive, not a schema rewrite.** See §7.
 
@@ -209,12 +236,12 @@ Per `01-DATA-CONTRACT.md` §6, these are the only defence against a selector tha
 
 ### Presenters
 
-| `presenter` | Accepts `type`                  | Renders                                           |
-| ----------- | ------------------------------- | ------------------------------------------------- |
-| `metric`    | number, currency, percent, date | Large value, unit, label, source link             |
-| `markdown`  | markdown, string                | Prose block via markdown parser, source link      |
-| `list`      | string (with `multiple: true`)  | Bulleted items, each with its own anchor          |
-| `status`    | enum                            | Coloured pill, states mapped in the section theme |
+| `presenter` | Accepts `type`                                  | Renders                                                                                       |
+| ----------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `metric`    | number, currency, percent, date                 | Large value, unit, label, source link                                                         |
+| `markdown`  | markdown, string                                | Prose block via markdown parser, source link                                                  |
+| `list`      | string (plain) or markdown (composite, ADR-025) | Bulleted items, each rendered inline (sanitized markdown for a composite row), source popover |
+| `status`    | enum                                            | Coloured pill, states mapped in the section theme                                             |
 
 ---
 
@@ -251,13 +278,13 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 4. `extractor.key` is unique within its target.
 5. `cron` parses; `ttlHours > 0`; `ttlHours ≥ 2 ×` the cron interval, **or** `schedule.ttlOverrideReason` is a non-empty string. _(Corrected 2026-09-12 — the original override mechanism was a `// eslint-disable`-style comment, which a JSON Schema / Zod validator cannot see. `ttlOverrideReason` is a real schema field so the override is machine-checkable and self-documenting.)_
 6. Location fields match `kind` per the discriminated union in §3: `{ kind: "html", selector, ... }` requires the target's `kind` to be `"html"`; `{ kind: "api", jsonPath }` requires `"api"`. Mismatch is a type error at author time (the union makes it unrepresentable), and a defence-in-depth runtime check for anything hand-constructed.
-7. `type` and `presenter` are compatible per the table in §3.
+7. `type` and `presenter` are compatible per the table in §3. **(Extended, ADR-025)** `presenter: "list"` further requires `type: "string"` for a plain location and `type: "markdown"` for a composite one (`fields`+`template`) — never the other pairing.
 8. `currency` set ⟺ `type: "currency"`. `enumValues` set ⟺ `type: "enum"`. `minItems`/`maxItems` set ⟹ `presenter: "list"`. **(Extended, ADR-018)** every other `assert` field is rejected outside the type/presenter it can actually affect, since a field that can never fire is worse than no field — it reads as a guard that isn't one: `min`/`max` ⟹ a numeric type; `pattern`/`maxLength` ⟹ a string-like type or `presenter: "list"`; `maxChangePct`/`maxChangeAbs` ⟹ a numeric type or `"list"` (compared against item count); `expectMonotonic` ⟹ numeric, `"date"`, or `"list"`; `maxFutureDays`/`notBefore` ⟹ `type: "date"`. `notEmpty` is unrestricted.
 9. **Config-time:** every `secretEnv` and `*Env` name is a non-empty string (existence of the _name_, not the _value_, since secrets legitimately don't exist at author time or in a pre-commit hook). **Run-time:** a `secretEnv` whose named variable is unset skips that target with `AUTH_ERROR` rather than failing the whole run. _(Split 2026-09-12 — the original single rule conflated these two checks and, read as one pre-commit rule, would fail on every author machine that hasn't set the secret.)_
 10. `url` is absolute and `https`.
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
 12. **(M3a/ADR-019)** `alert.thresholdPct` follows rule 8's no-op-field principle: it's rejected unless `alert.on` is `"threshold"`, against a numeric type or `presenter: "list"` (compared against item count, same applicability as `maxChangePct`/`maxChangeAbs`) — and `alert.on: "threshold"` itself requires `thresholdPct` to be set. `alerting.channel` is restricted to `"github-issue"`; `"webhook"`/`"email"` are rejected until a dispatcher for either exists (§4).
-13. **(ADR-022)** An `api` location has exactly one of `jsonPath` (simple) or `fields` + `template` (composite) — never both, never neither. For a composite location: every `template` placeholder is either `"index"` (only when `index` is set) or a name in `fields`, and every name in `fields` appears in `template`; no field may be named `"index"`; a field's `jsonPath` contains `"{index}"` if and only if `index` is configured; a field's `join` requires `split`; and the extractor's own `presenter`/`type` must be `"markdown"`/`"markdown"`.
+13. **(ADR-022)** An `api` location has exactly one of `jsonPath` (simple) or `fields` + `template` (composite) — never both, never neither. For a composite location: every `template` placeholder is either `"index"` (only when `index` is set) or a name in `fields`, and every name in `fields` appears in `template`; no field may be named `"index"`; a field's `jsonPath` contains `"{index}"` if and only if `index` is configured; a field's `join` requires `split`; and the extractor's own `presenter`/`type` must be `"markdown"`/`"markdown"`. **(Extended, ADR-025)** An `html` location may likewise carry `fields`+`template` instead of a plain `selector`; the same field/template consistency checks apply (minus the `index`/`{index}` rules, which have no html equivalent), plus: `attr` may not also be set (fields pick their own `attr` per row); `multiple: true` is required; and the extractor's own `presenter`/`type` must be `"list"`/`"markdown"`. `limit` (`ExtractorBase`) is required on any composite list (either kind) and rejected everywhere else.
 14. **(ADR-024)** `target.viewUrl` is required when `target.method` is `"POST"` — a POST endpoint is never itself a dashboard-clickable link. A `GET` target may set it too, but doesn't have to.
 
 ---
