@@ -19,7 +19,12 @@ function escapeMarkdown(s: string): string {
 
 // escape: "href" (ADR-025) percent-encodes characters that would otherwise
 // break the composed `[text](url)` markdown link syntax once resolved.
+// `encodeURIComponent` deliberately leaves "(" and ")" unescaped (they're
+// valid in a URI per RFC 3986's sub-delims), so they need an explicit map;
+// everything else `HREF_UNSAFE` matches (whitespace) is a normal
+// `encodeURIComponent` target.
 const HREF_UNSAFE = /[()\s]/g;
+const HREF_ENCODE_OVERRIDES: Readonly<Record<string, string>> = { "(": "%28", ")": "%29" };
 
 /**
  * strip -> split -> valueMap -> join -> format -> truncate -> escape, in
@@ -106,7 +111,10 @@ function resolveHref(
         `("${resolved.protocol}")`,
     );
   }
-  return resolved.href.replace(HREF_UNSAFE, (ch) => encodeURIComponent(ch));
+  return resolved.href.replace(
+    HREF_UNSAFE,
+    (ch) => HREF_ENCODE_OVERRIDES[ch] ?? encodeURIComponent(ch),
+  );
 }
 
 /** Fills `{name}` placeholders. Config validation (rule 13) already proves every name resolves. */
