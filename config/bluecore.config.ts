@@ -13,6 +13,55 @@ import type { CmieConfigInput } from "../src/config/schema.js";
 const SEC_UA = "bluecore-watcher/0.1 (contact: andymagill@gmail.com)";
 const GENERAL_UA = "bluecore-watcher/0.1 (+https://github.com/andymagill/bluecore-watcher)";
 
+// M4b (ADR-022): SEC's own Form 8-K item schedule — code to plain-English
+// title, covering the full modern (post-2004) set so a composite `valueMap`
+// extractor over `filings.recent.items[i]` never hits an unmapped code
+// (compose.ts throws PARSE_ERROR on a miss). 19 of these 32 codes have been
+// observed across the two competitor fixtures' history; the rest are mapped
+// ahead of need rather than guessed, from SEC's own Form 8-K instructions.
+// Does not cover pre-2004 bare item numbers ("Item 5") — neither fixture's
+// `recent` window reaches back that far.
+const SEC_8K_ITEMS: Record<string, string> = {
+  "1.01": "Entry into a Material Definitive Agreement",
+  "1.02": "Termination of a Material Definitive Agreement",
+  "1.03": "Bankruptcy or Receivership",
+  "1.04": "Mine Safety – Reporting of Shutdowns and Patterns of Violations",
+  "1.05": "Material Cybersecurity Incidents",
+  "2.01": "Completion of Acquisition or Disposition of Assets",
+  "2.02": "Results of Operations and Financial Condition",
+  "2.03":
+    "Creation of a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement of a Registrant",
+  "2.04":
+    "Triggering Events That Accelerate or Increase a Direct Financial Obligation or an Obligation under an Off-Balance Sheet Arrangement",
+  "2.05": "Costs Associated with Exit or Disposal Activities",
+  "2.06": "Material Impairments",
+  "3.01":
+    "Notice of Delisting or Failure to Satisfy a Continued Listing Rule or Standard; Transfer of Listing",
+  "3.02": "Unregistered Sales of Equity Securities",
+  "3.03": "Material Modification to Rights of Security Holders",
+  "4.01": "Changes in Registrant's Certifying Accountant",
+  "4.02":
+    "Non-Reliance on Previously Issued Financial Statements or a Related Audit Report or Completed Interim Review",
+  "5.01": "Changes in Control of Registrant",
+  "5.02":
+    "Departure of Directors or Certain Officers; Election of Directors; Appointment of Certain Officers; Compensatory Arrangements of Certain Officers",
+  "5.03": "Amendments to Articles of Incorporation or Bylaws; Change in Fiscal Year",
+  "5.04": "Temporary Suspension of Trading Under Registrant's Employee Benefit Plans",
+  "5.05":
+    "Amendment to Registrant's Code of Ethics, or Waiver of a Provision of the Code of Ethics",
+  "5.06": "Change in Shell Company Status",
+  "5.07": "Submission of Matters to a Vote of Security Holders",
+  "5.08": "Shareholder Director Nominations",
+  "6.01": "ABS Informational and Computational Material",
+  "6.02": "Change of Servicer or Trustee",
+  "6.03": "Change in Credit Enhancement or Other External Support",
+  "6.04": "Failure to Make a Required Distribution",
+  "6.05": "Securities Act Updating Disclosure",
+  "7.01": "Regulation FD Disclosure",
+  "8.01": "Other Events",
+  "9.01": "Financial Statements and Exhibits",
+};
+
 export const config: CmieConfigInput = {
   schemaVersion: 1,
 
@@ -294,6 +343,42 @@ export const config: CmieConfigInput = {
             expectMonotonic: "increasing",
           },
         },
+        {
+          key: "latest_8k",
+          label: "Latest 8-K",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          // ADR-022: the row of interest isn't at a fixed index (verified
+          // live 2026-09-16 — Oklo's first 8-K sat at index 1 on 2026-09-13
+          // and index 7 three days later), so `index` finds it and every
+          // {index} field reads that same row.
+          index: { jsonPath: '$.filings.recent.form[?(@ === "8-K")]~', pick: "first" },
+          fields: {
+            items: {
+              jsonPath: "$.filings.recent.items[{index}]",
+              split: ",",
+              valueMap: SEC_8K_ITEMS,
+              join: "; ",
+            },
+            date: { jsonPath: "$.filings.recent.filingDate[{index}]" },
+            acc: {
+              jsonPath: "$.filings.recent.accessionNumber[{index}]",
+              strip: "-",
+              escape: "none",
+            },
+            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "url" },
+          },
+          // CIK unpadded — the zero-padded form of the EDGAR Archives path
+          // 301-redirects (verified live 2026-09-16); no alert here, mirroring
+          // latest_filing_date's pattern — latest_filing_form's any-change
+          // would be redundant noise since it already fires on any new filing.
+          template:
+            "**{items}** filed {date} — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/{acc}/{doc})",
+          // 1200, not the plan doc's 500: a multi-item 8-K can compose six
+          // labels, several over 100 chars, before markdown-escaping.
+          assert: { notEmpty: true, maxLength: 1200 },
+        },
       ],
     },
 
@@ -344,6 +429,35 @@ export const config: CmieConfigInput = {
             notBefore: "2020-01-01",
             expectMonotonic: "increasing",
           },
+        },
+        {
+          key: "latest_8k",
+          label: "Latest 8-K",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          // ADR-022: same reasoning as oklo-sec-filings — NuScale's first
+          // 8-K sat at index 9 (verified live 2026-09-16, matching the
+          // 2026-09-13 fixture).
+          index: { jsonPath: '$.filings.recent.form[?(@ === "8-K")]~', pick: "first" },
+          fields: {
+            items: {
+              jsonPath: "$.filings.recent.items[{index}]",
+              split: ",",
+              valueMap: SEC_8K_ITEMS,
+              join: "; ",
+            },
+            date: { jsonPath: "$.filings.recent.filingDate[{index}]" },
+            acc: {
+              jsonPath: "$.filings.recent.accessionNumber[{index}]",
+              strip: "-",
+              escape: "none",
+            },
+            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "url" },
+          },
+          template:
+            "**{items}** filed {date} — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/{acc}/{doc})",
+          assert: { notEmpty: true, maxLength: 1200 },
         },
       ],
     },
