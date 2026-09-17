@@ -97,14 +97,14 @@ The milestone that decides whether this is maintainable by one person. Delivered
 
 ## M4 — Source quality: content-depth
 
-Upgrade three existing source types to extract substantive content alongside volume metrics, and reconfigure one dashboard-occupying source as alert-only. Builds on M2's verified baseline extractors. In progress across three sequential workstreams (M4a, M4b delivered; M4c not started) — see [`docs/plans/m4-source-quality.md`](plans/m4-source-quality.md) for the plan, decisions, and status.
+Upgrade three existing source types to extract substantive content alongside volume metrics, and reconfigure one dashboard-occupying source as alert-only. Builds on M2's verified baseline extractors. In progress across three sequential workstreams (M4a, M4b delivered; M4c folded into M6a, see below) — see [`docs/plans/m4-source-quality.md`](plans/m4-source-quality.md) for the plan, decisions, and status.
 
 **Scope:**
 
 - **Engine:** a composite/indexed `api` location (ADR-022) — SEC's `filings.recent` is parallel arrays with no stable index for "the latest 8-K," which a plain `jsonPath` can't bind across arrays. ✅ M4a.
 - **Federal Register sources** (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`): Extract the title (as a link), type, and date of the most recent document matching each filter, alongside the existing count; `fr-smr-mentions` also extracts the publishing agency (the other two already filter to one agency, so it'd be a constant there). A regulatory signal moves from "NRC attention is 56 documents" to "NRC published a [specific] rulemaking on [date]". ✅ M4b.
 - **SEC submissions** (`oklo-sec-filings`, `nuscale-sec-filings`): Extract the filing's `items` field and a link to the primary document from the most recent 8-K, not just the form code and date, using M4a's composite location. Turns "Oklo filed an 8-K on Tuesday" into "Oklo [filed a partnership agreement / announced financing]". `bluecore-sec-filings` (Company section) gets a generic latest-filing composite instead — live-verified to have no 8-K in its history, just two Form D filings. ✅ M4b.
-- **BlueCore Form D** (`bluecore-form-d`): Retire the target — the companion `bluecore-sec-filings` already detects new filings, and M4b's `bluecore-sec-filings` upgrade absorbs the primary-document link Form D existed partly to surface. The XML target's dollar amounts were relevant once (the seed filing) but static between filings; frees dashboard real estate for higher-signal sources. M4c.
+- **BlueCore Form D** (`bluecore-form-d`): Retire the target — the companion `bluecore-sec-filings` already detects new filings, and M4b's `bluecore-sec-filings` upgrade absorbs the primary-document link Form D existed partly to surface. The XML target's dollar amounts were relevant once (the seed filing) but static between filings; frees dashboard real estate for higher-signal sources. **M4c, folded into M6a 2026-09-17** — M6 introduces a real `kind: "xml"` handler, and `bluecore-form-d` (parsing XML through the `html` kind as a workaround) is the target M6a's Company-card rework already touches; see [`docs/plans/m6-recent-item-lists.md`](plans/m6-recent-item-lists.md).
 
 **Testing approach:** Per ADR-001, the engine feature (M4a) is proven against synthetic fixtures directly in vitest (`tests/api-composite.test.ts`), not `config/example.config.ts` — the real bluecore config (`npm run fixture:verify`) already proves it doesn't disturb any existing target. FR/SEC extractors (M4b) are tested the same way against generalized, entity-agnostic fixtures (`example-regulatory-api`, `example-sec-submissions`) in `tests/composite-config-shapes.test.ts`. Entity configs verified via `npm run fixture:verify` against `bluecore-*` and competitor config (ADR-021). No entity names in test requirements.
 
@@ -134,21 +134,43 @@ Add sources that expose regulatory and procurement content currently unavailable
 
 ---
 
-## M6 — Source quality: competitor depth & sector signal
+## M6 — Recent-item lists & competitor news
 
-Beyond M4+M5's completeness bar (every section has ≥1 substantive source) — this fills the remaining named-but-unfilled `SPEC.md` §3 sub-dimensions: "technology updates"/"supply chain bottlenecks" under Competitive Landscape, and "sector sentiment" under Market Conditions. Not required for the first client deliverable (that gate is M5's); this is depth beyond it.
+Every "latest X" block on the dashboard today shows exactly one item, even where the underlying source has dozens (BlueCore's own newsroom, all four Federal Register targets, both competitors' SEC filings, USAspending's contract awards). `bluecore-newsroom`'s headline in particular renders as plain unlinked text. Upgrades the unused `list` presenter (`01-DATA-CONTRACT.md` §4.1, shipped at M0.5, never exercised by a real target) to a short, linked, per-item list wherever a "latest" extractor exists today, and gives both competitors a news source for the first time — closing a real gap: Oklo and NuScale have had SEC-filing coverage since M2 but no news-level signal at all. Delivered across four sequential workstreams (M6a–M6d) — see [`docs/plans/m6-recent-item-lists.md`](plans/m6-recent-item-lists.md) for the plan, live-triage findings, and status.
 
 **Scope:**
 
-- **Competitor depth (`oklo-inc`, `nuscale-power`):** Triage and configure at least one additional source type about the two existing competitor entities — not new entities. Candidates to triage: patent filings (USPTO), investor-relations/press pages, technology-update announcements. Chosen per `docs/05-SOURCES.md` method; should extract substantive content the way M4b's SEC upgrade did, not just another count.
+- **Engine (ADR-025):** a composite `list` location — ADR-022's per-row `fields`+`template` composition, repeated over the first `limit` matched rows instead of one row, for both `html`/`xml` (row-selector) and `api` (`index.pick: "each"`, new alongside the existing `"first"`) locations. Also fixes three defects the unused `list` presenter was carrying: `ListBlock.tsx`'s broken per-item link, a template-only edit not actually publishing its new display value, and `computeSetDelta` reporting a normal "new item pushed the oldest one out" window shift as both an add and a remove.
+- **Engine (ADR-026):** a new `kind: "xml"` handler — Cheerio's default HTML parser returns an empty string for `<link>` (a void element in HTML, not XML), which breaks RSS-feed extraction; XML mode fixes it. Additive per ADR-010 (one handler module, one registry line).
+- **Company** (`bluecore-newsroom`): `latest_headline`/`latest_post_category` become a 3-item `recent_posts` list; `latest_post_date`'s monotonic guard stays.
+- **Competitive Landscape** (new: `oklo-press-releases`, `nuscale-press-releases`): each competitor's own RSS press feed, 3-item lists — the first competitor source that isn't an SEC filing.
+- **Competitive + Regulatory** (`oklo-sec-filings`, `nuscale-sec-filings`, `bluecore-sec-filings`, all four `fr-*` targets): each target's single "latest" composite becomes a 3-item list alongside its existing count/date/amount scalars.
+- **Market Conditions** (`usaspending-advanced-reactor-awards`): same treatment, 3-item `recent_awards` list.
+- **Folded in — M4c:** retires `bluecore-form-d` (the one target parsing XML through the `html` kind as a workaround) now that a real `kind: "xml"` exists and M6a already reworks the Company card it lives on.
+
+**Testing approach:** Same as M4/M5 — generalized, entity-agnostic synthetic fixtures per new engine capability (`example-news-cards` for html row lists, `example-rss-feed` for the xml handler; `example-regulatory-api`/`example-contracts-api` extended to ≥3 rows for `pick: "each"`) in vitest; entity configs verified via `npm run fixture:verify`. No entity names in test requirements.
+
+**Exit:** Every list-shaped block (11 total) renders 3 linked items with working hrefs. Oklo and NuScale each have a Competitive Landscape news source. A new item produces a clean "+1" delta, not "+1 −1". A template-only edit changes what's displayed without a spurious any-change alert. `bluecore-form-d` is retired. Standard verification passes.
+
+**Status:** Not started — design-only as of 2026-09-17 (this section and `docs/plans/m6-recent-item-lists.md`; ADR-025/ADR-026 are written in `00-DECISIONS.md` when M6a/M6b land, per house convention). M6a (engine + `bluecore-newsroom` + M4c) is Next.
+
+---
+
+## M7 — Source quality: competitor depth & sector signal
+
+Beyond M4+M5's completeness bar (every section has ≥1 substantive source) and M6's recency bar (every "latest" is now a list) — this fills the remaining named-but-unfilled `SPEC.md` §3 sub-dimensions: "technology updates"/"supply chain bottlenecks" under Competitive Landscape, and "sector sentiment" under Market Conditions. Not required for the first client deliverable (that gate is M5's); this is depth beyond it.
+
+**Scope:**
+
+- **Competitor depth (`oklo-inc`, `nuscale-power`):** Triage and configure at least one additional **non-news** source type about the two existing competitor entities — not new entities. Candidates to triage: patent filings (USPTO), technology-update announcements not already covered by M6's press-release lists. **"Investor-relations/press pages" is explicitly dropped from this candidate list** — M6 already gives both competitors a press-release source, so a second news-shaped source here wouldn't add a new sub-dimension. Chosen per `docs/05-SOURCES.md` method; should extract substantive content the way M4b's SEC upgrade did, not just another count.
 - **Sector sentiment (Market Conditions):** Triage a **documented** sentiment index or survey for the nuclear/advanced-energy sector — a real organization's already-published number or category, not a value computed in-app from scraped text. Two hard constraints from `SPEC.md` §2 rule out the latter: Zero-LLM Runtime (no LLM call during ingestion/transformation/rendering) and Deterministic Provenance (every block anchors to one raw value at one documented location, not a multi-source aggregate). If triage finds no such source for this sector, drop this scope item rather than force a fit.
 - **Explicitly out of scope: Google Trends.** No official public API exists — every source triaged so far in this project is an official, documented API or a robots.txt-compliant page (SEC, Federal Register, EIA, Lever), and an unofficial/reverse-engineered endpoint conflicts with that bar and with the Deferred table's "robots.txt / ToS enforcement (Q6) — before any client deliverable" note. If search/attention-interest data is still wanted later, triage a documented alternative instead.
 
-**Testing approach:** Same as M4/M5 — generalized, entity-agnostic fixtures in vitest per new source type; entity configs verified via `npm run fixture:verify`.
+**Testing approach:** Same as M4/M5/M6 — generalized, entity-agnostic fixtures in vitest per new source type; entity configs verified via `npm run fixture:verify`.
 
-**Exit:** At least one new substantive, non-numeric source added to Competitive Landscape for an existing competitor. Market Conditions' sector-sentiment sub-dimension filled if triage finds a documented source (not a hard requirement — none may exist). Standard verification passes.
+**Exit:** At least one new substantive, non-numeric, **non-news** source added to Competitive Landscape for an existing competitor. Market Conditions' sector-sentiment sub-dimension filled if triage finds a documented source (not a hard requirement — none may exist). Standard verification passes.
 
-**Status:** Not started — more exploratory than M4/M5 at time of writing; neither the competitor-depth source nor a candidate sentiment index has been triaged yet. A future planning conversation should live-verify real candidates (same discipline as M4a/M4b: confirm the actual shape/API/documentation before writing config) before any implementation.
+**Status:** Not started — more exploratory than M4/M5 at time of writing; neither the competitor-depth source nor a candidate sentiment index has been triaged yet. A future planning conversation should live-verify real candidates (same discipline as M4a/M4b: confirm the actual shape/API/documentation before writing config) before any implementation. **Renumbered from M6 to M7 and re-scoped 2026-09-17** when M6 was redefined as recent-item lists — see the M6 section above.
 
 ---
 
@@ -166,6 +188,7 @@ Beyond M4+M5's completeness bar (every section has ≥1 substantive source) — 
 | robots.txt / ToS enforcement (Q6)                       | Before any client deliverable                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
 | Analyst-facing health UX (Q4 SLA/UX half)               | Before first client deliverable, after auth (ADR-004). Rewritten health-modal copy, a tiered outage banner, an operator-written `outage.note` config field. **Re-scoped out of M3c 2026-09-14** — needs an actual analyst audience to design for; the full original spec is preserved in `docs/plans/m3-operability.md`'s M3c section.                                                                                                                                                                                              |
 | `extractedAt` means "last changed", not "last verified" | If TTL/freshness tuning surfaces confusion. The ADR-011 fingerprint deliberately excludes timestamps, so a no-op re-verification still advances `extractedAt` (`src/ingest/process-extractor.ts`) — but a run that skips the commit entirely never publishes that advance, so a long-unchanged-but-still-passing value's displayed age can lag its true last-checked time. Noticed while investigating the Q4 safety half; not itself a defect, just a naming/documentation gap between Invariant 7's wording and what's published. |
+| Feed conditional GET (ETag/If-Modified-Since)           | If polling cost on `oklo-press-releases`/`nuscale-press-releases` (M6) ever becomes a concern — nothing at M6's design time indicates it is.                                                                                                                                                                                                                                                                                                                                                                                        |
 
 ---
 
@@ -173,7 +196,7 @@ Beyond M4+M5's completeness bar (every section has ≥1 substantive source) — 
 
 ```
 M0.5 (engine spine) ──────────┐
-                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► M5 ──► first client (source quality gate) ──► M6 (depth, optional)
+                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► M5 ──► first client (source quality gate) ──► M6 (recent-item lists) ──► M7 (depth, optional)
 Q1 (source triage, M0) ────────┘
 
 Auth (ADR-004, Deferred) ─────► required before charging a client
@@ -183,4 +206,6 @@ Auth (ADR-004, Deferred) ─────► required before charging a client
 
 **2026-09-14 update:** M4 and M5 gate the first client deliverable (source quality: all four sections have substantive, non-metric sources). Auth (ADR-004) is deferred to Backlog; it is required before charging, not a pipeline prerequisite.
 
-**2026-09-17 update:** M6 hangs off the gate, not into it — it adds depth (competitor breadth, sector sentiment if a documented source exists) beyond the four-section completeness bar M5 already satisfies. Nothing downstream is blocked on it.
+**2026-09-17 update:** M6/M7 hang off the gate, not into it — they add polish (recency, list depth) and further depth (competitor breadth, sector sentiment if a documented source exists) beyond the four-section completeness bar M5 already satisfies. Nothing downstream is blocked on either.
+
+**2026-09-17 update (M6 redefined):** M6 was retargeted from "competitor depth & sector signal" to "recent-item lists & competitor news" — upgrading every single-item "latest X" block to a short linked list, and giving both competitors a news source. The original M6 scope (competitor depth beyond news, sector sentiment) is renumbered M7 and re-scoped to exclude news-shaped sources, since M6 now covers that ground. See [`docs/plans/m6-recent-item-lists.md`](plans/m6-recent-item-lists.md).

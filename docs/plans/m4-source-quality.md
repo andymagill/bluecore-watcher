@@ -14,11 +14,11 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 
 ## Status
 
-| Workstream                                     | Status      | PR  |
-| ---------------------------------------------- | ----------- | --- |
-| M4a — Composite/indexed api location (ADR-022) | Delivered   | —   |
-| M4b — FR + SEC extractor upgrades              | Delivered   | —   |
-| M4c — Retire `bluecore-form-d`, close out M4   | Not started | —   |
+| Workstream                                     | Status                                                                                             | PR  |
+| ---------------------------------------------- | -------------------------------------------------------------------------------------------------- | --- |
+| M4a — Composite/indexed api location (ADR-022) | Delivered                                                                                          | —   |
+| M4b — FR + SEC extractor upgrades              | Delivered                                                                                          | —   |
+| M4c — Retire `bluecore-form-d`, close out M4   | Folded into M6a (2026-09-17) — see [`docs/plans/m6-recent-item-lists.md`](m6-recent-item-lists.md) | —   |
 
 ## Context / findings (all of M4)
 
