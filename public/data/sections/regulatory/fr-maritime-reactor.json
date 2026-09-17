@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.count",
         "contentHash": "sha256:e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb",
-        "extractedAt": "2026-09-17T13:19:57.393Z",
+        "extractedAt": "2026-09-17T14:35:53.409Z",
         "rawText": "15",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest"
       },
@@ -33,7 +33,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#title:$.results[0].title url:$.results[0].html_url",
         "contentHash": "sha256:bba3315f475760d457d9c0ddb7bde70f6a1902b38783cedcfb20bbc348200840",
-        "extractedAt": "2026-09-17T13:19:57.393Z",
+        "extractedAt": "2026-09-17T14:35:53.410Z",
         "rawText": "{\"title\":\"Request for Information: Development of a Commercially Viable System-Centric Small Modular Reactor Concept for Deployment in the Marine Transportation System\",\"url\":\"https://www.federalregister.gov/documents/2026/05/07/2026-09070/request-for-information-development-of-a-commercially-viable-system-centric-small-modular-reactor\"}",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest"
       },
@@ -55,7 +55,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].type",
         "contentHash": "sha256:65659145569b894bd67d06e685509c2decc5b2ac5e18700c085a253506b0fb75",
-        "extractedAt": "2026-09-17T13:19:57.393Z",
+        "extractedAt": "2026-09-17T14:35:53.410Z",
         "rawText": "Notice",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest"
       },
@@ -77,7 +77,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].publication_date",
         "contentHash": "sha256:6e64e76521e38239ff08105bf265bc4da7621b4285cb7ba8152d79a19165ab97",
-        "extractedAt": "2026-09-17T13:19:57.393Z",
+        "extractedAt": "2026-09-17T14:35:53.410Z",
         "rawText": "2026-05-07",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest"
       },
@@ -99,7 +99,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].agencies[-1:].name",
         "contentHash": "sha256:e5c7779970bc1076f63b3b9170c8b0815bfd27e5761e2342c045555b0e5b5ea8",
-        "extractedAt": "2026-09-17T13:19:57.393Z",
+        "extractedAt": "2026-09-17T14:35:53.410Z",
         "rawText": "Maritime Administration",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest"
       },
@@ -115,12 +115,12 @@
   "entityId": "bluecore-energy",
   "label": "Federal Register — Maritime/Coast Guard Reactor Documents",
   "run": {
-    "completedAt": "2026-09-17T13:19:57.394Z",
-    "durationMs": 983,
+    "completedAt": "2026-09-17T14:35:53.410Z",
+    "durationMs": 977,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T13-19-49-861Z-1cbad33",
-    "startedAt": "2026-09-17T13:19:56.411Z",
+    "runId": "2026-09-17T14-35-46-196Z-4cb1c84",
+    "startedAt": "2026-09-17T14:35:52.433Z",
     "status": "ok"
   },
   "schemaVersion": 1,

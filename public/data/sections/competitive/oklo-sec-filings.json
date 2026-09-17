@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
         "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-09-17T13:19:52.551Z",
+        "extractedAt": "2026-09-17T14:35:48.346Z",
         "rawText": "4",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -48,7 +48,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:135a65c2272a6f586108edc6466120a0ef3dc00849ca966bb3a7cdb4219a36c4",
-        "extractedAt": "2026-09-17T13:19:52.552Z",
+        "extractedAt": "2026-09-17T14:35:48.347Z",
         "rawText": "2026-09-16",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@7:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[7] date:$.filings.recent.filingDate[7] acc:$.filings.recent.accessionNumber[7] doc:$.filings.recent.primaryDocument[7]",
         "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5",
-        "extractedAt": "2026-09-17T13:19:52.552Z",
+        "extractedAt": "2026-09-17T14:35:48.347Z",
         "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-09-17T13:19:52.555Z",
-    "durationMs": 775,
+    "completedAt": "2026-09-17T14:35:48.351Z",
+    "durationMs": 348,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T13-19-49-861Z-1cbad33",
-    "startedAt": "2026-09-17T13:19:51.780Z",
+    "runId": "2026-09-17T14-35-46-196Z-4cb1c84",
+    "startedAt": "2026-09-17T14:35:48.003Z",
     "status": "ok"
   },
   "schemaVersion": 1,

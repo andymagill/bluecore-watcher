@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
         "contentHash": "sha256:498a5992a45cccadc5248e2877cd367d7a457e547d0d0658f58b558705f0b070",
-        "extractedAt": "2026-09-17T13:19:54.332Z",
+        "extractedAt": "2026-09-17T14:35:50.269Z",
         "rawText": "4/A",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -32,7 +32,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:d31fac478f875d3f8fa95a8a9a30f31d7f5d90946da706c50a45be42524934ba",
-        "extractedAt": "2026-09-17T13:19:54.333Z",
+        "extractedAt": "2026-09-17T14:35:50.269Z",
         "rawText": "2026-09-11",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -54,7 +54,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@9:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[9] date:$.filings.recent.filingDate[9] acc:$.filings.recent.accessionNumber[9] doc:$.filings.recent.primaryDocument[9]",
         "contentHash": "sha256:2a44e274f48933da3611779503d7546697c70e8c18aca07fe4a9139e8da4fa8b",
-        "extractedAt": "2026-09-17T13:19:54.333Z",
+        "extractedAt": "2026-09-17T14:35:50.269Z",
         "rawText": "{\"acc\":\"0001104659-26-094073\",\"date\":\"2026-08-11\",\"doc\":\"tm2622138d2_8k.htm\",\"items\":\"1.01,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -70,12 +70,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-09-17T13:19:54.336Z",
-    "durationMs": 1781,
+    "completedAt": "2026-09-17T14:35:50.272Z",
+    "durationMs": 1921,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T13-19-49-861Z-1cbad33",
-    "startedAt": "2026-09-17T13:19:52.555Z",
+    "runId": "2026-09-17T14-35-46-196Z-4cb1c84",
+    "startedAt": "2026-09-17T14:35:48.351Z",
     "status": "ok"
   },
   "schemaVersion": 1,
