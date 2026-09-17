@@ -81,8 +81,12 @@ describe("XmlHandler", () => {
     const result = handler.parse(asFetchResult(exampleRssXml));
     const located = handler.locate(result, target.extractors[0]!, target);
     expect(located.matchCount).toBe(1);
-    const linkText = result(target.extractors[0]!.selector).text();
-    expect(linkText).toBe("https://example.com/article-1");
+    // Use cheerio's selector directly from the extractor
+    const extractor = target.extractors[0]!;
+    if ("selector" in extractor) {
+      const linkText = result(extractor.selector).text();
+      expect(linkText).toBe("https://example.com/article-1");
+    }
   });
 
   it("handles namespace elements with attribute selector", () => {
@@ -175,14 +179,15 @@ describe("XmlHandler", () => {
         key: "bad_kind",
         section: "s",
         label: "Bad Kind",
-        kind: "xml", // Must match handler
+        kind: "xml",
         selector: "channel > item > title",
         type: "string",
         presenter: "markdown",
       },
     ]);
-    // Test: manually pass an html extractor to xml handler
-    const htmlExtractor = { ...target.extractors[0]!, kind: "html" as const };
+    // Test: manually pass an html extractor to xml handler by changing kind
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const htmlExtractor = { ...target.extractors[0]!, kind: "html" as const } as any;
     expect(() => handler.locate(result, htmlExtractor, target)).toThrow(
       /XmlHandler received a non-xml extractor/,
     );
