@@ -18,7 +18,7 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
         "contentHash": "sha256:0d4c6e20da8c54b25152810355a94852fd028fab86e1c12546ebfa666718a9ed",
-        "extractedAt": "2026-09-17T14:49:02.019Z",
+        "extractedAt": "2026-09-17T15:50:40.298Z",
         "rawText": [
           "{\"category\":\"Press Release\",\"date\":\"September 8, 2026\",\"title\":\"Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach\",\"url\":\"/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach\"}",
           "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch\",\"url\":\"https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/\"}",
@@ -48,7 +48,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86",
-        "extractedAt": "2026-09-17T14:49:02.026Z",
+        "extractedAt": "2026-09-17T15:50:40.303Z",
         "rawText": "September 8, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -64,12 +64,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-09-17T14:49:02.027Z",
-    "durationMs": 146,
+    "completedAt": "2026-09-17T15:50:40.304Z",
+    "durationMs": 315,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T14-49-01-541Z-1a609a1",
-    "startedAt": "2026-09-17T14:49:01.881Z",
+    "runId": "2026-09-17T15-50-39-580Z-0f16952",
+    "startedAt": "2026-09-17T15:50:39.989Z",
     "status": "ok"
   },
   "schemaVersion": 1,

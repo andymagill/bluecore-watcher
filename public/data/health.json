@@ -1,14 +1,14 @@
 {
   "entries": [],
-  "generatedAt": "2026-09-17T14:49:12.692Z",
-  "runId": "2026-09-17T14-49-01-541Z-1a609a1",
+  "generatedAt": "2026-09-17T15:50:48.939Z",
+  "runId": "2026-09-17T15-50-39-580Z-0f16952",
   "schemaVersion": 1,
   "summary": {
     "degraded": 0,
     "failed": 0,
-    "ok": 11,
+    "ok": 13,
     "oldestDataAgeHours": 0,
-    "targets": 11,
+    "targets": 13,
     "targetsPastCeiling": 0
   }
 }

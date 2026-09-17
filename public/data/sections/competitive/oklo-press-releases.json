@@ -1,0 +1,81 @@
+{
+  "blocks": [
+    {
+      "delta": null,
+      "displayValue": [
+        "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
+        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
+        "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+      ],
+      "failingSince": null,
+      "key": "recent_releases",
+      "label": "Recent Releases",
+      "presenter": "list",
+      "provenance": {
+        "anchor": [
+          "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1)",
+          "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(2)",
+          "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
+        ],
+        "contentHash": "sha256:1d0b35e75e5c36c8e103f42ace9e5854838ce08770d2f488bd5681a0fddae2be",
+        "extractedAt": "2026-09-17T15:50:44.280Z",
+        "rawText": [
+          "{\"date\":\"Fri, 07 Aug 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Second Quarter 2026 Financial Results and Business Update\"}",
+          "{\"date\":\"Thu, 06 Aug 2026 08:15:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year\",\"title\":\"Oklo's Groves Reactor Achieves First Criticality in Under a Year\"}",
+          "{\"date\":\"Mon, 27 Jul 2026 06:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call\"}"
+        ],
+        "sourceUrl": "https://oklo.com/newsroom/rss.xml"
+      },
+      "status": "ok",
+      "type": "markdown",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": [
+        "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
+        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
+        "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+      ]
+    },
+    {
+      "delta": null,
+      "displayValue": "07 Aug 2026",
+      "failingSince": null,
+      "key": "latest_release_date",
+      "label": "Latest Release Date",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
+        "contentHash": "sha256:ab596ec2b8260236fcde82753d5d4e2a69feabd441b92897ff40c29f76272ecf",
+        "extractedAt": "2026-09-17T15:50:44.282Z",
+        "rawText": "Fri, 07 Aug 2026 07:00:00 GMT",
+        "sourceUrl": "https://oklo.com/newsroom/rss.xml"
+      },
+      "status": "ok",
+      "type": "date",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "2026-08-07T07:00:00.000Z"
+    }
+  ],
+  "entityId": "oklo-inc",
+  "label": "Oklo Inc. — Latest Press Releases",
+  "run": {
+    "completedAt": "2026-09-17T15:50:44.283Z",
+    "durationMs": 610,
+    "httpStatus": 200,
+    "renderer": "static",
+    "runId": "2026-09-17T15-50-39-580Z-0f16952",
+    "startedAt": "2026-09-17T15:50:43.673Z",
+    "status": "ok"
+  },
+  "schemaVersion": 1,
+  "sectionId": "competitive",
+  "sourceUrl": "https://oklo.com/newsroom/rss.xml",
+  "staleCeilingHours": 504,
+  "targetId": "oklo-press-releases",
+  "ttlHours": 168
+}
