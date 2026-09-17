@@ -304,6 +304,20 @@ A second discriminated-union branch on the same `kind: "api"` literal isn't avai
 - `extractorLocatorOf` (`src/ingest/extract/locator.ts`) replaces the `kind === "html" ? selector : jsonPath` ternary repeated across `pipeline.ts`, `process-extractor.ts`, and `scripts/repair-diff.ts` — a composite location has no single field any of those could have fallen back to.
 - Verified additive: `npm run fixture:verify` reports all ten real `bluecore.config.ts` targets unchanged (zero golden drift) — every existing `jsonPath` extractor takes the same code path it always did.
 
+### ADR-023 — `ingest.yml` gets a preview mode, so ingestion changes are testable off `main`
+
+**Decision.** `.github/workflows/ingest.yml` can now run against any branch via a manual `workflow_dispatch` — checking out that branch's own tip instead of `main` — and executes the identical fetch → extract → validate → diff → gate pipeline against a real Cloudflare preview deploy. It stops at the gate: a preview run never squash-merges into `main` and never opens, comments on, or closes a GitHub Issue. `schedule` and the `config/**` `push` trigger are unaffected — both only ever fire against `main`, so prod behavior (ADR-005) is unchanged.
+
+**Rationale.** Before this, ingestion could only be exercised for real (a live fetch, real extractors, a real gate run) after landing on `main` — and the same `push: config/**` trigger that re-ingests a merged repair immediately would also fire on any PR that touches `config/**`, running an untested extractor against production the moment it merges. An ingestion change now gets the same end-to-end proof `main` gets — including the Workers Builds preview and the smoke-render gate — while still on a branch, with zero risk to production data or operator-facing issues.
+
+**Consequences.**
+
+- One `env.PREVIEW` flag (`github.ref_name != 'main'`) gates every prod-only effect: the squash-merge step, and every `--issues` flag on `scripts/alert-dispatch.ts`. Without `--issues`, that script's normal mode only prints its alert plan and its `--pipeline-failure` mode makes no GitHub API call at all — so gating on the flag, not on separate preview/prod code paths, was enough.
+- A preview run pushes `ingest-preview/<branch>/<run-id>` (vs. prod's `ingest/<run-id>`) and never deletes it — unlike the prod branch, which the squash-merge step deletes on success. These accumulate; periodic manual cleanup is expected (`06-OPS-RUNBOOK.md` §12).
+- Concurrency is now grouped per ref (`ingest-<branch>`) rather than one global `ingest` group, so a preview run never queues behind or blocks the prod cron. Prod's group is never cancelled (ADR-005's serialization requirement); a preview group cancels its own stale runs.
+- `workflow_dispatch` only reads a workflow definition that exists on the default branch, so this change had to land on `main` before it could be dispatched against any other branch — a one-time bootstrapping order, not an ongoing constraint.
+- Does not change what merges to `main` or what triggers alerting — a preview run that looks good still needs its branch to actually merge (normally via the next scheduled prod run, once the branch's own PR lands) before it affects production.
+
 ---
 
 ## Open

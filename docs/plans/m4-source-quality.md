@@ -17,12 +17,12 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 | Workstream                                     | Status      | PR  |
 | ---------------------------------------------- | ----------- | --- |
 | M4a — Composite/indexed api location (ADR-022) | Delivered   | —   |
-| M4b — FR + SEC extractor upgrades              | Not started | —   |
+| M4b — FR + SEC extractor upgrades              | Delivered   | —   |
 | M4c — Retire `bluecore-form-d`, close out M4   | Not started | —   |
 
 ## Context / findings (all of M4)
 
-- **FR fixtures are already newest-first, single-record.** `fr-nrc-smr`/`fr-doe-nuclear`/`fr-smr-mentions` fetch `per_page=1&order=newest`, so `$.results[0].title`/`.type`/`.publication_date`/`.html_url`/`.agencies[0].name` resolve directly with the existing simple `jsonPath` shape — no engine change needed for FR. (Verified against the live fixtures during M4a's exploration: `results[0]` carries `title`, `type`, `abstract`, `document_number`, `html_url`, `pdf_url`, `publication_date`, `agencies[]`.)
+- **FR fixtures are newest-first**, so `$.results[0].title`/`.type`/`.publication_date`/`.html_url`/`.agencies[0].name` resolve directly with the existing simple `jsonPath` shape — no engine change needed for FR. (Verified against the live fixtures during M4a's exploration: `results[0]` carries `title`, `type`, `abstract`, `document_number`, `html_url`, `pdf_url`, `publication_date`, `agencies[]`.) **Correction, M4b (2026-09-16):** `per_page=1` in the URL is not actually honoured by FR's API — live-verified it returns 20 results regardless of that parameter — but `order=newest` still reliably puts the newest document at `results[0]`, so the extraction path holds; no fixture recapture or URL change was needed.
 - **SEC's `filings.recent` is parallel arrays, not per-filing objects**, and the row of interest isn't at a fixed index — Oklo's `form[0]` is a `424B5`; its most recent `8-K` is at `form[1]`. JSONPath can find the matching index (`$.filings.recent.form[?(@ === "8-K")]~` → array of matching indices, confirmed live) but can't join that index into a sibling array by position — a filter predicate referencing `@root` throws in jsonpath-plus's safe-eval sandbox (confirmed live, jsonpath-plus 10.4.0). This is why M4a exists: the engine needed a real feature (ADR-022), not just new config.
 - **SEC item codes are bare** (`"1.01,1.02,9.01"`, comma-joined, no labels) — a human-readable rendering needs a code→label vocabulary, which belongs in config (`valueMap`), not code (ADR-001).
 - **`bluecore-form-d`'s URL is pinned to one immutable accession number.** It can never observe BlueCore's next Form D on its own (that's what M2b's `bluecore-sec-filings` companion target exists to catch) — a value alert on it essentially cannot fire. Retiring it (M4c) rather than adding a "hidden" display concept keeps the engine surface smaller; `writeAll` (`src/ingest/persist.ts`) never deletes orphaned target files, so removing the target from config needs a manual delete of its committed data file too.
@@ -62,7 +62,23 @@ Only the workstream marked **Next** below gets implemented in a given conversati
 
 ## M4b — FR + SEC extractor upgrades
 
-**Not started.** Design below; the implementer should re-verify every live shape against the actual API before writing config, the way M4a's exploration did.
+**Delivered.** Design below is the original plan; corrections found during live re-verification (2026-09-16, as this doc asked the implementer to do) are called out inline rather than silently edited away.
+
+**Summary of what shipped:**
+
+- Federal Register (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`): `latest_document_title` (a two-field composite link, `[{title}]({url})`, `escape: "none"` on the URL field), `latest_document_type` (`enum`, five values — see correction below), `latest_document_date`. `fr-smr-mentions` only, additionally: `latest_document_agency` (`type: "string"`, not `enum` — eight distinct values observed live in its own result set).
+- SEC (`oklo-sec-filings`, `nuscale-sec-filings`): `latest_8k`, a composite/indexed extractor per the design below, using the full modern Form 8-K item schedule (`SEC_8K_ITEMS`, 32 codes) rather than only the codes observed in the fixtures.
+- `bluecore-sec-filings` (Company section) — **not in the original scope**, added during implementation: a `latest_filing_summary` composite over row 0 (no `index`), not an 8-K extractor. Live-verified this filer has exactly two filings on record, both Form D — the `latest_8k` shape doesn't apply here.
+- Tests: `tests/composite-config-shapes.test.ts` (6 cases) plus the two fixtures named below. Full suite 211/211 (one pre-existing `smoke-render.test.ts` timeout flake under parallel load, confirmed unrelated — passes standalone every time).
+- Verified additive: `npm run fixture:verify -- --env bluecore` reports all 10 real targets passing; every blessed golden diff is a new block only, zero churn on existing ones.
+
+**Corrections found during live re-verification (2026-09-16):**
+
+- **`per_page=1` is not honoured by FR's API** — confirmed it returns 20 results regardless. `order=newest` still reliably puts the current document at `results[0]`, so no fixture recapture or URL change was needed (see "Re-fixturing," corrected below).
+- **The live FR `type` vocabulary has five values, not four** — `Rule` / `Proposed Rule` / `Notice` / `Presidential Document` / **`Uncategorized Document`** (the fifth appears once in `fr-doe-nuclear`'s own 51-document result set). All five are in `enumValues`.
+- **`maxLength: 300` on the title was too tight** — the longest live title across the three FR queries is 299 characters before markdown-escaping inflates it further (5–8% of titles contain `[`, `]`, `(`, or `)`). Shipped as `maxLength: 1000`.
+- **`escape: "url"` on the SEC `doc` field was wrong** — found while building `bluecore-sec-filings`' composite: that filer's own row-0 `primaryDocument` is `"xslFormDX01/primary_doc.xml"` (SEC's XSL-viewer path prefix for a Form D), and `encodeURIComponent` turns the literal `/` into `%2F`, which 303s instead of resolving (verified live both ways). Changed to `escape: "none"` on all three `doc` fields; re-blessing confirmed this was a no-op for the two competitor targets' current flat-filename values.
+- **`maxLength: 500` on `latest_8k` was too tight for a multi-item filing** — a multi-item 8-K can compose several item labels, some over 100 characters, before escaping. Shipped as `maxLength: 1200`.
 
 ### Federal Register (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`)
 
@@ -104,16 +120,22 @@ Uses M4a's composite location. Add one new extractor per target, alongside the e
 }
 ```
 
-- `SEC_8K_ITEMS`: a `Record<string,string>` mapping SEC's documented Item numbers (1.01, 2.02, 5.02, 9.01, ...) to plain-English labels — lives in `config/bluecore.config.ts` as a shared const (both SEC targets use the same vocabulary), not in `src/`. Populate it from SEC's own Item-number schedule (Form 8-K instructions), not guessed — an unmapped code is `PARSE_ERROR` at runtime (compose.ts's strictness), so the map needs to cover every Item number that's realistically shown up across both fixtures' history, same spirit as M2b's form-code pattern regex being "verified against all 52 distinct historical values across both fixtures."
-- `<CIK>` in the template is the entity's own CIK, hardcoded per-target the same way `bluecore-form-d`'s URL already is — not extracted, since it's a config fact, not a scraped one.
-- Decide (at implementation time) whether this warrants its own `alert` — an `any-change` on `latest_filing_form`/`.filingDate` already fires when any new filing appears (including this one), so a second alert on `latest_8k` specifically would likely be redundant noise; probably `alert` stays unset here, mirroring `latest_filing_date`'s existing pattern of "no alert, the sibling field alerts."
-- If a competitor genuinely has no 8-K in the fetched `filings.recent` window (`index` resolves to zero matches), this extractor fails `SELECTOR_NO_MATCH`. Since it's not `required: true`, the target still reports `run.status: partial` — the same tolerance the two existing scalar extractors already rely on. Confirm this is the desired behavior (vs. omitting the block from the dashboard some other way) before shipping.
+`doc`'s `escape: "url"` above is the design as originally planned — **shipped as `escape: "none"` instead**; see the correction above.
 
-**Testing:** `fixtures/example-sec-submissions/response.json` — a synthetic `filings.recent`-shaped envelope with the target row not at index 0 (mirroring the real Oklo case), a multi-code `items` entry, and a dashed accession number. Exercises the real `oklo-sec-filings`/`nuscale-sec-filings` extractor shape generically.
+- `SEC_8K_ITEMS`: a `Record<string,string>` mapping SEC's documented Item numbers (1.01, 2.02, 5.02, 9.01, ...) to plain-English labels — lives in `config/bluecore.config.ts` as a shared const (both SEC targets use the same vocabulary), not in `src/`. Populate it from SEC's own Item-number schedule (Form 8-K instructions), not guessed — an unmapped code is `PARSE_ERROR` at runtime (compose.ts's strictness), so the map needs to cover every Item number that's realistically shown up across both fixtures' history, same spirit as M2b's form-code pattern regex being "verified against all 52 distinct historical values across both fixtures." Shipped with the full modern (post-2004) 32-code schedule rather than only the codes observed live.
+- `<CIK>` in the template is the entity's own CIK, hardcoded per-target the same way `bluecore-form-d`'s URL already is — not extracted, since it's a config fact, not a scraped one.
+- Decide (at implementation time) whether this warrants its own `alert` — an `any-change` on `latest_filing_form`/`.filingDate` already fires when any new filing appears (including this one), so a second alert on `latest_8k` specifically would likely be redundant noise; probably `alert` stays unset here, mirroring `latest_filing_date`'s existing pattern of "no alert, the sibling field alerts." Shipped with no alert, per this reasoning.
+- If a competitor genuinely has no 8-K in the fetched `filings.recent` window (`index` resolves to zero matches), this extractor fails `SELECTOR_NO_MATCH`. Since it's not `required: true`, the target still reports `run.status: partial` — the same tolerance the two existing scalar extractors already rely on. This is exactly `bluecore-sec-filings`' situation (below), so it got a different extractor shape entirely rather than shipping a permanently-failing one.
+
+**Testing:** `fixtures/example-sec-submissions/response.json` — a synthetic `filings.recent`-shaped envelope with the target row not at index 0 (mirroring the real Oklo case), a multi-code `items` entry, and a dashed accession number. Exercises the real `oklo-sec-filings`/`nuscale-sec-filings` extractor shape generically. Its target row's `primaryDocument` is itself a path (`"viewer-path/8k.htm"`), not a flat filename — deliberately, to regression-guard the `escape: "none"` fix above.
+
+### `bluecore-sec-filings` (Company section) — not in the original scope
+
+Live-verified 2026-09-16: this filer (CIK 2125928) has exactly two filings on record, both Form D — no 8-K exists. A `latest_8k`-shaped extractor here would resolve zero matches forever (permanent `SELECTOR_NO_MATCH`, permanent `run.status: partial`, recurring health alerts), and `fixture:bless` refuses to write a golden when an extractor throws — it would have blocked the commit outright. Shipped a generic `latest_filing_summary` composite instead: same field set (`form`/`date`/`acc`/`doc`), but over row 0 directly (no `index`, since row 0 always exists) rather than filtered to `"8-K"`.
 
 ### Re-fixturing
 
-FR fixtures currently hold `results.length === 20` (captured before `per_page=1` was confirmed as the live query param) — recapture (`npm run fixture:capture -- --env bluecore <targetId>`) before blessing the new title/type/date extractors, so the golden file matches what the live query actually returns. Re-bless all five touched targets (`fr-nrc-smr`, `fr-doe-nuclear`, `fr-smr-mentions`, `oklo-sec-filings`, `nuscale-sec-filings`) and review each diff — a new extractor showing up should be the only change, not a structural shift.
+~~FR fixtures currently hold `results.length === 20` (captured before `per_page=1` was confirmed as the live query param) — recapture...~~ **Correction:** this reasoning was itself wrong. `per_page=1` was never honoured by FR's live API (see above) — the 20-result fixtures already match what the live query actually returns, and always did. No FR or SEC fixture was recaptured; every `response.json` stayed frozen, and only `expected.json` was re-blessed per touched target, keeping each diff to new golden blocks only.
 
 ---
 

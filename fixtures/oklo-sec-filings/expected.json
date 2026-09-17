@@ -14,5 +14,13 @@
     "rawText": "2026-09-11",
     "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
     "contentHash": "sha256:d31fac478f875d3f8fa95a8a9a30f31d7f5d90946da706c50a45be42524934ba"
+  },
+  "latest_8k": {
+    "presenter": "markdown",
+    "value": "**Entry into a Material Definitive Agreement; Termination of a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-09\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000110465926106897/tm2625056d1_8k.htm)",
+    "displayValue": "**Entry into a Material Definitive Agreement; Termination of a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-09\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000110465926106897/tm2625056d1_8k.htm)",
+    "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
+    "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@1:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[1] date:$.filings.recent.filingDate[1] acc:$.filings.recent.accessionNumber[1] doc:$.filings.recent.primaryDocument[1]",
+    "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5"
   }
 }

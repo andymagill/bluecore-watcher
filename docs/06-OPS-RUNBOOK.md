@@ -185,3 +185,21 @@ If any step requires touching application code, ADR-001 is violated and the sche
 | Single operator — no coverage                                                                                                                  | Accepted for now. The `notes` field and this runbook are the mitigation.                              |
 | Edge relay unvalidated (ADR-006)                                                                                                               | Gathering evidence via §6.                                                                            |
 | Cloudflare's actual free-tier terms for this usage pattern haven't been re-verified since the host correction (ADR-013, superseded by ADR-014) | **Open.** Verify before treating the first client deliverable as cost-free.                           |
+
+---
+
+## 12. Runbook: testing an ingestion change before it merges
+
+**When.** A PR touches extraction code (`src/ingest/**`) or `config/*.config.ts` and you want a real, live-fetched, gate-checked run before it reaches `main` — not just `npm run ingest -- --dry` against fixtures, and not the risk of the `config/**` push trigger firing a live prod run the moment it merges.
+
+1. Push the branch (or the PR's branch), then dispatch ingest.yml against it:
+   ```
+   gh workflow run ingest.yml --ref <branch-name>
+   ```
+   This is ADR-023's preview mode (`env.PREVIEW`, true whenever the dispatched ref isn't `main`): same fetch → extract → validate → diff → gate pipeline as prod, run against that branch's own tip, gated on a real Cloudflare preview — but it never touches `main` and never opens, comments on, or closes a GitHub Issue.
+2. `gh run watch` (or the Actions tab) to follow it. The job's **step summary** carries a preview-mode-only "Ingestion preview" block: the pushed branch name, the resolved preview URL, the gate outcome, a `public/data` diffstat, and the alert plan that _would_ fire (printed only — nothing is dispatched).
+3. Open the preview URL and eyeball the change. A failed gate leaves the `ingest-preview/<branch>/<run-id>` branch in place for inspection, exactly like a failed prod run leaves its `ingest/<run-id>` branch — check it out and run locally to reproduce.
+4. Local-only alternative for quick iteration without CI: `npm run ingest -- --env bluecore --live --only <targetId>` runs the live fetch straight to your working tree (needs `EIA_API_KEY` locally for the one target that needs it, §2); `npm run gate` still needs an actual deployed preview to check against, so it doesn't substitute for step 1 when you need gate check 3.
+5. **Clean up.** Preview branches are never deleted automatically (only a successful prod squash-merge deletes its `ingest/*` branch). Periodically sweep stale ones: `git branch -r --list 'origin/ingest-preview/*'` and delete what's no longer needed.
+
+`workflow_dispatch` only ever runs the copy of `ingest.yml` that exists on the default branch, so a change to the workflow file itself (like ADR-023's own introduction of preview mode) has to merge to `main` before it can be dispatched against any other branch.
