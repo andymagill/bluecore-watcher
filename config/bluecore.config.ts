@@ -91,60 +91,10 @@ export const config: CmieConfigInput = {
   targets: [
     // --- Company Performance ---------------------------------------
 
-    // Official SEC Form D, not press coverage — ground truth for financial
-    // milestones. Deliberately disagrees with the widely-reported "$50M
-    // raise": this filing's offering/sold amounts are the real number.
-    {
-      id: "bluecore-form-d",
-      label: "BlueCore Energy — SEC Form D (Seed, Sept 2026)",
-      entityId: "bluecore-energy",
-      sectionId: "company",
-      kind: "html",
-      url: "https://www.sec.gov/Archives/edgar/data/2125928/000212592826000003/primary_doc.xml",
-      schedule: { cron: "0 6 * * *", ttlHours: 2160 },
-      politeness: { minIntervalMs: 2000, userAgent: SEC_UA },
-      notes:
-        "Form D XML, not a scraped page — tag names are SEC's own schema, as durable as a real id. " +
-        "Cheerio's default (non-XML) parser handles the custom tags fine (verified against the live " +
-        "filing). Episodic: only 2 filings exist since incorporation (2026-04-06, 2026-09-04), so " +
-        "maxChangePct is set generously — an early-stage seed company's next filing could plausibly " +
-        "show a multiple of this amount, and that's a real jump worth surfacing, not a selector bug. " +
-        "This URL is pinned to one specific filing (accession 0002125928-26-000003) and cannot see a " +
-        "future Form D on its own — bluecore-sec-filings below (M2b) surfaces a new D/D-A so the " +
-        "operator knows to repoint this URL.",
-      extractors: [
-        {
-          key: "total_offering_amount",
-          label: "Total Offering Amount",
-          presenter: "metric",
-          kind: "html",
-          selector: "totalOfferingAmount",
-          type: "currency",
-          currency: "USD",
-          required: true,
-          assert: { min: 0, max: 200_000_000, maxChangePct: 300 },
-        },
-        {
-          key: "total_amount_sold",
-          label: "Total Amount Sold",
-          presenter: "metric",
-          kind: "html",
-          selector: "totalAmountSold",
-          type: "currency",
-          currency: "USD",
-          required: true,
-          assert: { min: 0, max: 200_000_000, maxChangePct: 300 },
-        },
-      ],
-    },
-
-    // M2b — companion to bluecore-form-d above, which is pinned to one
-    // specific accession number and so can never observe BlueCore's next
-    // Form D on its own. Same shape as oklo-sec-filings/nuscale-sec-filings:
-    // SEC's own submissions JSON, newest-filing-first. Its job is to reveal
-    // *that* a new filing exists so the operator can repoint the pinned URL
-    // above — not to replace it, since the XML-vs-JSON extraction paths
-    // pull genuinely different facts (dollar amounts vs. form/date).
+    // M2b, generic latest-filing composite (see below) — no target-specific
+    // Form D scrape (M4c/M6a retired bluecore-form-d, the one target that
+    // parsed XML through the html kind; SEC's submissions JSON below already
+    // reveals the same facts without a URL pinned to one accession number).
     {
       id: "bluecore-sec-filings",
       label: "BlueCore Energy — Latest SEC Filing",
@@ -155,15 +105,14 @@ export const config: CmieConfigInput = {
       schedule: { cron: "0 12 * * 1-5", ttlHours: 48 },
       politeness: { minIntervalMs: 2000, userAgent: SEC_UA },
       notes:
-        "Verified live 2026-09-13: $.filings.recent.form[0]/.filingDate[0] resolve to the same 'D' " +
-        "filing bluecore-form-d's pinned URL currently points at (2026-09-04, accession " +
-        "0002125928-26-000003) — identical shape to oklo-sec-filings/nuscale-sec-filings. " +
-        "any-change alert so a new filing is visible without waiting on M3 alert dispatch review; " +
-        "notBefore is set to the entity's own incorporation (2026-04-06), tighter than the 2020 " +
-        "floor used for the two established competitors above. M4b: this filer has exactly two " +
-        "filings on record (both Form D) — no 8-K exists (verified live 2026-09-16), so unlike the " +
-        "two competitor targets this gets a generic latest-filing composite over row 0 (always " +
-        "present) rather than an 8-K-specific one.",
+        "Verified live 2026-09-13: $.filings.recent.form[0]/.filingDate[0] resolve to a 'D' filing " +
+        "(2026-09-04, accession 0002125928-26-000003) — identical shape to " +
+        "oklo-sec-filings/nuscale-sec-filings. any-change alert so a new filing is visible without " +
+        "waiting on M3 alert dispatch review; notBefore is set to the entity's own incorporation " +
+        "(2026-04-06), tighter than the 2020 floor used for the two established competitors above. " +
+        "M4b: this filer has exactly two filings on record (both Form D) — no 8-K exists (verified " +
+        "live 2026-09-16), so unlike the two competitor targets this gets a generic latest-filing " +
+        "composite over row 0 (always present) rather than an 8-K-specific one.",
       extractors: [
         {
           key: "latest_filing_form",
@@ -218,8 +167,12 @@ export const config: CmieConfigInput = {
     },
 
     // Recommended M1 walking-skeleton target (see docs/05-SOURCES.md §6.3):
-    // one page, three extractors, one section, real anchors, polled daily
-    // against a source that updates roughly weekly (hence ttlHours: 168).
+    // one page, real anchors, polled daily against a source that updates
+    // roughly weekly (hence ttlHours: 168). M6a (ADR-025): the single
+    // "latest post" scalar became a 3-row composite list — recent_posts
+    // below subsumes latest_headline/latest_post_category entirely
+    // (removed); latest_post_date stays, since its expectMonotonic/
+    // maxFutureDays guard is a metric/date-only concern a list can't carry.
     {
       id: "bluecore-newsroom",
       label: "BlueCore Energy — Latest News",
@@ -229,32 +182,40 @@ export const config: CmieConfigInput = {
       url: "https://www.bluecore.energy/news-insights",
       schedule: { cron: "0 13 * * *", ttlHours: 168 },
       notes:
-        "Use :first, NOT :first-child — each .bc-n-card sits in its own individual Webflow " +
-        "collection-list wrapper (div.w-dyn-item), so every card is trivially the first child of its " +
-        "own parent and :first-child matched all 12 (SELECTOR_AMBIGUOUS territory), confirmed against " +
-        "the live dry run. Also avoid .bc-n-feat-* — that hero block is manually pinned to the July " +
-        "stealth-launch post and never advances. Hand-authored bc-n-* classes are stable; nearby " +
-        "Webflow UUID ids churn on every republish and must not be used as anchors. .bc-n-cat-key is " +
-        "a genuine 3-value enum confirmed via the page's own filter pills.",
+        "Use :first / :lt(3), NOT :first-child / :nth-child — each .bc-n-card sits in its own " +
+        "individual Webflow collection-list wrapper (div.w-dyn-item), so every card is trivially the " +
+        "first child of its own parent and :first-child matched all 12 (SELECTOR_AMBIGUOUS territory), " +
+        "confirmed against the live dry run. Also avoid .bc-n-feat-* — that hero block is manually " +
+        "pinned to the July stealth-launch post and never advances. Hand-authored bc-n-* classes are " +
+        "stable; nearby Webflow UUID ids churn on every republish and must not be used as anchors. " +
+        "recent_posts (ADR-025): row = .bc-n-card:lt(3) (the CSS cap) plus limit: 3 (the engine's own " +
+        "defense-in-depth bound, independent of whether :lt() is ever dropped by mistake) — 12 cards " +
+        'exist live, newest first. The <a class="bc-n-card"> row node IS the value (title/date/' +
+        'category are its children) — url has no selector, just attr: "href". Hrefs are mixed: some ' +
+        "relative (/post/...), most absolute external press links (techcrunch.com, axios.com, " +
+        'bloomberg.com, ...) — escape: "href" resolves the relative ones against target.url and ' +
+        "leaves the absolute ones alone. .bc-n-cat-key is a genuine 3-value enum confirmed via the " +
+        "page's own filter pills; kept unenumerated in the list's own category field since the list " +
+        "presents raw text, not a status pill.",
       extractors: [
         {
-          key: "latest_headline",
-          label: "Latest Headline",
-          presenter: "markdown",
+          key: "recent_posts",
+          label: "Recent Posts",
+          presenter: "list",
           kind: "html",
-          // M2b (was ".bc-n-ctitle:first"): the three fields on this card were
-          // each matched by an independent :first over the whole page. Every
-          // card carries all three elements today (verified against the
-          // fixture: 12/12/12), but that made it possible for a future
-          // redesign to drop one field from just the newest card -- the
-          // other two :first selectors would then silently pair the
-          // headline/date/category from *different* cards. Scoping to
-          // ".bc-n-card:first" first, then the field, ties all three to the
-          // same DOM node the way "latest post" actually means.
-          selector: ".bc-n-card:first .bc-n-ctitle",
-          type: "string",
+          type: "markdown",
+          selector: ".bc-n-card:lt(3)",
+          multiple: true,
+          limit: 3,
+          fields: {
+            title: { selector: ".bc-n-ctitle" },
+            url: { attr: "href", escape: "href" },
+            category: { selector: ".bc-n-cat-key" },
+            date: { selector: ".bc-n-cdate", format: "date" },
+          },
+          template: "[{title}]({url}) — {category}, {date}",
           required: true,
-          assert: { notEmpty: true, maxLength: 200 },
+          assert: { notEmpty: true, maxLength: 400, minItems: 3, maxItems: 3 },
         },
         {
           key: "latest_post_date",
@@ -270,16 +231,6 @@ export const config: CmieConfigInput = {
           // (a post edited and bumped) is exactly what an acknowledgement
           // (ADR-012) is for, not a wider tolerance.
           assert: { notEmpty: true, maxFutureDays: 1, expectMonotonic: "increasing" },
-        },
-        {
-          key: "latest_post_category",
-          label: "Latest Post Category",
-          presenter: "status",
-          kind: "html",
-          selector: ".bc-n-card:first .bc-n-cat-key",
-          type: "enum",
-          enumValues: ["Press Release", "In the News", "Insights"],
-          alert: { on: "any-change", severity: "info" },
         },
       ],
     },

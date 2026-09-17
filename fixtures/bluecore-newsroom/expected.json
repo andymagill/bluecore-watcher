@@ -1,11 +1,27 @@
 {
-  "latest_headline": {
-    "presenter": "markdown",
-    "value": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
-    "displayValue": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
-    "rawText": "Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach",
-    "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(2)",
-    "contentHash": "sha256:2bb00c8ddb95e10ee5e09632a01b459f1a885f3627e7748fea27d76ac623fa48"
+  "recent_posts": {
+    "presenter": "list",
+    "value": [
+      "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026",
+      "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026",
+      "[Bluecore raises $50 million for port\\-powering nuclear barges](https://www.axios.com/2026/09/08/bluecore-nuclear-barges) — In the News, 08 Sep 2026"
+    ],
+    "displayValue": [
+      "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026",
+      "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026",
+      "[Bluecore raises $50 million for port\\-powering nuclear barges](https://www.axios.com/2026/09/08/bluecore-nuclear-barges) — In the News, 08 Sep 2026"
+    ],
+    "rawText": [
+      "{\"category\":\"Press Release\",\"date\":\"September 8, 2026\",\"title\":\"Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach\",\"url\":\"/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach\"}",
+      "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch\",\"url\":\"https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/\"}",
+      "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Bluecore raises $50 million for port-powering nuclear barges\",\"url\":\"https://www.axios.com/2026/09/08/bluecore-nuclear-barges\"}"
+    ],
+    "anchor": [
+      "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a",
+      "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(2) > a",
+      "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
+    ],
+    "contentHash": "sha256:0d4c6e20da8c54b25152810355a94852fd028fab86e1c12546ebfa666718a9ed"
   },
   "latest_post_date": {
     "presenter": "metric",
@@ -14,13 +30,5 @@
     "rawText": "September 8, 2026",
     "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
     "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86"
-  },
-  "latest_post_category": {
-    "presenter": "status",
-    "value": "Press Release",
-    "displayValue": "Press Release",
-    "rawText": "Press Release",
-    "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(1)",
-    "contentHash": "sha256:180c9abd7392671b20a7438ab3b9fe55dfbe981f3f783de7757dd0b203894e2c"
   }
 }

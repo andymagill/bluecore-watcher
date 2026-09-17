@@ -43,8 +43,11 @@ export function ListBlock({
   }
 
   const suppressed = state === "expired";
+  // "prose" (Tailwind Typography) gives each row's inline markdown the same
+  // link/emphasis styling MarkdownBlock's rendered content already has —
+  // without it, a row's `<a>` renders with no visible link affordance.
   const list = (
-    <ul className="list-disc space-y-0.5 pl-4 text-sm">
+    <ul className="prose prose-sm max-w-none list-disc space-y-0.5 pl-4 text-sm marker:text-muted-foreground">
       {html.map((itemHtml, i) => (
         <li key={i} dangerouslySetInnerHTML={{ __html: itemHtml }} />
       ))}
