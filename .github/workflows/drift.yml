@@ -11,10 +11,10 @@ name: Drift check
 
 on:
   schedule:
-    # Monday, one hour after the daily ingest cron (ingest.yml: 0 13 * * *)
+    # Monday, one hour after the evening ingest cron (ingest.yml: 0 22 * * *)
     # -- gives that day's ingest run a clean head start so drift signals
     # aren't confused with an in-flight ingestion.
-    - cron: "0 14 * * 1"
+    - cron: "0 23 * * 1"
   workflow_dispatch: {}
 
 permissions:

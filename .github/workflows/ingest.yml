@@ -5,15 +5,14 @@
 # overlapping runs can't both fork from the same `main` (§2).
 #
 # M1 scoped this to one target (bluecore-newsroom, --only) on that target's
-# own cron (0 13 * * *). M2a (docs/07-ROADMAP.md) drops --only: every
-# target now runs on this one daily cron, regardless of its own `cron`
-# field, which stays documentation and the basis for `ttlHours`. This is
-# deliberately not a per-target due-date planner -- every target's
-# ttlHours is >= 48h, so a daily run under-polls nothing, and per-target
-# politeness (SEC UA + 2s interval, Lever's Crawl-delay: 1, etc.) is already
-# enforced inside HttpFetcher regardless of workflow cadence. A real
-# due-date planner is still deferred until more than one cadence actually
-# needs to diverge from daily.
+# own cron. M2a (docs/07-ROADMAP.md) drops --only: every target now runs on
+# these two daily crons (0 10 * * * and 0 22 * * *), regardless of its own
+# `cron` field, which stays documentation and the basis for `ttlHours`. This is
+# deliberately not a per-target due-date planner -- every target's ttlHours is
+# >= 48h, so daily runs under-poll nothing, and per-target politeness (SEC UA +
+# 2s interval, Lever's Crawl-delay: 1, etc.) is already enforced inside
+# HttpFetcher regardless of workflow cadence. A real due-date planner is still
+# deferred until more than one cadence actually needs to diverge from daily.
 #
 # M3a (ADR-019, docs/plans/m3-operability.md) adds alerting: on a
 # successful squash-merge, scripts/alert-dispatch.ts diffs public/data as
@@ -40,7 +39,8 @@ name: Ingest
 
 on:
   schedule:
-    - cron: "0 13 * * *"
+    - cron: "0 10 * * *"
+    - cron: "0 22 * * *"
   push:
     branches: [main]
     paths: ["config/**"]
