@@ -1,5 +1,5 @@
 {
-  "commit": "80ffb26",
+  "commit": "4a262da",
   "displayName": "Bluecore Watcher",
   "entities": [
     {
@@ -19,14 +19,14 @@
     }
   ],
   "environmentId": "bluecore",
-  "generatedAt": "2026-09-17T02:48:20.231Z",
+  "generatedAt": "2026-09-17T12:51:08.956Z",
   "health": {
     "degraded": 0,
     "failed": 0,
-    "ok": 10,
+    "ok": 11,
     "overall": "ok"
   },
-  "runId": "2026-09-17T02-48-13-213Z-2f78d6f",
+  "runId": "2026-09-17T12-51-01-228Z-3e1a944",
   "schemaVersion": 1,
   "sections": [
     {
@@ -56,7 +56,7 @@
       "id": "bluecore-form-d",
       "label": "BlueCore Energy — SEC Form D (Seed, Sept 2026)",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:13.453Z",
+      "lastSuccessAt": "2026-09-17T12:51:01.429Z",
       "path": "sections/company/bluecore-form-d.json",
       "sectionId": "company",
       "ttlHours": 2160
@@ -66,7 +66,7 @@
       "id": "bluecore-sec-filings",
       "label": "BlueCore Energy — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:13.823Z",
+      "lastSuccessAt": "2026-09-17T12:51:01.664Z",
       "path": "sections/company/bluecore-sec-filings.json",
       "sectionId": "company",
       "ttlHours": 48
@@ -76,7 +76,7 @@
       "id": "bluecore-newsroom",
       "label": "BlueCore Energy — Latest News",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:14.186Z",
+      "lastSuccessAt": "2026-09-17T12:51:01.845Z",
       "path": "sections/company/bluecore-newsroom.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -86,7 +86,7 @@
       "id": "bluecore-careers",
       "label": "BlueCore Energy — Open Roles",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:14.701Z",
+      "lastSuccessAt": "2026-09-17T12:51:02.969Z",
       "path": "sections/company/bluecore-careers.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -96,7 +96,7 @@
       "id": "oklo-sec-filings",
       "label": "Oklo Inc. — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:15.494Z",
+      "lastSuccessAt": "2026-09-17T12:51:03.481Z",
       "path": "sections/competitive/oklo-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -106,7 +106,7 @@
       "id": "nuscale-sec-filings",
       "label": "NuScale Power — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:17.518Z",
+      "lastSuccessAt": "2026-09-17T12:51:05.456Z",
       "path": "sections/competitive/nuscale-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -116,7 +116,7 @@
       "id": "fr-smr-mentions",
       "label": "Federal Register — SMR Mentions (All Agencies)",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:18.094Z",
+      "lastSuccessAt": "2026-09-17T12:51:05.691Z",
       "path": "sections/competitive/fr-smr-mentions.json",
       "sectionId": "competitive",
       "ttlHours": 168
@@ -126,7 +126,7 @@
       "id": "fr-nrc-smr",
       "label": "Federal Register — NRC SMR Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:18.704Z",
+      "lastSuccessAt": "2026-09-17T12:51:06.536Z",
       "path": "sections/regulatory/fr-nrc-smr.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -136,7 +136,7 @@
       "id": "fr-doe-nuclear",
       "label": "Federal Register — DOE Advanced Nuclear Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:19.635Z",
+      "lastSuccessAt": "2026-09-17T12:51:07.472Z",
       "path": "sections/regulatory/fr-doe-nuclear.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -146,10 +146,20 @@
       "id": "eia-ca-industrial-price",
       "label": "EIA — CA Industrial Retail Electricity Price",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-17T02:48:20.231Z",
+      "lastSuccessAt": "2026-09-17T12:51:08.285Z",
       "path": "sections/market/eia-ca-industrial-price.json",
       "sectionId": "market",
       "ttlHours": 1440
+    },
+    {
+      "entityId": "bluecore-energy",
+      "id": "usaspending-advanced-reactor-awards",
+      "label": "USAspending — Advanced Reactor Contract Awards",
+      "lastRunStatus": "ok",
+      "lastSuccessAt": "2026-09-17T12:51:08.955Z",
+      "path": "sections/market/usaspending-advanced-reactor-awards.json",
+      "sectionId": "market",
+      "ttlHours": 168
     }
   ]
 }
