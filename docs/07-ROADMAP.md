@@ -114,11 +114,11 @@ Upgrade three existing source types to extract substantive content alongside vol
 
 ## M5 — Source quality: new source types
 
-Add sources that expose regulatory and procurement content currently unavailable through the public web dashboard, exercising the additive handler pattern (ADR-010).
+Add sources that expose regulatory and procurement content currently unavailable through the public web dashboard. Whether this needs a new handler kind beyond `html`/`api` (ADR-010's additive registry) depends entirely on what triage finds — not assumed up front.
 
 **Scope:**
 
-- **SAM.gov FPDS contract awards**: Triage and configure at least one target in the Market Conditions or Regulatory & Policy section (per `docs/05-SOURCES.md` method) filtering for nuclear power generation (`naics_code`) and California (`place_of_performance.state`). Extract award amount, recipient, and agency.
+- **SAM.gov FPDS contract awards**: Triage and configure at least one target in the **Market Conditions** section (per `docs/05-SOURCES.md` method) filtering for nuclear power generation (`naics_code`) and California (`place_of_performance.state`). Extract award amount, recipient, and agency. Market Conditions specifically, not Regulatory & Policy — M4's plan doc already committed this ("M5's SAM.gov work is what gives Market its substantive-content source"), and M4b gave Regulatory its own non-numeric content (`fr-nrc-smr`/`fr-doe-nuclear`'s title/type/date). Market Conditions is the only section still all-numeric (`eia-ca-industrial-price`'s `retail_price_industrial`/`price_period`); putting SAM.gov in Regulatory instead would leave this milestone's own exit criterion (below) unmet.
 - **MARAD / Coast Guard maritime regulatory**: Triage one docket or regulatory guidance source relevant to floating power plants and port operations. Maritime regulatory approval is the actual path for BlueCore's Long Beach deployment; the dashboard has no source currently covering this.
 
 **Testing approach:** Same as M4 — generalized `example-contracts-api` and `example-maritime-regulatory` fixtures in vitest; entity configs verified via `npm run fixture:verify`.
