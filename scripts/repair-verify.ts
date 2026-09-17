@@ -53,13 +53,13 @@ function getPositional(): string | undefined {
 // extractor's own kind.
 async function loadCandidatesFile(
   path: string,
-  kind: "html" | "api",
+  kind: "html" | "api" | "xml",
 ): Promise<RelocationCandidate[]> {
   const raw = JSON.parse(await readFile(path, "utf-8")) as unknown[];
   return raw.map((entry, i) => {
     const patch: LocationPatch =
       typeof entry === "string"
-        ? kind === "html"
+        ? kind === "html" || kind === "xml"
           ? { selector: entry }
           : { jsonPath: entry }
         : (entry as LocationPatch);

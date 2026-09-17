@@ -18,7 +18,7 @@ import { getHandler } from "../ingest/extract/registry.js";
 import { extractOne, type Candidate } from "../ingest/extract/pipeline.js";
 import { resolveApiPaths } from "../ingest/extract/api-handler.js";
 import { IngestError } from "../ingest/errors.js";
-import { htmlSkeleton, jsonShape, jaccardSimilarity, setDiff } from "./structure.js";
+import { htmlSkeleton, xmlSkeleton, jsonShape, jaccardSimilarity, setDiff } from "./structure.js";
 
 export type DriftSignalCode =
   "EXTRACTION_BROKEN" | "ANCHOR_MOVED" | "TYPE_CHANGED" | "STRUCTURE_CHANGED" | "FETCH_FAILED";
@@ -82,8 +82,17 @@ export async function checkTargetDrift(
   const liveDoc = await handler.parse(live);
 
   const baselineShape =
-    target.kind === "html" ? htmlSkeleton(baseline.body) : jsonShape(baselineDoc);
-  const liveShape = target.kind === "html" ? htmlSkeleton(live.body) : jsonShape(liveDoc);
+    target.kind === "html" || target.kind === "xml"
+      ? target.kind === "html"
+        ? htmlSkeleton(baseline.body)
+        : xmlSkeleton(baseline.body)
+      : jsonShape(baselineDoc);
+  const liveShape =
+    target.kind === "html" || target.kind === "xml"
+      ? target.kind === "html"
+        ? htmlSkeleton(live.body)
+        : xmlSkeleton(live.body)
+      : jsonShape(liveDoc);
   const similarity = jaccardSimilarity(baselineShape, liveShape);
   if (similarity < STRUCTURE_SIMILARITY_THRESHOLD) {
     const { added, removed } = setDiff(baselineShape, liveShape);
@@ -136,7 +145,7 @@ async function checkExtractorDrift(
     ];
   }
 
-  if (target.kind === "html") {
+  if (target.kind === "html" || target.kind === "xml") {
     const baselineAnchor = JSON.stringify(baselineCandidate.anchor);
     const liveAnchor = JSON.stringify(liveCandidate.anchor);
     if (baselineAnchor !== liveAnchor) {

@@ -3,12 +3,14 @@
 import type { TargetDef } from "../../config/schema.js";
 import { ApiHandler } from "./api-handler.js";
 import { HtmlHandler } from "./html-handler.js";
+import { XmlHandler } from "./xml-handler.js";
 import type { ExtractHandler } from "./types.js";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const handlerRegistry: Record<TargetDef["kind"], ExtractHandler<any>> = {
   html: new HtmlHandler(),
   api: new ApiHandler(),
+  xml: new XmlHandler(),
 };
 
 export function getHandler(kind: TargetDef["kind"]) {

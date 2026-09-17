@@ -1,0 +1,34 @@
+{
+  "recent_releases": {
+    "presenter": "list",
+    "value": [
+      "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
+      "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
+      "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+    ],
+    "displayValue": [
+      "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
+      "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
+      "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+    ],
+    "rawText": [
+      "{\"date\":\"Fri, 07 Aug 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Second Quarter 2026 Financial Results and Business Update\"}",
+      "{\"date\":\"Thu, 06 Aug 2026 08:15:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year\",\"title\":\"Oklo's Groves Reactor Achieves First Criticality in Under a Year\"}",
+      "{\"date\":\"Mon, 27 Jul 2026 06:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call\"}"
+    ],
+    "anchor": [
+      "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1)",
+      "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(2)",
+      "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
+    ],
+    "contentHash": "sha256:1d0b35e75e5c36c8e103f42ace9e5854838ce08770d2f488bd5681a0fddae2be"
+  },
+  "latest_release_date": {
+    "presenter": "metric",
+    "value": "2026-08-07T07:00:00.000Z",
+    "displayValue": "07 Aug 2026",
+    "rawText": "Fri, 07 Aug 2026 07:00:00 GMT",
+    "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
+    "contentHash": "sha256:ab596ec2b8260236fcde82753d5d4e2a69feabd441b92897ff40c29f76272ecf"
+  }
+}

@@ -446,6 +446,109 @@ export const config: CmieConfigInput = {
       ],
     },
 
+    // M6b: Oklo press releases via RSS — ADR-026 (kind: "xml"). The Oklo
+    // newsroom page (oklo.com/newsroom) doesn't advertise an RSS feed link,
+    // but the feed exists at the conventional RSS path. Live-verified
+    // 2026-09-13: 50 items in feed, newest first. RSS 2.0, <link> holds the
+    // canonical article URL (resolved correctly by XML mode, not HTML mode's
+    // void-element bug), <pubDate> in RFC-822 GMT. Oklo's robots.txt allows /;
+    // CSS classes are build-hashed and churn on deploy, so RSS is the stable
+    // source for this target. M6 exit: 3 recent items per list + a date guard.
+    {
+      id: "oklo-press-releases",
+      label: "Oklo Inc. — Latest Press Releases",
+      entityId: "oklo-inc",
+      sectionId: "competitive",
+      kind: "xml",
+      url: "https://oklo.com/newsroom/rss.xml",
+      schedule: { cron: "0 16 * * *", ttlHours: 168 },
+      notes:
+        "M6b, ADR-026: XML handler for RSS feeds. Oklo newsroom page (oklo.com/newsroom, set as " +
+        "viewUrl on dashboard) doesn't advertise this feed link, but RSS at the conventional path " +
+        "verified live 2026-09-13 with 50 items newest-first. recent_releases list presents the " +
+        "first 3 items; latest_release_date scalar enforces monotonic-increasing (selector regress " +
+        "detection, ADR-018) and maxFutureDays (catches scheduled/draft dates).",
+      extractors: [
+        {
+          key: "recent_releases",
+          label: "Recent Releases",
+          presenter: "list",
+          kind: "xml",
+          type: "markdown",
+          selector: "channel > item",
+          multiple: true,
+          limit: 3,
+          fields: {
+            title: { selector: "title" },
+            link: { selector: "link", escape: "href" },
+            date: { selector: "pubDate", format: "date" },
+          },
+          template: "[{title}]({link}) — {date}",
+          required: true,
+          assert: { notEmpty: true, maxLength: 400, minItems: 3, maxItems: 3 },
+        },
+        {
+          key: "latest_release_date",
+          label: "Latest Release Date",
+          presenter: "metric",
+          kind: "xml",
+          selector: "channel > item:nth-of-type(1) > pubDate",
+          type: "date",
+          required: true,
+          assert: { notEmpty: true, maxFutureDays: 1, expectMonotonic: "increasing" },
+        },
+      ],
+    },
+
+    // M6b: NuScale press releases via RSS — same shape as Oklo above.
+    // Live-verified 2026-09-13: HubSpot-hosted, 10 items newest-first, RSS 2.0
+    // advertised via <link rel="alternate"> on the newsroom page. Robots.txt
+    // allows / and subdirs except HubSpot preview paths (none match this URL).
+    {
+      id: "nuscale-press-releases",
+      label: "NuScale Power Corporation — Latest Press Releases",
+      entityId: "nuscale-power",
+      sectionId: "competitive",
+      kind: "xml",
+      url: "https://www.nuscalepower.com/press-releases/rss.xml",
+      schedule: { cron: "0 17 * * *", ttlHours: 168 },
+      notes:
+        "M6b, ADR-026: XML handler for RSS feeds. NuScale's press-releases page advertises this " +
+        'feed via <link rel="alternate" type="application/rss+xml">. HubSpot-hosted, 10 items ' +
+        "newest-first. recent_releases list presents first 3; latest_release_date scalar mirrors " +
+        "Oklo's monotonic/maxFutureDays guard.",
+      extractors: [
+        {
+          key: "recent_releases",
+          label: "Recent Releases",
+          presenter: "list",
+          kind: "xml",
+          type: "markdown",
+          selector: "channel > item",
+          multiple: true,
+          limit: 3,
+          fields: {
+            title: { selector: "title" },
+            link: { selector: "link", escape: "href" },
+            date: { selector: "pubDate", format: "date" },
+          },
+          template: "[{title}]({link}) — {date}",
+          required: true,
+          assert: { notEmpty: true, maxLength: 400, minItems: 3, maxItems: 3 },
+        },
+        {
+          key: "latest_release_date",
+          label: "Latest Release Date",
+          presenter: "metric",
+          kind: "xml",
+          selector: "channel > item:nth-of-type(1) > pubDate",
+          type: "date",
+          required: true,
+          assert: { notEmpty: true, maxFutureDays: 1, expectMonotonic: "increasing" },
+        },
+      ],
+    },
+
     // Sector-wide document volume — a "sector capacity metrics" proxy,
     // distinct from the NRC-specific regulatory count below.
     {

@@ -99,6 +99,14 @@ export const HtmlFieldDef = FieldTransformDef.extend({
 });
 export type HtmlFieldDef = z.infer<typeof HtmlFieldDef>;
 
+// ADR-026 — a field within a composite xml row. Identical to HtmlFieldDef
+// — row-relative, omitted selector means the row node itself.
+export const XmlFieldDef = FieldTransformDef.extend({
+  selector: z.string().optional(),
+  attr: z.string().optional(),
+});
+export type XmlFieldDef = z.infer<typeof XmlFieldDef>;
+
 // Rule 13 (ADR-022/ADR-025) helper, shared by every composite location's
 // field/template consistency check: every template placeholder resolves to
 // a field (or "index", when the caller allows it), and every field is used.
@@ -311,7 +319,60 @@ export const ApiLocation = z
     }
   });
 
-export const LocationDef = z.discriminatedUnion("kind", [HtmlLocation, ApiLocation]);
+// ADR-026 — an "xml" location is either simple (`selector`, optionally
+// `attr`/`multiple`) or composite (row-list: `selector`+`multiple: true`
+// picks the row nodes, `fields` + `template` compose each row into one
+// markdown string, and `limit` bounds the row count). Identical shape to
+// HtmlLocation — Cheerio parses both, only the parse option differs
+// (cheerio.load(body, { xml: true }) for xml-mode void elements like <link>).
+export const XmlLocation = z
+  .object({
+    kind: z.literal("xml"),
+    selector: z.string().min(1),
+    attr: z.string().optional(),
+    multiple: z.boolean().optional(),
+    fields: z.record(z.string(), XmlFieldDef).optional(),
+    template: z.string().min(1).optional(),
+  })
+  .check((ctx) => {
+    const v = ctx.value;
+    const hasComposite = v.fields !== undefined || v.template !== undefined;
+    if (!hasComposite) return;
+
+    if (v.fields === undefined || v.template === undefined) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message: 'a composite "xml" location requires both fields and template (rule 13, ADR-026)',
+        path: [],
+      });
+      return;
+    }
+    if (v.attr !== undefined) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a composite "xml" location (fields+template) may not also set attr — fields pick ' +
+          "their own attr per row (rule 13, ADR-026)",
+        path: ["attr"],
+      });
+    }
+    if (!v.multiple) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a composite "xml" location (fields+template) requires multiple: true (rule 13, ADR-026)',
+        path: ["multiple"],
+      });
+    }
+    for (const issue of templateFieldIssues(v.fields, v.template, "rule 13, ADR-026")) {
+      ctx.issues.push({ code: "custom", input: v, message: issue.message, path: issue.path });
+    }
+  });
+
+export const LocationDef = z.discriminatedUnion("kind", [HtmlLocation, ApiLocation, XmlLocation]);
 export type LocationDef = z.infer<typeof LocationDef>;
 
 export const AssertDef = z.object({
@@ -575,12 +636,12 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
     });
   }
 
-  // Rule 13 (ADR-025) — a composite html location (fields+template) always
-  // composes a markdown string per row, and only ever backs a `list` block —
-  // there is no scalar composite-html use case (that's what a plain
+  // Rule 13 (ADR-025/ADR-026) — a composite html/xml location (fields+template)
+  // always composes a markdown string per row, and only ever backs a `list` block —
+  // there is no scalar composite-html/xml use case (that's what a plain
   // scalar/markdown selector is for).
   if (
-    ex.kind === "html" &&
+    (ex.kind === "html" || ex.kind === "xml") &&
     ex.fields !== undefined &&
     (ex.presenter !== "list" || ex.type !== "markdown")
   ) {
@@ -588,8 +649,8 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
       code: "custom",
       input: ex,
       message:
-        'a composite "html" location (fields+template) requires presenter "list" and ' +
-        'type "markdown" (rule 13, ADR-025)',
+        `a composite "${ex.kind}" location (fields+template) requires presenter "list" and ` +
+        `type "markdown" (rule 13, ADR-025/ADR-026)`,
       path: ["presenter"],
     });
   }
@@ -641,7 +702,7 @@ export const TargetDef = z
     label: z.string().min(1),
     entityId: z.string().min(1),
     sectionId: z.string().min(1),
-    kind: z.enum(["html", "api"]), // pdf removed from v1 per ADR-010; see doc 02 §7
+    kind: z.enum(["html", "api", "xml"]), // pdf removed from v1 per ADR-010; see doc 02 §7
     url: z.url(), // rule 10
     renderer: RendererDef.default("static"),
     method: z.enum(["GET", "POST"]).default("GET"),

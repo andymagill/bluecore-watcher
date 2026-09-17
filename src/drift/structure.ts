@@ -38,6 +38,20 @@ export function htmlSkeleton(html: string): Set<string> {
   return skeleton;
 }
 
+// XML skeleton — identical logic to htmlSkeleton, but parses with xml: true.
+// Used for drift checking on RSS feeds and similar XML sources.
+export function xmlSkeleton(xml: string): Set<string> {
+  const $ = cheerio.load(xml, { xml: true });
+  const skeleton = new Set<string>();
+  $("*").each((_i, el) => {
+    if (el.type !== "tag") return;
+    const parent = el.parent;
+    if (!parent || parent.type !== "tag") return;
+    skeleton.add(`${elementSignature(parent)} > ${elementSignature(el)}`);
+  });
+  return skeleton;
+}
+
 // Every key path present in a parsed JSON document, with array indices
 // collapsed to `[]` (only the first element of an array is walked — arrays
 // are assumed structurally homogeneous, which is true of every API target
