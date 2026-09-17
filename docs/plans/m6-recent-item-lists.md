@@ -23,7 +23,7 @@ are design only, for a future conversation to pick up cold. Each workstream:
 | Workstream                                                       | Status      | PR  |
 | ---------------------------------------------------------------- | ----------- | --- |
 | M6a — Row lists (html), `bluecore-newsroom`, M4c (retire form-d) | Delivered   | #33 |
-| M6b — `kind: "xml"`, Oklo + NuScale press-release targets        | **Next**    | —   |
+| M6b — `kind: "xml"`, Oklo + NuScale press-release targets        | Delivered   | TBD |
 | M6c — Row lists (api), FR targets                                | Not started | —   |
 | M6d — SEC + USAspending targets, M6 close-out                    | Not started | —   |
 
