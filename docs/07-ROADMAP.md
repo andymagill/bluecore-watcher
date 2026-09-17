@@ -129,6 +129,24 @@ Add sources that expose regulatory and procurement content currently unavailable
 
 ---
 
+## M6 — Source quality: competitor depth & sector signal
+
+Beyond M4+M5's completeness bar (every section has ≥1 substantive source) — this fills the remaining named-but-unfilled `SPEC.md` §3 sub-dimensions: "technology updates"/"supply chain bottlenecks" under Competitive Landscape, and "sector sentiment" under Market Conditions. Not required for the first client deliverable (that gate is M5's); this is depth beyond it.
+
+**Scope:**
+
+- **Competitor depth (`oklo-inc`, `nuscale-power`):** Triage and configure at least one additional source type about the two existing competitor entities — not new entities. Candidates to triage: patent filings (USPTO), investor-relations/press pages, technology-update announcements. Chosen per `docs/05-SOURCES.md` method; should extract substantive content the way M4b's SEC upgrade did, not just another count.
+- **Sector sentiment (Market Conditions):** Triage a **documented** sentiment index or survey for the nuclear/advanced-energy sector — a real organization's already-published number or category, not a value computed in-app from scraped text. Two hard constraints from `SPEC.md` §2 rule out the latter: Zero-LLM Runtime (no LLM call during ingestion/transformation/rendering) and Deterministic Provenance (every block anchors to one raw value at one documented location, not a multi-source aggregate). If triage finds no such source for this sector, drop this scope item rather than force a fit.
+- **Explicitly out of scope: Google Trends.** No official public API exists — every source triaged so far in this project is an official, documented API or a robots.txt-compliant page (SEC, Federal Register, EIA, Lever), and an unofficial/reverse-engineered endpoint conflicts with that bar and with the Deferred table's "robots.txt / ToS enforcement (Q6) — before any client deliverable" note. If search/attention-interest data is still wanted later, triage a documented alternative instead.
+
+**Testing approach:** Same as M4/M5 — generalized, entity-agnostic fixtures in vitest per new source type; entity configs verified via `npm run fixture:verify`.
+
+**Exit:** At least one new substantive, non-numeric source added to Competitive Landscape for an existing competitor. Market Conditions' sector-sentiment sub-dimension filled if triage finds a documented source (not a hard requirement — none may exist). Standard verification passes.
+
+**Status:** Not started — more exploratory than M4/M5 at time of writing; neither the competitor-depth source nor a candidate sentiment index has been triaged yet. A future planning conversation should live-verify real candidates (same discipline as M4a/M4b: confirm the actual shape/API/documentation before writing config) before any implementation.
+
+---
+
 ## Deferred
 
 | Item                                                    | Trigger                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
@@ -150,7 +168,7 @@ Add sources that expose regulatory and procurement content currently unavailable
 
 ```
 M0.5 (engine spine) ──────────┐
-                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► M5 ──► first client (source quality gate)
+                               ├──► M1 ──► M2 ──► M3 ──► M4 ──► M5 ──► first client (source quality gate) ──► M6 (depth, optional)
 Q1 (source triage, M0) ────────┘
 
 Auth (ADR-004, Deferred) ─────► required before charging a client
@@ -159,3 +177,5 @@ Auth (ADR-004, Deferred) ─────► required before charging a client
 **Corrected 2026-09-12** — the original diagram chained `Q1 ──► M0 ──► M1` and read "everything hangs off Q1." That was wrong on the engine's own terms: ADR-001 requires the engine to work without knowledge of any specific client's sources, so an engine that cannot be built until the source list exists would be a defect, not a sequencing fact. M0.5 and M0/Q1 run **concurrently**; M1 is gated on the later of the two finishing. Q1 still gates M0, M1, M2, and the client deliverable — it was never optional, only mis-sequenced against the spine.
 
 **2026-09-14 update:** M4 and M5 gate the first client deliverable (source quality: all four sections have substantive, non-metric sources). Auth (ADR-004) is deferred to Backlog; it is required before charging, not a pipeline prerequisite.
+
+**2026-09-17 update:** M6 hangs off the gate, not into it — it adds depth (competitor breadth, sector sentiment if a documented source exists) beyond the four-section completeness bar M5 already satisfies. Nothing downstream is blocked on it.
