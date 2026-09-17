@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
         "contentHash": "sha256:f74efabef12ea619e30b79bddef89cffa9dda494761681ca862cff2871a85980",
-        "extractedAt": "2026-09-16T13:12:46.112Z",
+        "extractedAt": "2026-09-17T02:48:18.093Z",
         "rawText": "76",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
       },
@@ -22,17 +22,105 @@
         "warnings": []
       },
       "value": 76
+    },
+    {
+      "delta": null,
+      "displayValue": "[Modernizing Reactor Licensing, Safety Oversight, and Siting Practices](https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices)",
+      "failingSince": null,
+      "key": "latest_document_title",
+      "label": "Latest Document",
+      "presenter": "markdown",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#title:$.results[0].title url:$.results[0].html_url",
+        "contentHash": "sha256:44ea1d7f696cde7497413cf6bdff4b0cea41490b26cfc5b0eb33acc150d43756",
+        "extractedAt": "2026-09-17T02:48:18.093Z",
+        "rawText": "{\"title\":\"Modernizing Reactor Licensing, Safety Oversight, and Siting Practices\",\"url\":\"https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices\"}",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "markdown",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "[Modernizing Reactor Licensing, Safety Oversight, and Siting Practices](https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices)"
+    },
+    {
+      "delta": null,
+      "displayValue": "Proposed Rule",
+      "failingSince": null,
+      "key": "latest_document_type",
+      "label": "Latest Document Type",
+      "presenter": "status",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].type",
+        "contentHash": "sha256:aa1561677b1da0f7c6e2ef2ea3098f67e637ce020e39d464c23333bf56d6cf3a",
+        "extractedAt": "2026-09-17T02:48:18.093Z",
+        "rawText": "Proposed Rule",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "enum",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "Proposed Rule"
+    },
+    {
+      "delta": null,
+      "displayValue": "16 Jul 2026",
+      "failingSince": null,
+      "key": "latest_document_date",
+      "label": "Latest Document Date",
+      "presenter": "metric",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].publication_date",
+        "contentHash": "sha256:493d968306a2d9e1149e644526c1f4ec2a4df6f47b8df728ed26f54b02f33e49",
+        "extractedAt": "2026-09-17T02:48:18.093Z",
+        "rawText": "2026-07-16",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "date",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "2026-07-16T00:00:00.000Z"
+    },
+    {
+      "delta": null,
+      "displayValue": "Nuclear Regulatory Commission",
+      "failingSince": null,
+      "key": "latest_document_agency",
+      "label": "Latest Document Agency",
+      "presenter": "markdown",
+      "provenance": {
+        "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].agencies[0].name",
+        "contentHash": "sha256:9b0c2c9921d455a0f1e92ed30b6c41dd3bb9a4c67712119127abd1807b049598",
+        "extractedAt": "2026-09-17T02:48:18.094Z",
+        "rawText": "Nuclear Regulatory Commission",
+        "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest"
+      },
+      "status": "ok",
+      "type": "string",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "Nuclear Regulatory Commission"
     }
   ],
   "entityId": "bluecore-energy",
   "label": "Federal Register — SMR Mentions (All Agencies)",
   "run": {
-    "completedAt": "2026-09-16T13:12:46.113Z",
-    "durationMs": 418,
+    "completedAt": "2026-09-17T02:48:18.094Z",
+    "durationMs": 576,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-16T13-12-41-148Z-7851bd7",
-    "startedAt": "2026-09-16T13:12:45.695Z",
+    "runId": "2026-09-17T02-48-13-213Z-2f78d6f",
+    "startedAt": "2026-09-17T02:48:17.518Z",
     "status": "ok"
   },
   "schemaVersion": 1,

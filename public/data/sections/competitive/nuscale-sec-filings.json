@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
         "contentHash": "sha256:498a5992a45cccadc5248e2877cd367d7a457e547d0d0658f58b558705f0b070",
-        "extractedAt": "2026-09-16T13:12:45.694Z",
+        "extractedAt": "2026-09-17T02:48:17.515Z",
         "rawText": "4/A",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -32,7 +32,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:d31fac478f875d3f8fa95a8a9a30f31d7f5d90946da706c50a45be42524934ba",
-        "extractedAt": "2026-09-16T13:12:45.694Z",
+        "extractedAt": "2026-09-17T02:48:17.515Z",
         "rawText": "2026-09-11",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -43,17 +43,39 @@
         "warnings": []
       },
       "value": "2026-09-11T00:00:00.000Z"
+    },
+    {
+      "delta": null,
+      "displayValue": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-08\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000110465926094073/tm2622138d2_8k.htm)",
+      "failingSince": null,
+      "key": "latest_8k",
+      "label": "Latest 8-K",
+      "presenter": "markdown",
+      "provenance": {
+        "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@9:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[9] date:$.filings.recent.filingDate[9] acc:$.filings.recent.accessionNumber[9] doc:$.filings.recent.primaryDocument[9]",
+        "contentHash": "sha256:2a44e274f48933da3611779503d7546697c70e8c18aca07fe4a9139e8da4fa8b",
+        "extractedAt": "2026-09-17T02:48:17.515Z",
+        "rawText": "{\"acc\":\"0001104659-26-094073\",\"date\":\"2026-08-11\",\"doc\":\"tm2622138d2_8k.htm\",\"items\":\"1.01,9.01\"}",
+        "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
+      },
+      "status": "ok",
+      "type": "markdown",
+      "validation": {
+        "passed": true,
+        "warnings": []
+      },
+      "value": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-08\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000110465926094073/tm2622138d2_8k.htm)"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-09-16T13:12:45.694Z",
-    "durationMs": 1987,
+    "completedAt": "2026-09-17T02:48:17.518Z",
+    "durationMs": 2024,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-16T13-12-41-148Z-7851bd7",
-    "startedAt": "2026-09-16T13:12:43.707Z",
+    "runId": "2026-09-17T02-48-13-213Z-2f78d6f",
+    "startedAt": "2026-09-17T02:48:15.494Z",
     "status": "ok"
   },
   "schemaVersion": 1,
