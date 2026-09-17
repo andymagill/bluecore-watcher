@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
         "contentHash": "sha256:a1188ae4ce3c918f1081e2c6924346d88cd0614f0ddb281286935b4ec56dedfc",
-        "extractedAt": "2026-09-17T15:57:54.881Z",
+        "extractedAt": "2026-09-17T22:07:53.974Z",
         "rawText": "20.74",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -33,7 +33,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
         "contentHash": "sha256:383eb859abccbfc4f33ef694d899c53e722bde6b6c54e6ffc3ca171476672f15",
-        "extractedAt": "2026-09-17T15:57:54.881Z",
+        "extractedAt": "2026-09-17T22:07:53.974Z",
         "rawText": "2026-06",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -49,12 +49,12 @@
   "entityId": "bluecore-energy",
   "label": "EIA — CA Industrial Retail Electricity Price",
   "run": {
-    "completedAt": "2026-09-17T15:57:54.881Z",
-    "durationMs": 749,
+    "completedAt": "2026-09-17T22:07:53.975Z",
+    "durationMs": 1861,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T15-57-46-259Z-17b68da",
-    "startedAt": "2026-09-17T15:57:54.132Z",
+    "runId": "2026-09-17T22-07-44-088Z-b738924",
+    "startedAt": "2026-09-17T22:07:52.114Z",
     "status": "ok"
   },
   "schemaVersion": 1,
