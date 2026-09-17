@@ -234,6 +234,8 @@ The block envelope in §4 assumes a scalar `value`. The `list` presenter (`multi
 
 **Validation semantics for `multiple: true`:** shape assertions (`notEmpty`, `pattern`, `maxLength`) apply **per item** — each string in the array must individually satisfy them. `assert.minItems` / `assert.maxItems` (see `02-CONFIG-SCHEMA.md` §3) bound the array length. Change-magnitude guards (`maxChangePct`, `maxChangeAbs`) apply to **item count**, comparing `count` against `previousCount` — there is no meaningful "percent change" of a set of strings.
 
+**Row identity and window eviction (ADR-025).** `added`/`removed` are computed against each item's _identity_ — a plain list's `rawText`, or a composite row's pre-transform snapshot — never `displayValue`, so editing a composite's `valueMap`/`template` (which changes what a row displays, not what it's identified by) produces no `added`/`removed` churn. For an extractor that declares `limit` (a composite list, `02-CONFIG-SCHEMA.md` §3): when the row count is at `limit` both before and after a run, rows that fall out of the array purely because a new row pushed them past the window boundary are excluded from `removed` — a genuinely new item then reports as `added: [1 item], removed: []`, not `added: [1 item], removed: [1 item]`. A row that disappears for any other reason (the window wasn't already full, i.e. the underlying source itself yielded fewer rows than `limit`) is still reported as removed.
+
 ---
 
 ## 5. Freshness state machine (client-side)

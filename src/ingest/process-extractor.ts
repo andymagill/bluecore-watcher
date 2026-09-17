@@ -182,6 +182,14 @@ export async function processExtractor<TDoc>(
   if (unchanged && previousBlock && previousBlock.provenance) {
     // Re-verified, nothing moved: extractedAt advances honestly (ADR-011),
     // delta is carried forward untouched (01-DATA-CONTRACT.md §4, corrected).
+    // value/displayValue come from the fresh candidate, not previousBlock —
+    // ADR-022/025: a composite's contentHash hashes the raw pre-transform
+    // field values, so a template/valueMap-only edit leaves `unchanged` true
+    // even though the composed value/displayValue changed. Carrying the
+    // *previous* value forward would silently un-apply that edit. For every
+    // non-composite extractor, candidate.value/displayValue already equal
+    // previousBlock's here (same rawText, same deterministic transform), so
+    // this is a no-op for them.
     // The two branches are identical in substance -- the split exists because
     // TS can't narrow the Block union through an object spread, so a single
     // branch produces a provenance type that's a union of both shapes rather
@@ -191,6 +199,8 @@ export async function processExtractor<TDoc>(
         ? {
             ...previousBlock,
             status: "ok",
+            value: (candidate as ListCandidate).value,
+            displayValue: (candidate as ListCandidate).displayValue,
             provenance: { ...previousBlock.provenance, extractedAt: nowIso },
             validation: { passed: true, warnings: [] },
             failingSince: null, // recovered, if it was cached
@@ -198,6 +208,8 @@ export async function processExtractor<TDoc>(
         : {
             ...previousBlock,
             status: "ok",
+            value: (candidate as ScalarCandidate).value,
+            displayValue: (candidate as ScalarCandidate).displayValue,
             provenance: { ...previousBlock.provenance, extractedAt: nowIso },
             validation: { passed: true, warnings: [] },
             failingSince: null, // recovered, if it was cached
@@ -279,9 +291,17 @@ function publish(
 
   if (candidate.presenter === "list") {
     const c = candidate as ListCandidate;
-    const previousValues =
-      previousBlock && previousBlock.value !== null ? (previousBlock.value as string[]) : [];
-    const delta = previousBlock ? computeSetDelta(c.value, previousValues, nowIso) : null;
+    // Row identity for the diff is rawText (ADR-025) — the previous block's
+    // own provenance.rawText, not its displayed `value` — so a
+    // template/valueMap-only edit (which changes value but not rawText)
+    // produces no added/removed churn.
+    const previousRawText =
+      previousBlock && previousBlock.provenance
+        ? (previousBlock.provenance.rawText as string[])
+        : [];
+    const delta = previousBlock
+      ? computeSetDelta(c.rawText, previousRawText, nowIso, extractor.limit)
+      : null;
     const block: ListBlock = {
       ...common,
       presenter: "list",

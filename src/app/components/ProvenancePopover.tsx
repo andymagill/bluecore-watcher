@@ -4,12 +4,19 @@
 import * as Popover from "@radix-ui/react-popover";
 import type { ScalarProvenance, ListProvenance } from "../../contract/block.js";
 
-function formatRawText(rawText: string | string[]): string {
-  return Array.isArray(rawText) ? rawText.join(", ") : rawText;
-}
-
-function formatAnchor(anchor: string | string[]): string {
-  return Array.isArray(anchor) ? anchor.join(", ") : anchor;
+// ADR-025 — a list's rawText/anchor render as one entry per row rather than
+// a flat comma-joined string, which was never actually seen with real data
+// before a composite row list existed.
+function ProvenanceRows({ values }: { values: readonly string[] }) {
+  return (
+    <ol className="list-decimal space-y-1 pl-4">
+      {values.map((v, i) => (
+        <li key={i} className="break-words font-mono">
+          {v}
+        </li>
+      ))}
+    </ol>
+  );
 }
 
 export function ProvenancePopover({
@@ -51,7 +58,13 @@ export function ProvenancePopover({
             </div>
             <div>
               <dt className="text-muted-foreground">Anchor</dt>
-              <dd className="break-all font-mono">{formatAnchor(provenance.anchor)}</dd>
+              <dd className="break-all font-mono">
+                {Array.isArray(provenance.anchor) ? (
+                  <ProvenanceRows values={provenance.anchor} />
+                ) : (
+                  provenance.anchor
+                )}
+              </dd>
             </div>
             <div>
               <dt className="text-muted-foreground">Extracted</dt>
@@ -61,7 +74,13 @@ export function ProvenancePopover({
             </div>
             <div>
               <dt className="text-muted-foreground">Raw text</dt>
-              <dd className="break-words font-mono">{formatRawText(provenance.rawText)}</dd>
+              <dd className="break-words font-mono">
+                {Array.isArray(provenance.rawText) ? (
+                  <ProvenanceRows values={provenance.rawText} />
+                ) : (
+                  provenance.rawText
+                )}
+              </dd>
             </div>
           </dl>
           <Popover.Arrow className="fill-popover" />

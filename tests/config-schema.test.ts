@@ -533,6 +533,148 @@ describe("CmieConfig validation rules", () => {
     });
   });
 
+  describe("rule 13 (ADR-025): composite html row lists", () => {
+    function htmlListConfig(extractorOverrides: Record<string, unknown>): CmieConfigInput {
+      const cfg = baseConfig();
+      cfg.targets[0]!.kind = "html";
+      cfg.targets[0]!.extractors[0] = {
+        key: "e1",
+        label: "Extractor One",
+        presenter: "list",
+        kind: "html",
+        type: "markdown",
+        selector: ".row",
+        multiple: true,
+        limit: 3,
+        ...extractorOverrides,
+      } as CmieConfigInput["targets"][number]["extractors"][number];
+      return cfg;
+    }
+
+    it("accepts a valid composite html row list", () => {
+      const cfg = htmlListConfig({
+        fields: { title: { selector: ".title" }, url: { attr: "href" } },
+        template: "[{title}]({url})",
+      });
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("rejects fields without template", () => {
+      const cfg = htmlListConfig({ fields: { title: { selector: ".title" } } });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects template without fields", () => {
+      const cfg = htmlListConfig({ template: "{title}" });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a template referencing an unknown field", () => {
+      const cfg = htmlListConfig({
+        fields: { title: { selector: ".title" } },
+        template: "{title} {url}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a field that's never used in the template", () => {
+      const cfg = htmlListConfig({
+        fields: { title: { selector: ".title" }, url: { attr: "href" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects attr set alongside fields (fields pick their own attr per row)", () => {
+      const cfg = htmlListConfig({
+        attr: "data-x",
+        fields: { title: { selector: ".title" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a composite html location without multiple: true", () => {
+      const cfg = htmlListConfig({
+        multiple: false,
+        fields: { title: { selector: ".title" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a composite html location without presenter list / type markdown", () => {
+      const cfg = htmlListConfig({
+        presenter: "markdown",
+        type: "markdown",
+        fields: { title: { selector: ".title" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects a composite list without limit", () => {
+      const cfg = htmlListConfig({
+        limit: undefined,
+        fields: { title: { selector: ".title" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it("rejects limit set on a plain (non-composite) list", () => {
+      const cfg = htmlListConfig({ type: "string" });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
+    });
+
+    it('rejects presenter "list" with type "markdown" and no composite location', () => {
+      const cfg = htmlListConfig({ limit: undefined });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 7"))).toBe(true);
+    });
+
+    it('rejects presenter "list" with type "string" and a composite location', () => {
+      const cfg = htmlListConfig({
+        type: "string",
+        fields: { title: { selector: ".title" } },
+        template: "{title}",
+      });
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 7"))).toBe(true);
+    });
+  });
+
   describe("rule 14 (ADR-024): method POST requires viewUrl", () => {
     it("rejects method POST without viewUrl", () => {
       const cfg = baseConfig();

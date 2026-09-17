@@ -130,7 +130,13 @@ export class ApiHandler implements ExtractHandler<unknown> {
 
     const transformed: Record<string, string> = {};
     for (const [name, field] of Object.entries(extractor.fields)) {
-      transformed[name] = applyFieldTransform(rawValues[name]!, field, extractor.key, name);
+      transformed[name] = applyFieldTransform(
+        rawValues[name]!,
+        field,
+        extractor.key,
+        name,
+        target.url,
+      );
     }
     if (extractor.index) transformed.index = String(indexValue);
     const composedText = composeTemplate(extractor.template, transformed);

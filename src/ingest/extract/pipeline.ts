@@ -98,17 +98,21 @@ export async function extractOne<TDoc>(
     };
   }
 
-  // list presenter — per 02-CONFIG-SCHEMA.md §3 the only type it accepts is
-  // "string", so coercion is identity; still routed through coerce/format
-  // for a single code path.
+  // list presenter — a plain list narrows/coerces `rawText` itself (type
+  // "string", identity). ADR-025: a composite row list's `texts[i]` is the
+  // already-composed markdown row, distinct from `rawTexts[i]` (the raw
+  // pre-transform field snapshot that's stored and hashed below) — the same
+  // rawText/texts split ADR-022 introduced for a scalar composite, which
+  // this list branch previously ignored.
   const value: string[] = [];
   const displayValue: string[] = [];
-  for (const rawText of located.rawTexts) {
-    const narrowed = applyRegex(rawText, extractor);
+  located.rawTexts.forEach((rawText, i) => {
+    const startText = located.texts?.[i] ?? rawText;
+    const narrowed = applyRegex(startText, extractor);
     const coerced = coerce(narrowed, extractor);
     value.push(String(coerced));
     displayValue.push(formatDisplayValue(coerced, extractor));
-  }
+  });
   return {
     presenter: "list",
     value,

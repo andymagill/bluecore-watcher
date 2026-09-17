@@ -145,29 +145,37 @@ export async function scoreCandidates<TDoc>(
 ): Promise<ScoredCandidate[]> {
   const { target, extractor, handler, newDoc, candidates, previousBlock, now } = params;
 
-  // ADR-022 — a composite (fields+template) or indexed api location has no
-  // single locator to relocate automatically; relocate.ts already declines
-  // to propose candidates for these, but a hand-supplied one (e.g.
-  // `repair:verify --json-path`) shouldn't be silently patched into an
-  // extractor that would then carry both a `jsonPath` and `fields`/`index`
-  // — an invalid, mutually-exclusive shape per config rule 13. Surface the
-  // limitation explicitly instead.
+  // ADR-022/ADR-025 — a composite (fields+template) or indexed api location,
+  // or a composite html/xml row list, has no single locator to relocate
+  // automatically; relocate.ts already declines to propose candidates for
+  // these, but a hand-supplied one (e.g. `repair:verify --json-path`/
+  // `--selector`) shouldn't be silently patched into an extractor that would
+  // then carry both a locator and `fields`/`index`/`template` — an invalid,
+  // mutually-exclusive shape per config rule 13. Surface the limitation
+  // explicitly instead.
   if (
-    extractor.kind === "api" &&
-    (extractor.fields !== undefined || extractor.index !== undefined)
+    (extractor.kind === "api" &&
+      (extractor.fields !== undefined || extractor.index !== undefined)) ||
+    (extractor.kind === "html" && extractor.fields !== undefined)
   ) {
     return [
       {
-        patch: { jsonPath: "(unsupported — composite/indexed api location)" },
+        patch:
+          extractor.kind === "html"
+            ? { selector: "(unsupported — composite html row list)" }
+            : { jsonPath: "(unsupported — composite/indexed api location)" },
         basis: "unsupported",
         status: "unsupported",
         matchCount: null,
         value: null,
         displayValue: null,
         detail:
-          `extractor "${extractor.key}" uses a composite/indexed api location ` +
-          "(fields+template or index) — automatic relocation isn't supported for these; " +
-          "repair config/*.config.ts by hand (ADR-022).",
+          extractor.kind === "html"
+            ? `extractor "${extractor.key}" uses a composite html location (fields+template) — ` +
+              "automatic relocation isn't supported for these; repair config/*.config.ts by hand (ADR-025)."
+            : `extractor "${extractor.key}" uses a composite/indexed api location ` +
+              "(fields+template or index) — automatic relocation isn't supported for these; " +
+              "repair config/*.config.ts by hand (ADR-022).",
       },
     ];
   }

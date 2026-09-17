@@ -22,8 +22,8 @@ are design only, for a future conversation to pick up cold. Each workstream:
 
 | Workstream                                                       | Status      | PR  |
 | ---------------------------------------------------------------- | ----------- | --- |
-| M6a — Row lists (html), `bluecore-newsroom`, M4c (retire form-d) | **Next**    | —   |
-| M6b — `kind: "xml"`, Oklo + NuScale press-release targets        | Not started | —   |
+| M6a — Row lists (html), `bluecore-newsroom`, M4c (retire form-d) | Delivered   | #33 |
+| M6b — `kind: "xml"`, Oklo + NuScale press-release targets        | **Next**    | —   |
 | M6c — Row lists (api), FR targets                                | Not started | —   |
 | M6d — SEC + USAspending targets, M6 close-out                    | Not started | —   |
 
@@ -252,6 +252,14 @@ No acknowledgement entries or open alert issues reference any removed key (check
 ---
 
 ## M6a — Row lists (html), `bluecore-newsroom`, M4c close-out
+
+**Delivered 2026-09-17.** Implemented as planned below — no scope surprises during the build. One
+real bug caught while writing the transform tests: `encodeURIComponent` deliberately leaves `"("`
+and `")"` unescaped (RFC 3986 sub-delims), so `escape: "href"`'s percent-encoding needed an explicit
+override map rather than relying on `encodeURIComponent` alone. Also gave `ListBlock`'s rendered
+rows the `prose` typography class `MarkdownBlock` already applies — caught visually (dev server +
+screenshot): without it, a composed row's own markdown link resolved correctly in the DOM but had
+no visible link styling.
 
 **Prerequisites:** none beyond `main` — this is the milestone's first workstream, same "engine
 first" precedent M4a/M5a set.

@@ -64,17 +64,14 @@ The routine failure. Expect these weekly.
 
 ---
 
-## 4. Runbook: a new Form D filing appeared
+## 4. Runbook: a new SEC filing appeared
 
-**Symptom.** `bluecore-sec-filings.latest_filing_form`/`.latest_filing_date` change (M2b `any-change` alert fires on the form field) — most likely the next real event, not a bug, since this target's whole purpose is catching the next filing.
+**Symptom.** `bluecore-sec-filings.latest_filing_form`/`.latest_filing_date`/`.recent_filings` change (M2b `any-change` alert fires on the form field) — most likely the next real event, not a bug, since this target's whole purpose is catching the next filing.
 
-`bluecore-form-d` (the XML target extracting `totalOfferingAmount`/`totalAmountSold`) is pinned to one specific accession number's URL and does not follow this on its own.
+Nothing further to do beyond the normal review: `bluecore-sec-filings` reads SEC's own submissions JSON directly, so a new filing shows up on its own — no pinned URL to repoint. (M6a retired `bluecore-form-d`, the one target that _was_ pinned to a single accession number's XML URL and needed manual repointing here; this target is now the whole story for "a new SEC filing appeared.")
 
-1. Confirm via the new filing's accession number (`$.filings.recent.accessionNumber[0]` in the same submissions JSON) that it's a real new Form D or D/A, not a different form type this target also alerts on.
-2. Build the new filing's XML URL: `https://www.sec.gov/Archives/edgar/data/2125928/<accession-no-dashes>/primary_doc.xml`.
-3. Update `bluecore-form-d.url` in `config/bluecore.config.ts` to point at it.
-4. Capture and bless: `npm run fixture:capture -- --env bluecore bluecore-form-d`, then `npm run fixture:bless -- --env bluecore bluecore-form-d`. Review the diff — a real new filing should show the new dollar amounts, not a structural change.
-5. Merge. `maxChangePct: 300` on both extractors (`config/bluecore.config.ts`) is already generous for an early-stage company's next filing plausibly showing a multiple of the current amount — expect it to publish rather than guard-trip, but check `health.json` after the next run either way.
+1. Confirm via the new filing's accession number (`$.filings.recent.accessionNumber[0]` in the same submissions JSON) that it's a real new filing, not a form type you'd expect to ignore.
+2. Check `health.json` after the next run — `maxChangePct`/guard settings on the affected extractors (`config/bluecore.config.ts`) determine whether it published automatically or needs a guard review (§5 below).
 
 ---
 

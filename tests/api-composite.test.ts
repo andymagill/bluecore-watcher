@@ -225,27 +225,17 @@ describe("ApiHandler — composite location (ADR-022)", () => {
 
 describe("compose.ts — per-field transforms (unit)", () => {
   it("strip removes every match before split/join run", () => {
-    const out = applyFieldTransform(
-      "0001-26-000002",
-      { jsonPath: "$.x", strip: "-", escape: "none" },
-      "e",
-      "acc",
-    );
+    const out = applyFieldTransform("0001-26-000002", { strip: "-", escape: "none" }, "e", "acc");
     expect(out).toBe("000126000002");
   });
 
   it("escape: markdown escapes markdown-significant characters", () => {
-    const out = applyFieldTransform(
-      "a [link] *bold*",
-      { jsonPath: "$.x", escape: "markdown" },
-      "e",
-      "f",
-    );
+    const out = applyFieldTransform("a [link] *bold*", { escape: "markdown" }, "e", "f");
     expect(out).toBe("a \\[link\\] \\*bold\\*");
   });
 
   it("escape: url percent-encodes the joined value", () => {
-    const out = applyFieldTransform("a filing.htm", { jsonPath: "$.x", escape: "url" }, "e", "f");
+    const out = applyFieldTransform("a filing.htm", { escape: "url" }, "e", "f");
     expect(out).toBe("a%20filing.htm");
   });
 
