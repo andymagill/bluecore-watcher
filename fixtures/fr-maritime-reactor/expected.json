@@ -1,0 +1,42 @@
+{
+  "maritime_reactor_document_count": {
+    "presenter": "metric",
+    "value": 15,
+    "displayValue": "15 documents",
+    "rawText": "15",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.count",
+    "contentHash": "sha256:e629fa6598d732768f7c726b4b621285f9c3b85303900aa912017db7617d8bdb"
+  },
+  "latest_document_title": {
+    "presenter": "markdown",
+    "value": "[Request for Information: Development of a Commercially Viable System\\-Centric Small Modular Reactor Concept for Deployment in the Marine Transportation System](https://www.federalregister.gov/documents/2026/05/07/2026-09070/request-for-information-development-of-a-commercially-viable-system-centric-small-modular-reactor)",
+    "displayValue": "[Request for Information: Development of a Commercially Viable System\\-Centric Small Modular Reactor Concept for Deployment in the Marine Transportation System](https://www.federalregister.gov/documents/2026/05/07/2026-09070/request-for-information-development-of-a-commercially-viable-system-centric-small-modular-reactor)",
+    "rawText": "{\"title\":\"Request for Information: Development of a Commercially Viable System-Centric Small Modular Reactor Concept for Deployment in the Marine Transportation System\",\"url\":\"https://www.federalregister.gov/documents/2026/05/07/2026-09070/request-for-information-development-of-a-commercially-viable-system-centric-small-modular-reactor\"}",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#title:$.results[0].title url:$.results[0].html_url",
+    "contentHash": "sha256:bba3315f475760d457d9c0ddb7bde70f6a1902b38783cedcfb20bbc348200840"
+  },
+  "latest_document_type": {
+    "presenter": "status",
+    "value": "Notice",
+    "displayValue": "Notice",
+    "rawText": "Notice",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].type",
+    "contentHash": "sha256:65659145569b894bd67d06e685509c2decc5b2ac5e18700c085a253506b0fb75"
+  },
+  "latest_document_date": {
+    "presenter": "metric",
+    "value": "2026-05-07T00:00:00.000Z",
+    "displayValue": "07 May 2026",
+    "rawText": "2026-05-07",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].publication_date",
+    "contentHash": "sha256:6e64e76521e38239ff08105bf265bc4da7621b4285cb7ba8152d79a19165ab97"
+  },
+  "latest_document_agency": {
+    "presenter": "markdown",
+    "value": "Maritime Administration",
+    "displayValue": "Maritime Administration",
+    "rawText": "Maritime Administration",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=coast-guard&conditions%5Bagencies%5D%5B%5D=maritime-administration&conditions%5Bterm%5D=reactor&order=newest#$.results[0].agencies[-1:].name",
+    "contentHash": "sha256:e5c7779970bc1076f63b3b9170c8b0815bfd27e5761e2342c045555b0e5b5ea8"
+  }
+}
