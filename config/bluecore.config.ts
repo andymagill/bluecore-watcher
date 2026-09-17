@@ -160,7 +160,10 @@ export const config: CmieConfigInput = {
         "0002125928-26-000003) — identical shape to oklo-sec-filings/nuscale-sec-filings. " +
         "any-change alert so a new filing is visible without waiting on M3 alert dispatch review; " +
         "notBefore is set to the entity's own incorporation (2026-04-06), tighter than the 2020 " +
-        "floor used for the two established competitors above.",
+        "floor used for the two established competitors above. M4b: this filer has exactly two " +
+        "filings on record (both Form D) — no 8-K exists (verified live 2026-09-16), so unlike the " +
+        "two competitor targets this gets a generic latest-filing composite over row 0 (always " +
+        "present) rather than an 8-K-specific one.",
       extractors: [
         {
           key: "latest_filing_form",
@@ -187,6 +190,29 @@ export const config: CmieConfigInput = {
             notBefore: "2026-01-01",
             expectMonotonic: "increasing",
           },
+        },
+        {
+          key: "latest_filing_summary",
+          label: "Latest Filing",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          // No `index` — row 0 always exists here, unlike the two
+          // competitor targets' 8-K-specific extractor. CIK unpadded, same
+          // reasoning as latest_8k above. `doc` is escape: "none", not
+          // "url" — this filer's own row-0 primaryDocument is
+          // "xslFormDX01/primary_doc.xml" (SEC's XSL-viewer path prefix for
+          // a Form D), and encodeURIComponent turns that literal "/" into
+          // "%2F", which 303s instead of 200 (verified live 2026-09-16).
+          fields: {
+            form: { jsonPath: "$.filings.recent.form[0]" },
+            date: { jsonPath: "$.filings.recent.filingDate[0]" },
+            acc: { jsonPath: "$.filings.recent.accessionNumber[0]", strip: "-", escape: "none" },
+            doc: { jsonPath: "$.filings.recent.primaryDocument[0]", escape: "none" },
+          },
+          template:
+            "**{form}** filed {date} — [primary document](https://www.sec.gov/Archives/edgar/data/2125928/{acc}/{doc})",
+          assert: { notEmpty: true, maxLength: 500 },
         },
       ],
     },
@@ -367,7 +393,13 @@ export const config: CmieConfigInput = {
               strip: "-",
               escape: "none",
             },
-            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "url" },
+            // escape: "none", not "url" — an 8-K's primaryDocument is a
+            // flat filename today, but bluecore-sec-filings' Form D proved
+            // SEC sometimes nests it under a viewer-path prefix
+            // ("xslFormDX01/primary_doc.xml"); encodeURIComponent would
+            // turn that "/" into "%2F" and break the link (verified live
+            // 2026-09-16 — see bluecore-sec-filings' latest_filing_summary).
+            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "none" },
           },
           // CIK unpadded — the zero-padded form of the EDGAR Archives path
           // 301-redirects (verified live 2026-09-16); no alert here, mirroring
@@ -438,7 +470,8 @@ export const config: CmieConfigInput = {
           type: "markdown",
           // ADR-022: same reasoning as oklo-sec-filings — NuScale's first
           // 8-K sat at index 9 (verified live 2026-09-16, matching the
-          // 2026-09-13 fixture).
+          // 2026-09-13 fixture). `doc` is escape: "none" for the same
+          // reason as oklo-sec-filings' latest_8k.
           index: { jsonPath: '$.filings.recent.form[?(@ === "8-K")]~', pick: "first" },
           fields: {
             items: {
@@ -453,7 +486,7 @@ export const config: CmieConfigInput = {
               strip: "-",
               escape: "none",
             },
-            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "url" },
+            doc: { jsonPath: "$.filings.recent.primaryDocument[{index}]", escape: "none" },
           },
           template:
             "**{items}** filed {date} — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/{acc}/{doc})",
