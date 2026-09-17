@@ -26,6 +26,10 @@
       "type": "string",
       "format": "uri"
     },
+    "viewUrl": {
+      "type": "string",
+      "format": "uri"
+    },
     "ttlHours": {
       "type": "number",
       "exclusiveMinimum": 0

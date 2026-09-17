@@ -805,6 +805,99 @@ export const config: CmieConfigInput = {
         },
       ],
     },
+
+    // M5a — the roadmap's original filter (NAICS 221113 + California
+    // place-of-performance, via api.sam.gov) returns zero contracts since
+    // 2007 and api.sam.gov cannot be verified without a registered,
+    // rate-limited key (verified live 2026-09-17). Substituted:
+    // USAspending's own spending_by_award search (same underlying FPDS
+    // award data, keyless, sortable), filtered nationwide on keywords
+    // rather than NAICS+state — 43 real contracts at triage, newest
+    // 2026-08-27. First method: "POST" target (ADR-024) — a plain GET on
+    // this endpoint 405s, hence viewUrl for the dashboard link.
+    {
+      id: "usaspending-advanced-reactor-awards",
+      label: "USAspending — Advanced Reactor Contract Awards",
+      entityId: "bluecore-energy",
+      sectionId: "market",
+      kind: "api",
+      method: "POST",
+      url: "https://api.usaspending.gov/api/v2/search/spending_by_award/",
+      headers: { "content-type": "application/json" },
+      body: '{"filters":{"award_type_codes":["A","B","C","D"],"keywords":["small modular reactor","microreactor","advanced reactor"]},"fields":["Award ID","Recipient Name","Award Amount","Awarding Agency","Description","generated_internal_id","Base Obligation Date"],"sort":"Base Obligation Date","order":"desc","limit":1,"page":1}',
+      // Verified live 2026-09-17: resolves to a real, human-readable
+      // multi-keyword results page (200), same host as the award-record
+      // links latest_award composes.
+      viewUrl: "https://www.usaspending.gov/keyword_search/advanced%20reactor",
+      schedule: { cron: "0 17 * * *", ttlHours: 168 },
+      notes:
+        "Verified live 2026-09-17: this exact request body returns 43 contracts (newest 2026-08-27, " +
+        "NRC -> DEF-LOGIX INC, $249,978, cybersecurity-of-advanced-reactors work). No time_period " +
+        "filter — omitting it returns the same result as an explicit range, so there's no hardcoded " +
+        "end date to go stale. api.usaspending.gov/robots.txt 404s (unrestricted, same convention as " +
+        "data.sec.gov). No auth — this endpoint is keyless. maxLength on latest_award (3000) is sized " +
+        "from the live 43-contract set's longest composed value (2564 chars, post-escape) plus " +
+        "headroom, not a guess — federal contract Description fields run far longer than the " +
+        "SEC/FR composites elsewhere in this config. No maxChangePct on latest_award_amount: each " +
+        "value is a different award's dollar amount, not a step in one continuous series, so a " +
+        "percent-change guard would compare unrelated numbers and fire constantly. No " +
+        "expectMonotonic on latest_award_date: a contract can be indexed after its own obligation " +
+        "date, out of strict order, same reasoning as the fr-* targets' publication-date extractors. " +
+        "notBefore is USAspending's own documented earliest-searchable date (2007-10-01).",
+      extractors: [
+        {
+          key: "latest_award",
+          label: "Latest Award",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          // No `index` — row 0 is always "the latest" given the
+          // sort/order in the request body itself, unlike SEC's
+          // filings.recent which is newest-first with no filter applied.
+          fields: {
+            recipient: { jsonPath: "$.results[0]['Recipient Name']" },
+            desc: { jsonPath: "$.results[0].Description" },
+            // escape: "none" — generated_internal_id is a path-safe token
+            // ("CONT_AWD_..."), not free text that needs markdown escaping.
+            id: { jsonPath: "$.results[0].generated_internal_id", escape: "none" },
+          },
+          template:
+            "**{recipient}** — {desc} — [award record](https://www.usaspending.gov/award/{id})",
+          assert: { notEmpty: true, maxLength: 3000 },
+        },
+        {
+          key: "latest_award_amount",
+          label: "Latest Award Amount",
+          presenter: "metric",
+          kind: "api",
+          type: "number",
+          unit: "USD",
+          jsonPath: "$.results[0]['Award Amount']",
+          assert: { min: 0, notEmpty: true },
+        },
+        {
+          key: "latest_award_agency",
+          label: "Latest Award Agency",
+          presenter: "markdown",
+          kind: "api",
+          type: "string",
+          // Not enum — NRC, DOE, DoD, and others all appear across the
+          // 43-contract set (7 distinct agencies observed live).
+          jsonPath: "$.results[0]['Awarding Agency']",
+          assert: { notEmpty: true, maxLength: 120 },
+        },
+        {
+          key: "latest_award_date",
+          label: "Latest Award Date",
+          presenter: "metric",
+          kind: "api",
+          type: "date",
+          jsonPath: "$.results[0]['Base Obligation Date']",
+          assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2007-10-01" },
+          alert: { on: "any-change" },
+        },
+      ],
+    },
   ],
 
   alerting: { channel: "github-issue", minSeverity: "warn" },

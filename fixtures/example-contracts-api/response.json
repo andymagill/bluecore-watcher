@@ -1,0 +1,37 @@
+{
+  "spending_level": "awards",
+  "limit": 1,
+  "results": [
+    {
+      "internal_id": 1234567,
+      "Award ID": "TEST-AWD-0001",
+      "Recipient Name": "Example Vendor & Co.",
+      "Award Amount": 500000.5,
+      "Awarding Agency": "Example Federal Agency",
+      "Description": "EXAMPLE PROCUREMENT FOR WIDGET TESTING (PHASE 2)",
+      "generated_internal_id": "CONT_AWD_TEST0001_0000_-NONE-_-NONE-",
+      "Base Obligation Date": "2026-06-15",
+      "awarding_agency_id": 1,
+      "agency_slug": "example-federal-agency"
+    },
+    {
+      "internal_id": 7654321,
+      "Award ID": "TEST-AWD-0002",
+      "Recipient Name": "Older Example Contractor LLC",
+      "Award Amount": 12000,
+      "Awarding Agency": "Example Federal Agency",
+      "Description": "EARLIER EXAMPLE AWARD, NOT THE LATEST ROW",
+      "generated_internal_id": "CONT_AWD_TEST0002_0000_-NONE-_-NONE-",
+      "Base Obligation Date": "2026-01-02",
+      "awarding_agency_id": 1,
+      "agency_slug": "example-federal-agency"
+    }
+  ],
+  "page_metadata": {
+    "page": 1,
+    "hasNext": false,
+    "last_record_unique_id": 1234567,
+    "last_record_sort_value": "1750000000000"
+  },
+  "messages": []
+}

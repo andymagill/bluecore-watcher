@@ -3,7 +3,7 @@
 Status of record for architectural decisions on Bluecore Watcher / CMIE.
 Where this document and `SPEC.md` disagree, **this document wins** and SPEC.md is the bug.
 
-Last updated: 2026-09-14
+Last updated: 2026-09-17
 
 ---
 
@@ -317,6 +317,21 @@ A second discriminated-union branch on the same `kind: "api"` literal isn't avai
 - Concurrency is now grouped per ref (`ingest-<branch>`) rather than one global `ingest` group, so a preview run never queues behind or blocks the prod cron. Prod's group is never cancelled (ADR-005's serialization requirement); a preview group cancels its own stale runs.
 - `workflow_dispatch` only reads a workflow definition that exists on the default branch, so this change had to land on `main` before it could be dispatched against any other branch — a one-time bootstrapping order, not an ongoing constraint.
 - Does not change what merges to `main` or what triggers alerting — a preview run that looks good still needs its branch to actually merge (normally via the next scheduled prod run, once the branch's own PR lands) before it affects production.
+
+### ADR-024 — `viewUrl`: a dashboard link independent of the fetched endpoint (M5a)
+
+**Decision.** A target may set an optional `viewUrl` (`02-CONFIG-SCHEMA.md` §2) — a human-browsable page. New validation rule 14 requires it whenever `method: "POST"`; a `GET` target may still set it when `url` isn't the nicest page to send a reader to. `provenance.sourceUrl` and `TargetFile.sourceUrl` keep meaning exactly what they mean today — the real fetched endpoint — and stay untouched. Only the dashboard's clickable target-header link (`TargetCard.tsx`) changes, rendering `viewUrl ?? sourceUrl`. `ProvenancePopover`'s per-block source link is deliberately left alone: it's a provenance record of what was actually requested, not a navigation aid, so it keeps showing the literal `sourceUrl` even when that link would 405 if clicked — same honesty tradeoff as `eia-ca-industrial-price`'s existing "link 403s without the key" precedent.
+
+**Rationale.** M5 (`docs/plans/m5-new-source-types.md`) needed the first `method: "POST"` target — USAspending's `spending_by_award` search — and a plain `GET` on that endpoint returns 405. `HttpFetcher` already sends `target.method`/`headers`/`body` correctly (M2a's EIA `auth` work exercised the surrounding plumbing; no real target had exercised `POST` itself until now), so the gap wasn't fetching, it was that `TargetFile.sourceUrl`/`provenance.sourceUrl` are the _fetched_ endpoint by design (Invariant 2, `01-DATA-CONTRACT.md`) — repurposing either field to sometimes mean "a clickable page" instead would quietly break that invariant for every other target. A new, purely additive field keeps both meanings intact and correct.
+
+**Consequences.**
+
+- `src/config/schema.ts`: `TargetDef.viewUrl` (`z.url().optional()`) plus rule 14's `.check()`.
+- `src/contract/target-file.ts`: `TargetFile.viewUrl`, optional so a target file committed before this field existed still validates.
+- `src/ingest/orchestrate.ts` threads `target.viewUrl` onto the assembled `TargetFile`; `src/ingest/persist.ts`'s semantic fingerprint (ADR-011) includes it, so a config-only `viewUrl` edit still produces a commit — same treatment `staleCeilingHours` already gets.
+- `schemas/config.schema.json` / `schemas/target-file.schema.json` regenerated (`npm run schema:gen`) — purely additive, no existing target's validated shape changes.
+- `TargetCard.tsx`'s header link swaps to `viewUrl ?? sourceUrl`; `ProvenancePopover.tsx` is unchanged by design (see Decision above).
+- Verified additive: `npm run fixture:verify` reports every pre-existing target unchanged (zero golden drift) — no target set `viewUrl` before this workstream added one.
 
 ---
 

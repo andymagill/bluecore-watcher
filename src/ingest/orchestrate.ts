@@ -162,6 +162,7 @@ async function runOneTarget(
     sectionId: target.sectionId,
     label: target.label,
     sourceUrl: target.url,
+    viewUrl: target.viewUrl,
     ttlHours: target.schedule.ttlHours,
     // M3c — schedule.staleCeilingHours (per-target) overrides the resolved
     // environment.staleCeilingMultiplier x ttlHours default; either way this

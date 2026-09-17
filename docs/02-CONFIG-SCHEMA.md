@@ -65,6 +65,7 @@ export interface TargetDef {
   body?: string;
   auth?: AuthDef;
   proxy?: "none" | "edge"; // default "none" — see ADR-006
+  viewUrl?: string; // ADR-024 — dashboard link; required when method is "POST" (rule 14)
 
   schedule: ScheduleDef;
   politeness?: PolitenessDef;
@@ -257,6 +258,7 @@ Enforced by `npm run validate:config`, which runs in CI and as a pre-commit hook
 11. No literal secret appears anywhere in config. Enforced by a pattern scan, because this file is committed.
 12. **(M3a/ADR-019)** `alert.thresholdPct` follows rule 8's no-op-field principle: it's rejected unless `alert.on` is `"threshold"`, against a numeric type or `presenter: "list"` (compared against item count, same applicability as `maxChangePct`/`maxChangeAbs`) — and `alert.on: "threshold"` itself requires `thresholdPct` to be set. `alerting.channel` is restricted to `"github-issue"`; `"webhook"`/`"email"` are rejected until a dispatcher for either exists (§4).
 13. **(ADR-022)** An `api` location has exactly one of `jsonPath` (simple) or `fields` + `template` (composite) — never both, never neither. For a composite location: every `template` placeholder is either `"index"` (only when `index` is set) or a name in `fields`, and every name in `fields` appears in `template`; no field may be named `"index"`; a field's `jsonPath` contains `"{index}"` if and only if `index` is configured; a field's `join` requires `split`; and the extractor's own `presenter`/`type` must be `"markdown"`/`"markdown"`.
+14. **(ADR-024)** `target.viewUrl` is required when `target.method` is `"POST"` — a POST endpoint is never itself a dashboard-clickable link. A `GET` target may set it too, but doesn't have to.
 
 ---
 

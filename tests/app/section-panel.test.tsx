@@ -150,6 +150,63 @@ describe("SectionPanel -- M1 scope discipline (one populated section, others zer
     expect(badge!.textContent).toMatch(/Last known value from/);
   });
 
+  // ADR-024: the target header link swaps to viewUrl when set, falling
+  // back to sourceUrl otherwise -- proven at the rendered-component level
+  // since TargetCard has no dedicated test file of its own.
+  it("target header link uses sourceUrl when viewUrl is unset", () => {
+    const tf = makeTargetFile();
+    render(
+      <SectionPanel
+        section={{ id: "company", label: "Company Performance", order: 1 }}
+        manifestTargets={[
+          {
+            id: "example-newsroom",
+            sectionId: "company",
+            entityId: "example-co",
+            label: tf.label,
+            path: "sections/company/example-newsroom.json",
+            ttlHours: 168,
+            lastRunStatus: "ok",
+            lastSuccessAt: "2026-09-12T00:00:00Z",
+          },
+        ]}
+        targetFiles={new Map([["example-newsroom", tf]])}
+        now={NOW}
+      />,
+    );
+    expect(screen.getByRole("link", { name: tf.label })).toHaveAttribute("href", tf.sourceUrl);
+  });
+
+  it("target header link uses viewUrl when set (e.g. a POST target's dashboard-clickable page)", () => {
+    const tf = TargetFile.parse({
+      ...makeTargetFile(),
+      viewUrl: "https://www.example.test/nicer-page",
+    });
+    render(
+      <SectionPanel
+        section={{ id: "company", label: "Company Performance", order: 1 }}
+        manifestTargets={[
+          {
+            id: "example-newsroom",
+            sectionId: "company",
+            entityId: "example-co",
+            label: tf.label,
+            path: "sections/company/example-newsroom.json",
+            ttlHours: 168,
+            lastRunStatus: "ok",
+            lastSuccessAt: "2026-09-12T00:00:00Z",
+          },
+        ]}
+        targetFiles={new Map([["example-newsroom", tf]])}
+        now={NOW}
+      />,
+    );
+    expect(screen.getByRole("link", { name: tf.label })).toHaveAttribute(
+      "href",
+      "https://www.example.test/nicer-page",
+    );
+  });
+
   it("renders an explicit zero-state when the section has no targets (competitive/regulatory/market in M1)", () => {
     render(
       <SectionPanel
