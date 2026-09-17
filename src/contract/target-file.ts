@@ -24,6 +24,11 @@ export const TargetFile = z.object({
   sectionId: z.string().min(1),
   label: z.string().min(1),
   sourceUrl: z.url(),
+  // ADR-024 — the dashboard's clickable link, when it differs from the real
+  // fetched endpoint (`sourceUrl`, unchanged meaning). Optional so a target
+  // file committed before this field existed still validates; the dashboard
+  // falls back to `sourceUrl` when absent.
+  viewUrl: z.url().optional(),
   ttlHours: z.number().positive(),
   // M3c — resolved server-side from schedule.staleCeilingHours (per-target
   // override) or environment.staleCeilingMultiplier × ttlHours (the default),

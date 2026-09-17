@@ -532,4 +532,33 @@ describe("CmieConfig validation rules", () => {
         expect(result.error.issues.some((i) => i.message.includes("rule 13"))).toBe(true);
     });
   });
+
+  describe("rule 14 (ADR-024): method POST requires viewUrl", () => {
+    it("rejects method POST without viewUrl", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.method = "POST";
+      const result = CmieConfig.safeParse(cfg);
+      expect(result.success).toBe(false);
+      if (!result.success)
+        expect(result.error.issues.some((i) => i.message.includes("rule 14"))).toBe(true);
+    });
+
+    it("accepts method POST with viewUrl", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.method = "POST";
+      cfg.targets[0]!.viewUrl = "https://example.test/human-page";
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("a GET target's viewUrl remains optional", () => {
+      const cfg = baseConfig();
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+
+    it("a GET target may still set viewUrl", () => {
+      const cfg = baseConfig();
+      cfg.targets[0]!.viewUrl = "https://example.test/nicer-page";
+      expect(CmieConfig.safeParse(cfg).success).toBe(true);
+    });
+  });
 });

@@ -151,6 +151,9 @@ export function computeFingerprint(
       targetId: tf.targetId,
       label: tf.label,
       sourceUrl: tf.sourceUrl,
+      // ADR-024 — a config-only viewUrl change must still produce a commit,
+      // same reasoning as staleCeilingHours below.
+      viewUrl: tf.viewUrl ?? null,
       ttlHours: tf.ttlHours,
       // M3c — a config-only change to staleCeilingHours (schedule override
       // or the environment multiplier it resolves from) must still produce

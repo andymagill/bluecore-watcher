@@ -184,6 +184,10 @@
             ],
             "additionalProperties": false
           },
+          "viewUrl": {
+            "type": "string",
+            "format": "uri"
+          },
           "proxy": {
             "default": "none",
             "type": "string",

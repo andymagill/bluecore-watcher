@@ -1,4 +1,8 @@
 // 04-FRONTEND.md §2: "One target: label, source link, run status, its blocks."
+// ADR-024: this header link is the one dashboard surface that swaps to
+// viewUrl when set (a human-browsable page) -- ProvenancePopover's
+// per-block source link stays the literal fetched sourceUrl, since that's
+// provenance (what was actually requested), not navigation.
 import type { TargetFile } from "../../contract/target-file.js";
 import { MetricBlock } from "./MetricBlock.js";
 import { MarkdownBlock } from "./MarkdownBlock.js";
@@ -22,7 +26,7 @@ export function TargetCard({ targetFile, now }: { targetFile: TargetFile; now?: 
     <div className="rounded border border-border bg-card p-4 text-card-foreground">
       <div className="mb-3 flex items-baseline justify-between gap-2">
         <a
-          href={targetFile.sourceUrl}
+          href={targetFile.viewUrl ?? targetFile.sourceUrl}
           target="_blank"
           rel="noopener"
           className="font-medium hover:underline"

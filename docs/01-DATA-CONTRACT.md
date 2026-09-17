@@ -119,6 +119,8 @@ A `failed_cached` run never destroys data. That is the single most important inv
 
 **`staleCeilingHours`** (M3c) is resolved server-side — `schedule.staleCeilingHours` (per-target override) or `environment.staleCeilingMultiplier × ttlHours` (the default) — and published so the freshness state machine (§5) doesn't re-derive it. Optional on the schema so a target file committed before this field existed still validates; §5's client falls back to the documented 3x default when it's absent.
 
+**`viewUrl`** (ADR-024, M5a) is optional and, when set, is the dashboard's clickable target link instead of `sourceUrl` — `sourceUrl` never changes meaning (it's always the real fetched endpoint, per Invariant 2 below). Required in config when the target's `method` is `"POST"` (02-CONFIG-SCHEMA.md rule 14), since a POST endpoint 405s on a plain browser `GET`.
+
 ---
 
 ## 4. Block envelope

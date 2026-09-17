@@ -471,6 +471,13 @@ export const TargetDef = z
     headers: z.record(z.string(), z.string()).optional(),
     body: z.string().optional(),
     auth: AuthDef.optional(),
+    // ADR-024 — the human-browsable page the dashboard links to. A POST
+    // target's own `url` is never itself dashboard-clickable (rule 14
+    // below requires this); a GET target may still set it when `url` isn't
+    // the nicest page to send a reader to. `provenance.sourceUrl` /
+    // `TargetFile.sourceUrl` keep meaning the real fetched endpoint either
+    // way — this field only changes what the dashboard renders as a link.
+    viewUrl: z.url().optional(),
     proxy: ProxyDef.default("none"),
     schedule: ScheduleDef,
     politeness: PolitenessDef.optional(),
@@ -488,6 +495,19 @@ export const TargetDef = z
         input: t,
         message: `url must be https (rule 10): ${t.url}`,
         path: ["url"],
+      });
+    }
+
+    // Rule 14 (ADR-024) — a POST target's `url` is never itself a
+    // dashboard-clickable link (the fetch is a search/query call, not a
+    // page), so `viewUrl` must be set to something a reader can actually
+    // open.
+    if (t.method === "POST" && !t.viewUrl) {
+      ctx.issues.push({
+        code: "custom",
+        input: t,
+        message: `target "${t.id}" has method "POST" but no viewUrl (rule 14, ADR-024)`,
+        path: ["viewUrl"],
       });
     }
 
