@@ -19,10 +19,10 @@ design only, for a future conversation to pick up cold. Each workstream:
 
 ## Status
 
-| Workstream                                               | Status      | PR  |
-| -------------------------------------------------------- | ----------- | --- |
-| M5a — `viewUrl` (ADR-024) + USAspending contracts target | Next        | —   |
-| M5b — Maritime FR target, M5 close-out                   | Not started | —   |
+| Workstream                                               | Status    | PR  |
+| -------------------------------------------------------- | --------- | --- |
+| M5a — `viewUrl` (ADR-024) + USAspending contracts target | Delivered | TBD |
+| M5b — Maritime FR target, M5 close-out                   | Next      | —   |
 
 ## Context / findings (all of M5, live-verified 2026-09-17)
 
