@@ -204,6 +204,47 @@ export function relocateHtml(
   return out;
 }
 
+// XML relocation — identical to HTML, since both use selector-based Cheerio
+// matching. XML sources (RSS feeds) carry the same structure considerations.
+// ADR-026.
+export function relocateXml(
+  $: cheerio.CheerioAPI,
+  extractor: ExtractorDef,
+  oldRawText: string | string[],
+): RelocationCandidate[] {
+  if (extractor.kind !== "xml") return [];
+  // ADR-026 — composite xml locations unsupported, same as html (ADR-025).
+  if (extractor.fields !== undefined) return [];
+  const targets = Array.isArray(oldRawText) ? oldRawText : [oldRawText];
+  const primary = targets[0];
+  if (primary === undefined) return [];
+
+  const out: RelocationCandidate[] = [];
+  const seen = new Set<string>();
+  // Note: xml extractors don't have class-based structure like HTML, but we
+  // still apply the same selector-finding strategy (text match + ancestor
+  // context). XML has no :contains() pseudo-selector, but attribute matching
+  // (data-* analog) still works, and positional selectors are equally fragile.
+  const matches = findMatches($, extractor, primary);
+
+  for (const el of matches) {
+    // XML: no class-based selectors, but can still use tag+id or other attrs.
+    const own = ownClassSelector(el); // Will return null for most XML (no classes)
+    if (own) pushCandidate(out, seen, own, "own attributes, unscoped");
+
+    for (const da of dataAttrSelectors(el)) {
+      pushCandidate(out, seen, da, "attribute on the located node");
+    }
+  }
+
+  // Positional fallback.
+  for (const el of matches) {
+    pushCandidate(out, seen, positionalSelector($, el), "positional (fragile) — last resort");
+  }
+
+  return out;
+}
+
 // ---- api ----
 
 function jsonPathSegment(key: string): string {
@@ -281,5 +322,7 @@ export function relocate(
 ): RelocationCandidate[] {
   if (extractor.kind === "html")
     return relocateHtml(newDoc as cheerio.CheerioAPI, extractor, oldRawText);
+  if (extractor.kind === "xml")
+    return relocateXml(newDoc as cheerio.CheerioAPI, extractor, oldRawText);
   return relocateApi(newDoc, extractor, oldRawText);
 }

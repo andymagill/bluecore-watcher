@@ -156,26 +156,26 @@ export async function scoreCandidates<TDoc>(
   if (
     (extractor.kind === "api" &&
       (extractor.fields !== undefined || extractor.index !== undefined)) ||
-    (extractor.kind === "html" && extractor.fields !== undefined)
+    ((extractor.kind === "html" || extractor.kind === "xml") && extractor.fields !== undefined)
   ) {
     return [
       {
         patch:
-          extractor.kind === "html"
-            ? { selector: "(unsupported — composite html row list)" }
-            : { jsonPath: "(unsupported — composite/indexed api location)" },
+          extractor.kind === "api"
+            ? { jsonPath: "(unsupported — composite/indexed api location)" }
+            : { selector: "(unsupported — composite row list)" },
         basis: "unsupported",
         status: "unsupported",
         matchCount: null,
         value: null,
         displayValue: null,
         detail:
-          extractor.kind === "html"
-            ? `extractor "${extractor.key}" uses a composite html location (fields+template) — ` +
-              "automatic relocation isn't supported for these; repair config/*.config.ts by hand (ADR-025)."
-            : `extractor "${extractor.key}" uses a composite/indexed api location ` +
+          extractor.kind === "api"
+            ? `extractor "${extractor.key}" uses a composite/indexed api location ` +
               "(fields+template or index) — automatic relocation isn't supported for these; " +
-              "repair config/*.config.ts by hand (ADR-022).",
+              "repair config/*.config.ts by hand (ADR-022)."
+            : `extractor "${extractor.key}" uses a composite ${extractor.kind} location (fields+template) — ` +
+              "automatic relocation isn't supported for these; repair config/*.config.ts by hand (ADR-025/ADR-026).",
       },
     ];
   }

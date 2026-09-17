@@ -15,7 +15,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { extractOne } from "../src/ingest/extract/pipeline.js";
 import { extractorLocatorOf } from "../src/ingest/extract/locator.js";
 import { IngestError } from "../src/ingest/errors.js";
-import { htmlSkeleton, jsonShape, setDiff } from "../src/drift/structure.js";
+import { htmlSkeleton, xmlSkeleton, jsonShape, setDiff } from "../src/drift/structure.js";
 import { relocate, type RelocationCandidate } from "../src/repair/relocate.js";
 import { scoreCandidates } from "../src/repair/score.js";
 import { formatContextMarkdown, type ExtractorDiffEntry } from "../src/repair/report.js";
@@ -75,9 +75,17 @@ async function main() {
   let structureRemoved: string[] = [];
   if (oldBody !== null) {
     const oldShape =
-      target.kind === "html" ? htmlSkeleton(oldBody) : jsonShape(JSON.parse(oldBody));
+      target.kind === "html" || target.kind === "xml"
+        ? target.kind === "html"
+          ? htmlSkeleton(oldBody)
+          : xmlSkeleton(oldBody)
+        : jsonShape(JSON.parse(oldBody));
     const newShape =
-      target.kind === "html" ? htmlSkeleton(newBody) : jsonShape(JSON.parse(newBody));
+      target.kind === "html" || target.kind === "xml"
+        ? target.kind === "html"
+          ? htmlSkeleton(newBody)
+          : xmlSkeleton(newBody)
+        : jsonShape(JSON.parse(newBody));
     const diff = setDiff(oldShape, newShape);
     structureAdded = diff.added;
     structureRemoved = diff.removed;
