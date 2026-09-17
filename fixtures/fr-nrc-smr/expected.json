@@ -6,5 +6,29 @@
     "rawText": "55",
     "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.count",
     "contentHash": "sha256:02d20bbd7e394ad5999a4cebabac9619732c343a4cac99470c03e23ba2bdc2bc"
+  },
+  "latest_document_title": {
+    "presenter": "markdown",
+    "value": "[Modernizing Reactor Licensing, Safety Oversight, and Siting Practices](https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices)",
+    "displayValue": "[Modernizing Reactor Licensing, Safety Oversight, and Siting Practices](https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices)",
+    "rawText": "{\"title\":\"Modernizing Reactor Licensing, Safety Oversight, and Siting Practices\",\"url\":\"https://www.federalregister.gov/documents/2026/07/16/2026-14341/modernizing-reactor-licensing-safety-oversight-and-siting-practices\"}",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#title:$.results[0].title url:$.results[0].html_url",
+    "contentHash": "sha256:44ea1d7f696cde7497413cf6bdff4b0cea41490b26cfc5b0eb33acc150d43756"
+  },
+  "latest_document_type": {
+    "presenter": "status",
+    "value": "Proposed Rule",
+    "displayValue": "Proposed Rule",
+    "rawText": "Proposed Rule",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].type",
+    "contentHash": "sha256:aa1561677b1da0f7c6e2ef2ea3098f67e637ce020e39d464c23333bf56d6cf3a"
+  },
+  "latest_document_date": {
+    "presenter": "metric",
+    "value": "2026-07-16T00:00:00.000Z",
+    "displayValue": "16 Jul 2026",
+    "rawText": "2026-07-16",
+    "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=nuclear-regulatory-commission&conditions%5Bterm%5D=%22small+modular+reactor%22&per_page=1&order=newest#$.results[0].publication_date",
+    "contentHash": "sha256:493d968306a2d9e1149e644526c1f4ec2a4df6f47b8df728ed26f54b02f33e49"
   }
 }

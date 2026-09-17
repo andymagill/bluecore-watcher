@@ -363,7 +363,9 @@ export const config: CmieConfigInput = {
         "principle be revised down, so a decrease isn't necessarily a bug. M2b: backfilled weekly " +
         "counts 2026-06-01 through 2026-09-13 (73→76) show real movement of 0-1 document/week; " +
         "maxChangeAbs 10 is ~10x that observed ceiling. min/max are a sanity floor/ceiling, not a " +
-        "volatility bound.",
+        "volatility bound. M4b: `per_page=1` in the URL is not honoured by FR's API (verified live " +
+        "2026-09-16 — it returns 20 results regardless), but `order=newest` still puts the most " +
+        "recent document at `results[0]`, which is what every extractor below relies on.",
       extractors: [
         {
           key: "smr_mention_count",
@@ -374,6 +376,71 @@ export const config: CmieConfigInput = {
           type: "number",
           unit: "documents",
           assert: { min: 50, max: 500, maxChangeAbs: 10 },
+        },
+        {
+          key: "latest_document_title",
+          label: "Latest Document",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          // Composite so the dashboard links straight to the document.
+          // `url` needs escape: "none" — the default markdown escape would
+          // mangle "://" and the path's own hyphens/parens.
+          fields: {
+            title: { jsonPath: "$.results[0].title" },
+            url: { jsonPath: "$.results[0].html_url", escape: "none" },
+          },
+          template: "[{title}]({url})",
+          // 1000, not the ~300 a title alone would need: live titles across
+          // this query run up to 299 chars, and 5-8% contain "[]()" that the
+          // default markdown escape doubles in length (verified live 2026-09-16).
+          assert: { notEmpty: true, maxLength: 1000 },
+        },
+        {
+          key: "latest_document_type",
+          label: "Latest Document Type",
+          presenter: "status",
+          kind: "api",
+          type: "enum",
+          jsonPath: "$.results[0].type",
+          // Verified live 2026-09-16 against 1000 documents spanning
+          // 2011-2026 across all three FR targets' queries: exactly these
+          // five values occur. "Uncategorized Document" is real (one hit in
+          // fr-doe-nuclear's own 51-document result set) and easy to miss —
+          // an unmapped value here would be silently rejected as invalid.
+          enumValues: [
+            "Rule",
+            "Proposed Rule",
+            "Notice",
+            "Presidential Document",
+            "Uncategorized Document",
+          ],
+          assert: { notEmpty: true },
+        },
+        {
+          key: "latest_document_date",
+          label: "Latest Document Date",
+          presenter: "metric",
+          kind: "api",
+          type: "date",
+          jsonPath: "$.results[0].publication_date",
+          // No expectMonotonic: a document can be indexed out of strict date
+          // order (revisions, corrections) — see this target's own notes
+          // above on count possibly revising down.
+          assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2015-01-01" },
+        },
+        {
+          key: "latest_document_agency",
+          label: "Latest Document Agency",
+          presenter: "markdown",
+          kind: "api",
+          type: "string",
+          // Only meaningful here — fr-nrc-smr/fr-doe-nuclear already filter
+          // to one agency, so this would be a constant there. Eight distinct
+          // agencies[0].name values observed live across this query's own
+          // 76 results; string, not enum, since that set can grow.
+          jsonPath: "$.results[0].agencies[0].name",
+          assert: { notEmpty: true, maxLength: 120 },
         },
       ],
     },
@@ -395,7 +462,9 @@ export const config: CmieConfigInput = {
         "Revisit once/if a Bluecore-specific NRC docket opens; until then this tracks the class of " +
         "reactor, not the company. M2b: backfilled weekly counts 2026-06-01 through 2026-09-13 " +
         "(52→55) show real movement of 0-1 document/week; maxChangeAbs 10 is ~10x that observed " +
-        "ceiling.",
+        "ceiling. M4b: `per_page=1` is not honoured by FR's API (verified live 2026-09-16 — same " +
+        "finding as fr-smr-mentions), but `order=newest` still puts the newest document at " +
+        "`results[0]`.",
       extractors: [
         {
           key: "nrc_smr_document_count",
@@ -406,6 +475,49 @@ export const config: CmieConfigInput = {
           type: "number",
           unit: "documents",
           assert: { min: 35, max: 400, maxChangeAbs: 10 },
+        },
+        {
+          key: "latest_document_title",
+          label: "Latest Document",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          fields: {
+            title: { jsonPath: "$.results[0].title" },
+            url: { jsonPath: "$.results[0].html_url", escape: "none" },
+          },
+          template: "[{title}]({url})",
+          assert: { notEmpty: true, maxLength: 1000 },
+        },
+        {
+          key: "latest_document_type",
+          label: "Latest Document Type",
+          presenter: "status",
+          kind: "api",
+          type: "enum",
+          jsonPath: "$.results[0].type",
+          // Same vocabulary as fr-smr-mentions — verified live 2026-09-16
+          // against this target's own query too (Rule/Proposed Rule/Notice
+          // all present; Presidential Document/Uncategorized Document not
+          // observed here but mapped ahead of need, same reasoning as
+          // SEC_8K_ITEMS above).
+          enumValues: [
+            "Rule",
+            "Proposed Rule",
+            "Notice",
+            "Presidential Document",
+            "Uncategorized Document",
+          ],
+          assert: { notEmpty: true },
+        },
+        {
+          key: "latest_document_date",
+          label: "Latest Document Date",
+          presenter: "metric",
+          kind: "api",
+          type: "date",
+          jsonPath: "$.results[0].publication_date",
+          assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2015-01-01" },
         },
       ],
     },
@@ -423,7 +535,11 @@ export const config: CmieConfigInput = {
       schedule: { cron: "0 15 * * *", ttlHours: 168 },
       notes:
         "M2b: backfilled weekly counts 2026-06-01 through 2026-09-13 (49→51) show real movement of " +
-        "0-1 document/week; maxChangeAbs 10 is ~10x that observed ceiling.",
+        "0-1 document/week; maxChangeAbs 10 is ~10x that observed ceiling. M4b: `per_page=1` is not " +
+        "honoured by FR's API (verified live 2026-09-16 — same finding as fr-smr-mentions), but " +
+        "`order=newest` still puts the newest document at `results[0]`. This query's own live " +
+        '51-document result set is where the rare "Uncategorized Document" type value was ' +
+        "observed (2026-09-16) — see latest_document_type below.",
       extractors: [
         {
           key: "doe_nuclear_policy_count",
@@ -434,6 +550,44 @@ export const config: CmieConfigInput = {
           type: "number",
           unit: "documents",
           assert: { min: 35, max: 400, maxChangeAbs: 10 },
+        },
+        {
+          key: "latest_document_title",
+          label: "Latest Document",
+          presenter: "markdown",
+          kind: "api",
+          type: "markdown",
+          fields: {
+            title: { jsonPath: "$.results[0].title" },
+            url: { jsonPath: "$.results[0].html_url", escape: "none" },
+          },
+          template: "[{title}]({url})",
+          assert: { notEmpty: true, maxLength: 1000 },
+        },
+        {
+          key: "latest_document_type",
+          label: "Latest Document Type",
+          presenter: "status",
+          kind: "api",
+          type: "enum",
+          jsonPath: "$.results[0].type",
+          enumValues: [
+            "Rule",
+            "Proposed Rule",
+            "Notice",
+            "Presidential Document",
+            "Uncategorized Document",
+          ],
+          assert: { notEmpty: true },
+        },
+        {
+          key: "latest_document_date",
+          label: "Latest Document Date",
+          presenter: "metric",
+          kind: "api",
+          type: "date",
+          jsonPath: "$.results[0].publication_date",
+          assert: { notEmpty: true, maxFutureDays: 1, notBefore: "2015-01-01" },
         },
       ],
     },
