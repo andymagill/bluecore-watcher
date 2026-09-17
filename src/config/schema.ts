@@ -60,26 +60,128 @@ export type PolitenessDef = z.infer<typeof PolitenessDef>;
 // plus a handler module (02-CONFIG-SCHEMA.md §7) — no change to this file's
 // structure, no change to any existing member.
 
-export const HtmlLocation = z.object({
-  kind: z.literal("html"),
-  selector: z.string().min(1),
-  attr: z.string().optional(),
-  multiple: z.boolean().optional(),
-});
-
-// ADR-022 — a field within a composite api location. `jsonPath` may contain
-// a literal `{index}` token, substituted from `ApiIndexDef` before this
-// field's own JSONPath runs. Transforms apply in this order: strip -> split
-// -> valueMap -> join -> escape (src/ingest/extract/compose.ts).
-export const ApiFieldDef = z.object({
-  jsonPath: z.string().min(1),
+// ADR-022/ADR-025 — per-field transforms shared by every composite location
+// (api's fields+template; html/xml's row fields+template). Transform order:
+// strip -> split -> valueMap -> join -> format -> truncate -> escape
+// (src/ingest/extract/compose.ts).
+export const FieldTransformDef = z.object({
   strip: z.string().optional(), // regex source; every match removed
   split: z.string().optional(), // literal separator (String.prototype.split)
   valueMap: z.record(z.string(), z.string()).optional(),
   join: z.string().optional(), // default ", " — requires split (rule 13)
-  escape: z.enum(["markdown", "url", "none"]).default("markdown"),
+  // ADR-025 — runs the (post-join) text through the same date coercion/
+  // display path coerce.ts uses for type: "date", normalizing free-text
+  // dates ("September 8, 2026", RFC-822, ...) to one display convention.
+  format: z.enum(["date"]).optional(),
+  // ADR-025 — display-only length cap; the stored/hashed raw value is
+  // unaffected (compose.ts truncates only the composed field text).
+  truncate: z.int().positive().optional(),
+  // ADR-025 adds "href": resolves relative to target.url, rejects a
+  // non-http(s) scheme as PARSE_ERROR, percent-encodes parens/whitespace.
+  escape: z.enum(["markdown", "url", "none", "href"]).default("markdown"),
+});
+export type FieldTransformDef = z.infer<typeof FieldTransformDef>;
+
+// ADR-022 — a field within a composite api location. `jsonPath` may contain
+// a literal `{index}` token, substituted from `ApiIndexDef` before this
+// field's own JSONPath runs.
+export const ApiFieldDef = FieldTransformDef.extend({
+  jsonPath: z.string().min(1),
 });
 export type ApiFieldDef = z.infer<typeof ApiFieldDef>;
+
+// ADR-025 — a field within a composite html/xml row. Row-relative: an
+// omitted `selector` means the row node itself (needed when the row node
+// carries the value directly, e.g. an `<a>` row's own `href`).
+export const HtmlFieldDef = FieldTransformDef.extend({
+  selector: z.string().optional(),
+  attr: z.string().optional(),
+});
+export type HtmlFieldDef = z.infer<typeof HtmlFieldDef>;
+
+// Rule 13 (ADR-022/ADR-025) helper, shared by every composite location's
+// field/template consistency check: every template placeholder resolves to
+// a field (or "index", when the caller allows it), and every field is used.
+function templateFieldIssues(
+  fields: Readonly<Record<string, unknown>>,
+  template: string,
+  ruleTag: string,
+): Array<{ message: string; path: (string | number)[] }> {
+  const fieldNames = Object.keys(fields);
+  const templateNames = [...template.matchAll(/\{(\w+)\}/g)].map((m) => m[1]!);
+  const issues: Array<{ message: string; path: (string | number)[] }> = [];
+  for (const name of templateNames) {
+    if (name !== "index" && !fieldNames.includes(name)) {
+      issues.push({
+        message: `template references unknown field "{${name}}" (${ruleTag})`,
+        path: ["template"],
+      });
+    }
+  }
+  for (const name of fieldNames) {
+    if (!templateNames.includes(name)) {
+      issues.push({
+        message: `field "${name}" is never used in template (${ruleTag})`,
+        path: ["fields", name],
+      });
+    }
+  }
+  return issues;
+}
+
+// ADR-025 — an "html" location is either the original simple shape
+// (`selector`, optionally `attr`/`multiple`) or a composite row-list shape:
+// `selector`+`multiple: true` picks the row nodes (same as a plain list),
+// `fields` (row-relative) + `template` compose each row into one markdown
+// string, and `limit` bounds how many of the matched rows are resolved
+// (required — SEC-scale sources make an unbounded list never the intent,
+// same reasoning ADR-022 gives for requiring `index` on an unbounded array).
+export const HtmlLocation = z
+  .object({
+    kind: z.literal("html"),
+    selector: z.string().min(1),
+    attr: z.string().optional(),
+    multiple: z.boolean().optional(),
+    fields: z.record(z.string(), HtmlFieldDef).optional(),
+    template: z.string().min(1).optional(),
+  })
+  .check((ctx) => {
+    const v = ctx.value;
+    const hasComposite = v.fields !== undefined || v.template !== undefined;
+    if (!hasComposite) return;
+
+    if (v.fields === undefined || v.template === undefined) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message: 'a composite "html" location requires both fields and template (rule 13, ADR-025)',
+        path: [],
+      });
+      return;
+    }
+    if (v.attr !== undefined) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a composite "html" location (fields+template) may not also set attr — fields pick ' +
+          "their own attr per row (rule 13, ADR-025)",
+        path: ["attr"],
+      });
+    }
+    if (!v.multiple) {
+      ctx.issues.push({
+        code: "custom",
+        input: v,
+        message:
+          'a composite "html" location (fields+template) requires multiple: true (rule 13, ADR-025)',
+        path: ["multiple"],
+      });
+    }
+    for (const issue of templateFieldIssues(v.fields, v.template, "rule 13, ADR-025")) {
+      ctx.issues.push({ code: "custom", input: v, message: issue.message, path: issue.path });
+    }
+  });
 
 // Resolves which "row" a composite location's fields read from — e.g. the
 // first index where a parallel array field equals a given value (SEC's
@@ -256,6 +358,11 @@ const ExtractorBase = z.object({
   locale: z.string().default("en-US"),
   dateFormat: z.string().optional(),
   enumValues: z.array(z.string()).optional(),
+  // ADR-025 — required on a composite list location (html/xml row-fields or,
+  // once M6c lands, api `pick: "each"`): bounds how many matched rows are
+  // resolved. Applies before field resolution, so a malformed row past the
+  // window can't fail extraction for a well-formed one inside it.
+  limit: z.int().positive().optional(),
   assert: AssertDef.optional(),
   alert: AlertDef.optional(),
 });
@@ -269,7 +376,10 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
   const presenterTypes: Record<string, readonly string[]> = {
     metric: ["number", "currency", "percent", "date"],
     markdown: ["markdown", "string"],
-    list: ["string"],
+    // ADR-025 — "string" for a plain list (a bare selector/jsonPath repeated
+    // per match, unchanged); "markdown" for a composite row list
+    // (fields+template composed per row) only — see the pairing check below.
+    list: ["string", "markdown"],
     status: ["enum"],
   };
   if (!presenterTypes[ex.presenter]?.includes(ex.type)) {
@@ -440,6 +550,73 @@ export const ExtractorDef = z.intersection(ExtractorBase, LocationDef).check((ct
         'a composite "api" location (fields+template) requires presenter "markdown" and ' +
         'type "markdown" (rule 13, ADR-022)',
       path: ["presenter"],
+    });
+  }
+
+  // Rule 13 (ADR-025) — `limit` bounds a composite list's row count; it's
+  // required there (an unbounded list is never the intent — SEC-scale
+  // sources run into the hundreds) and meaningless anywhere else.
+  const isCompositeList = ex.fields !== undefined && ex.presenter === "list";
+  if (isCompositeList && ex.limit === undefined) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message: 'a composite "list" location (fields+template) requires limit (rule 13, ADR-025)',
+      path: ["limit"],
+    });
+  }
+  if (!isCompositeList && ex.limit !== undefined) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'limit only applies to a composite "list" location (fields+template) (rule 13, ADR-025)',
+      path: ["limit"],
+    });
+  }
+
+  // Rule 13 (ADR-025) — a composite html location (fields+template) always
+  // composes a markdown string per row, and only ever backs a `list` block —
+  // there is no scalar composite-html use case (that's what a plain
+  // scalar/markdown selector is for).
+  if (
+    ex.kind === "html" &&
+    ex.fields !== undefined &&
+    (ex.presenter !== "list" || ex.type !== "markdown")
+  ) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'a composite "html" location (fields+template) requires presenter "list" and ' +
+        'type "markdown" (rule 13, ADR-025)',
+      path: ["presenter"],
+    });
+  }
+
+  // Rule 7 (extended, ADR-025) — presenter "list" now splits by type: type
+  // "string" is a plain list (bare selector/jsonPath repeated per match);
+  // type "markdown" is a composite row list (fields+template) — pairing the
+  // wrong type with a location shape would work but reads as unexplained,
+  // so it's rejected instead.
+  if (ex.presenter === "list" && ex.type === "markdown" && ex.fields === undefined) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'presenter "list" with type "markdown" requires a composite location (fields+template) ' +
+        "(rule 7, ADR-025)",
+      path: ["type"],
+    });
+  }
+  if (ex.presenter === "list" && ex.type === "string" && ex.fields !== undefined) {
+    ctx.issues.push({
+      code: "custom",
+      input: ex,
+      message:
+        'presenter "list" with a composite location (fields+template) requires type "markdown", ' +
+        'not "string" (rule 7, ADR-025)',
+      path: ["type"],
     });
   }
 

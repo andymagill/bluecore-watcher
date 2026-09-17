@@ -135,6 +135,11 @@ export function relocateHtml(
   oldRawText: string | string[],
 ): RelocationCandidate[] {
   if (extractor.kind !== "html") return [];
+  // ADR-025 — a composite html location has no single selector to relocate
+  // by value match (oldRawText for one is the raw-field JSON blob per row,
+  // not text that would appear verbatim in a redesigned page), same
+  // reasoning ADR-022 gives for declining a composite/indexed api location.
+  if (extractor.fields !== undefined) return [];
   const targets = Array.isArray(oldRawText) ? oldRawText : [oldRawText];
   const primary = targets[0];
   if (primary === undefined) return [];

@@ -1,12 +1,21 @@
-// 04-FRONTEND.md §2: "Bulleted items, per-item anchors." Built for contract
-// completeness (01-DATA-CONTRACT.md §4.1) even though no current target uses
-// presenter: "list" -- every M1 extractor is markdown/metric/status.
-// Exercising this path is left to M2's real list source.
+// 04-FRONTEND.md §2: "Bulleted items, per-item anchors." ADR-025 — first
+// exercised for real by a composite row list (M6a): each item renders as
+// sanitized inline markdown (a composed row's own `[title](url) —
+// category, date` template), with expired-state disclosure and a
+// ProvenancePopover matching MarkdownBlock's treatment.
+import { useMemo } from "react";
+import { marked } from "marked";
+import DOMPurify from "dompurify";
 import type { ListBlock as ListBlockType } from "../../contract/block.js";
 import { useFreshness } from "../lib/use-freshness.js";
 import { FreshnessBadge } from "./FreshnessBadge.js";
 import { DeltaChip } from "./DeltaChip.js";
+import { ProvenancePopover } from "./ProvenancePopover.js";
 import { ZeroState } from "./ZeroState.js";
+
+function sanitizeInline(raw: string): string {
+  return DOMPurify.sanitize(marked.parseInline(raw, { async: false }) as string);
+}
 
 export function ListBlock({
   targetId,
@@ -22,6 +31,8 @@ export function ListBlock({
   now?: Date;
 }) {
   const state = useFreshness(block, ttlHours, staleCeilingHours, now);
+  const items = block.displayValue ?? [];
+  const html = useMemo(() => items.map(sanitizeInline), [items]);
 
   if (block.status === "missing" || !block.provenance || !block.value) {
     return (
@@ -31,26 +42,32 @@ export function ListBlock({
     );
   }
 
-  const { anchor, sourceUrl } = block.provenance;
+  const suppressed = state === "expired";
+  const list = (
+    <ul className="list-disc space-y-0.5 pl-4 text-sm">
+      {html.map((itemHtml, i) => (
+        <li key={i} dangerouslySetInnerHTML={{ __html: itemHtml }} />
+      ))}
+    </ul>
+  );
 
   return (
-    <div data-block-key={`${targetId}.${block.key}`} className="space-y-1">
+    <div data-block-key={`${targetId}.${block.key}`} className="col-span-full space-y-1">
       <p className="text-xs text-muted-foreground">{block.label}</p>
-      <ul className="list-disc space-y-0.5 pl-4 text-sm">
-        {(block.displayValue ?? []).map((item, i) => (
-          <li key={i}>
-            <a
-              href={`${sourceUrl}#${encodeURIComponent(anchor[i] ?? "")}`}
-              className="hover:underline"
-            >
-              {item}
-            </a>
-          </li>
-        ))}
-      </ul>
+      {suppressed ? (
+        <details>
+          <summary className="cursor-pointer text-sm text-muted-foreground">
+            Last known values from an earlier check
+          </summary>
+          <div className="mt-1">{list}</div>
+        </details>
+      ) : (
+        list
+      )}
       <div className="flex flex-wrap items-center gap-2">
         <FreshnessBadge block={block} state={state} />
         <DeltaChip delta={block.delta} ttlHours={ttlHours} now={now} />
+        <ProvenancePopover provenance={block.provenance} />
       </div>
     </div>
   );

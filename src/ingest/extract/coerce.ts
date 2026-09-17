@@ -40,6 +40,37 @@ function reanchorToUtc(parsed: Date): Date {
   );
 }
 
+// Shared by coerce()'s "date" case and, for the free-text case only (no
+// `dateFormat` — a composite field has no per-field format config, ADR-025),
+// compose.ts's `format: "date"` transform.
+export function coerceDate(rawText: string, errorContext: string, dateFormat?: string): string {
+  // date-fns's parse() always resolves against the host's local zone (it has
+  // no zone-token support), so an explicit dateFormat always needs the same
+  // re-anchoring `new Date(rawText)` needs conditionally.
+  let parsed = dateFormat ? parseDateFns(rawText, dateFormat, new Date()) : new Date(rawText);
+  if (Number.isNaN(parsed.getTime())) {
+    throw new IngestError(
+      "PARSE_ERROR",
+      `Could not coerce "${rawText}" to a date for ${errorContext}`,
+    );
+  }
+  if (dateFormat || needsUtcReanchor(rawText)) {
+    parsed = reanchorToUtc(parsed);
+  }
+  return parsed.toISOString();
+}
+
+// Shared by formatDisplayValue()'s "date" case and compose.ts's
+// `format: "date"` transform — reads an ISO instant back with the UTC
+// getters (not date-fns's local-zone format()) so display can't shift a day
+// relative to the stored/committed value.
+export function formatDateDisplay(isoInstant: string): string {
+  const d = new Date(isoInstant);
+  const day = String(d.getUTCDate()).padStart(2, "0");
+  const month = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
+  return `${day} ${month} ${d.getUTCFullYear()}`;
+}
+
 export function coerce(rawText: string, extractor: ExtractorDef): CoercedValue {
   switch (extractor.type) {
     case "number":
@@ -55,24 +86,8 @@ export function coerce(rawText: string, extractor: ExtractorDef): CoercedValue {
       }
       return n;
     }
-    case "date": {
-      // date-fns's parse() always resolves against the host's local zone
-      // (it has no zone-token support), so an explicit dateFormat always
-      // needs the same re-anchoring `new Date(rawText)` needs conditionally.
-      let parsed = extractor.dateFormat
-        ? parseDateFns(rawText, extractor.dateFormat, new Date())
-        : new Date(rawText);
-      if (Number.isNaN(parsed.getTime())) {
-        throw new IngestError(
-          "PARSE_ERROR",
-          `Could not coerce "${rawText}" to a date for extractor "${extractor.key}"`,
-        );
-      }
-      if (extractor.dateFormat || needsUtcReanchor(rawText)) {
-        parsed = reanchorToUtc(parsed);
-      }
-      return parsed.toISOString();
-    }
+    case "date":
+      return coerceDate(rawText, `extractor "${extractor.key}"`, extractor.dateFormat);
     case "string":
     case "markdown":
     case "enum":
@@ -96,15 +111,9 @@ export function formatDisplayValue(value: CoercedValue, extractor: ExtractorDef)
         style: "percent",
         maximumFractionDigits: 2,
       }).format((value as number) / 100);
-    case "date": {
-      // `value` is always our own coerce() output: a full ISO instant. Read
-      // it back with the UTC getters (not date-fns's local-zone format())
-      // so display can't shift a day relative to the stored/committed value.
-      const d = new Date(value as string);
-      const day = String(d.getUTCDate()).padStart(2, "0");
-      const month = d.toLocaleString("en-US", { month: "short", timeZone: "UTC" });
-      return `${day} ${month} ${d.getUTCFullYear()}`;
-    }
+    case "date":
+      // `value` is always our own coerce() output: a full ISO instant.
+      return formatDateDisplay(value as string);
     case "string":
     case "markdown":
     case "enum":

@@ -325,6 +325,11 @@
                         "type": "string"
                       }
                     },
+                    "limit": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
+                    },
                     "assert": {
                       "type": "object",
                       "properties": {
@@ -429,6 +434,70 @@
                     },
                     "multiple": {
                       "type": "boolean"
+                    },
+                    "fields": {
+                      "type": "object",
+                      "propertyNames": {
+                        "type": "string"
+                      },
+                      "additionalProperties": {
+                        "type": "object",
+                        "properties": {
+                          "strip": {
+                            "type": "string"
+                          },
+                          "split": {
+                            "type": "string"
+                          },
+                          "valueMap": {
+                            "type": "object",
+                            "propertyNames": {
+                              "type": "string"
+                            },
+                            "additionalProperties": {
+                              "type": "string"
+                            }
+                          },
+                          "join": {
+                            "type": "string"
+                          },
+                          "format": {
+                            "type": "string",
+                            "enum": [
+                              "date"
+                            ]
+                          },
+                          "truncate": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
+                          "escape": {
+                            "default": "markdown",
+                            "type": "string",
+                            "enum": [
+                              "markdown",
+                              "url",
+                              "none",
+                              "href"
+                            ]
+                          },
+                          "selector": {
+                            "type": "string"
+                          },
+                          "attr": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "escape"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "template": {
+                      "type": "string",
+                      "minLength": 1
                     }
                   },
                   "required": [
@@ -514,6 +583,11 @@
                       "items": {
                         "type": "string"
                       }
+                    },
+                    "limit": {
+                      "type": "integer",
+                      "exclusiveMinimum": 0,
+                      "maximum": 9007199254740991
                     },
                     "assert": {
                       "type": "object",
@@ -640,10 +714,6 @@
                       "additionalProperties": {
                         "type": "object",
                         "properties": {
-                          "jsonPath": {
-                            "type": "string",
-                            "minLength": 1
-                          },
                           "strip": {
                             "type": "string"
                           },
@@ -662,19 +732,35 @@
                           "join": {
                             "type": "string"
                           },
+                          "format": {
+                            "type": "string",
+                            "enum": [
+                              "date"
+                            ]
+                          },
+                          "truncate": {
+                            "type": "integer",
+                            "exclusiveMinimum": 0,
+                            "maximum": 9007199254740991
+                          },
                           "escape": {
                             "default": "markdown",
                             "type": "string",
                             "enum": [
                               "markdown",
                               "url",
-                              "none"
+                              "none",
+                              "href"
                             ]
+                          },
+                          "jsonPath": {
+                            "type": "string",
+                            "minLength": 1
                           }
                         },
                         "required": [
-                          "jsonPath",
-                          "escape"
+                          "escape",
+                          "jsonPath"
                         ],
                         "additionalProperties": false
                       }

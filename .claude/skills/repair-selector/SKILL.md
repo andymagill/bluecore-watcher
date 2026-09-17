@@ -82,7 +82,7 @@ change to the engine itself.
 
 ## Hard rules
 
-- **A composite/indexed `api` location (ADR-022 — `fields`+`template`, optionally `index`) can't be auto-repaired.** `repair:diff`/`repair:verify` will report `status: "unsupported"` for one of these instead of proposing candidates — there's no single locator to relocate a value to. Read the target's `notes` for the source's known shape (e.g. which field holds which array), find the new jsonPaths by hand, and edit `fields`/`index`/`template` on that extractor directly in `config/*.config.ts`, then verify with `npm run fixture:verify` per step 7 below.
+- **A composite/indexed `api` location (ADR-022 — `fields`+`template`, optionally `index`) or a composite `html`/`xml` row list (ADR-025 — `fields`+`template`+`limit`) can't be auto-repaired.** `repair:diff`/`repair:verify` will report `status: "unsupported"` for one of these instead of proposing candidates — there's no single locator to relocate a value to. Read the target's `notes` for the source's known shape (e.g. which field holds which array, or which selector scopes a row), find the new jsonPaths/selectors by hand, and edit `fields`/`index`/`template` on that extractor directly in `config/*.config.ts`, then verify with `npm run fixture:verify` per step 7 below.
 - **Never edit anything under `src/` or `public/data/`.** A selector fix
   is a config-and-fixture change only. If the failure can't be fixed that
   way, it's an engine defect (ADR-001) — stop, explain why in the PR (or a
