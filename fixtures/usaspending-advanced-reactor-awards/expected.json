@@ -1,0 +1,34 @@
+{
+  "latest_award": {
+    "presenter": "markdown",
+    "value": "**DEF\\-LOGIX INC** — CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING — [award record](https://www.usaspending.gov/award/CONT_AWD_31310026C0015_3100_-NONE-_-NONE-)",
+    "displayValue": "**DEF\\-LOGIX INC** — CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING — [award record](https://www.usaspending.gov/award/CONT_AWD_31310026C0015_3100_-NONE-_-NONE-)",
+    "rawText": "{\"desc\":\"CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING\",\"id\":\"CONT_AWD_31310026C0015_3100_-NONE-_-NONE-\",\"recipient\":\"DEF-LOGIX INC\"}",
+    "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#recipient:$.results[0]['Recipient Name'] desc:$.results[0].Description id:$.results[0].generated_internal_id",
+    "contentHash": "sha256:614ccae8ce0d2e3bb4dc8e98c81c18d11c352343fee7f4e12cb80f3575f09d0a"
+  },
+  "latest_award_amount": {
+    "presenter": "metric",
+    "value": 249978,
+    "displayValue": "249,978 USD",
+    "rawText": "249978",
+    "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Award Amount']",
+    "contentHash": "sha256:b7bcc85cf5acc4b2318289ffb5a5eea9df516769fb5f7b2c2085d9493844a183"
+  },
+  "latest_award_agency": {
+    "presenter": "markdown",
+    "value": "Nuclear Regulatory Commission",
+    "displayValue": "Nuclear Regulatory Commission",
+    "rawText": "Nuclear Regulatory Commission",
+    "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Awarding Agency']",
+    "contentHash": "sha256:9b0c2c9921d455a0f1e92ed30b6c41dd3bb9a4c67712119127abd1807b049598"
+  },
+  "latest_award_date": {
+    "presenter": "metric",
+    "value": "2026-08-27T00:00:00.000Z",
+    "displayValue": "27 Aug 2026",
+    "rawText": "2026-08-27",
+    "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Base Obligation Date']",
+    "contentHash": "sha256:cde101dfb8021e2cce1b076db6d4a8ed2c0f64d8e7f94609ea70d51d6760074a"
+  }
+}
