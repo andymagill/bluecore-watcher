@@ -1,11 +1,20 @@
 {
   "blocks": [
     {
-      "delta": null,
+      "delta": {
+        "added": [
+          "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}"
+        ],
+        "changedAt": "2026-09-23T10:17:13.191Z",
+        "count": 3,
+        "kind": "set",
+        "previousCount": 3,
+        "removed": []
+      },
       "displayValue": [
+        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026",
         "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026",
-        "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026",
-        "[Bluecore raises $50 million for port\\-powering nuclear barges](https://www.axios.com/2026/09/08/bluecore-nuclear-barges) — In the News, 08 Sep 2026"
+        "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026"
       ],
       "failingSince": null,
       "key": "recent_posts",
@@ -17,12 +26,12 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(2) > a",
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
-        "contentHash": "sha256:0d4c6e20da8c54b25152810355a94852fd028fab86e1c12546ebfa666718a9ed",
-        "extractedAt": "2026-09-17T22:07:44.800Z",
+        "contentHash": "sha256:a0c058769a6d4d0ea9dff07b29bf53c3d08b43e33247db310ac815ce6a62a1b4",
+        "extractedAt": "2026-09-23T10:17:13.191Z",
         "rawText": [
+          "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}",
           "{\"category\":\"Press Release\",\"date\":\"September 8, 2026\",\"title\":\"Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach\",\"url\":\"/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach\"}",
-          "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch\",\"url\":\"https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/\"}",
-          "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Bluecore raises $50 million for port-powering nuclear barges\",\"url\":\"https://www.axios.com/2026/09/08/bluecore-nuclear-barges\"}"
+          "{\"category\":\"In the News\",\"date\":\"September 8, 2026\",\"title\":\"Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch\",\"url\":\"https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/\"}"
         ],
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -33,23 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026",
         "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026",
-        "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026",
-        "[Bluecore raises $50 million for port\\-powering nuclear barges](https://www.axios.com/2026/09/08/bluecore-nuclear-barges) — In the News, 08 Sep 2026"
+        "[Nuclear startup Bluecore Energy raises $50M seed round, just two months after launch](https://techcrunch.com/2026/09/08/nuclear-startup-bluecore-energy-raises-50m-seed-round-just-two-months-after-launch/) — In the News, 08 Sep 2026"
       ]
     },
     {
-      "delta": null,
-      "displayValue": "08 Sep 2026",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-09-23T10:17:13.198Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-09-17T22:07:44.806Z",
+        "previousValue": "2026-09-08T00:00:00.000Z"
+      },
+      "displayValue": "22 Sep 2026",
       "failingSince": null,
       "key": "latest_post_date",
       "label": "Latest Post Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
-        "contentHash": "sha256:e0cc0dad1281581478b2c7298b610fa1c0d0de8f3ab1ad078d85d43cc8427a86",
-        "extractedAt": "2026-09-17T22:07:44.806Z",
-        "rawText": "September 8, 2026",
+        "contentHash": "sha256:2cb0cbc007a9afba012830806b8a4025664bd2eeb25861e1fad989e9ea3a2d57",
+        "extractedAt": "2026-09-23T10:17:13.198Z",
+        "rawText": "September 22, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
       "status": "ok",
@@ -58,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-09-08T00:00:00.000Z"
+      "value": "2026-09-22T00:00:00.000Z"
     }
   ],
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-09-17T22:07:44.807Z",
-    "durationMs": 227,
+    "completedAt": "2026-09-23T10:17:13.199Z",
+    "durationMs": 121,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-17T22-07-44-088Z-b738924",
-    "startedAt": "2026-09-17T22:07:44.580Z",
+    "runId": "2026-09-23T10-17-12-750Z-fb1f191",
+    "startedAt": "2026-09-23T10:17:13.078Z",
     "status": "ok"
   },
   "schemaVersion": 1,
