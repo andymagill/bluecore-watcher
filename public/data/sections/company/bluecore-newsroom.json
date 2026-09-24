@@ -27,7 +27,7 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
         "contentHash": "sha256:a0c058769a6d4d0ea9dff07b29bf53c3d08b43e33247db310ac815ce6a62a1b4",
-        "extractedAt": "2026-09-23T10:17:13.191Z",
+        "extractedAt": "2026-09-24T22:07:06.720Z",
         "rawText": [
           "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}",
           "{\"category\":\"Press Release\",\"date\":\"September 8, 2026\",\"title\":\"Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach\",\"url\":\"/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:2cb0cbc007a9afba012830806b8a4025664bd2eeb25861e1fad989e9ea3a2d57",
-        "extractedAt": "2026-09-23T10:17:13.198Z",
+        "extractedAt": "2026-09-24T22:07:06.727Z",
         "rawText": "September 22, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -81,12 +81,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-09-23T10:17:13.199Z",
-    "durationMs": 121,
+    "completedAt": "2026-09-24T22:07:06.728Z",
+    "durationMs": 180,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-23T10-17-12-750Z-fb1f191",
-    "startedAt": "2026-09-23T10:17:13.078Z",
+    "runId": "2026-09-24T22-07-06-203Z-5508b58",
+    "startedAt": "2026-09-24T22:07:06.548Z",
     "status": "ok"
   },
   "schemaVersion": 1,

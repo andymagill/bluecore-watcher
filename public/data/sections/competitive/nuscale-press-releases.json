@@ -18,7 +18,7 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:4f77f1a690430b9dd5c3c531020f1a4ff2f2a1457935c5e2ce6c3f184307cc74",
-        "extractedAt": "2026-09-23T10:17:19.490Z",
+        "extractedAt": "2026-09-24T22:07:11.075Z",
         "rawText": [
           "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}",
           "{\"date\":\"Tue, 25 Aug 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program\",\"title\":\"NuScale Power Deploys Nuclear-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program\"}",
@@ -48,7 +48,7 @@
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:791c0527ccda26b8df5230709819111916f58680782ad3940eddb72a0a8e0316",
-        "extractedAt": "2026-09-23T10:17:19.492Z",
+        "extractedAt": "2026-09-24T22:07:11.076Z",
         "rawText": "Tue, 01 Sep 2026 10:50:01 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -64,12 +64,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-09-23T10:17:19.493Z",
-    "durationMs": 217,
+    "completedAt": "2026-09-24T22:07:11.077Z",
+    "durationMs": 280,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-23T10-17-12-750Z-fb1f191",
-    "startedAt": "2026-09-23T10:17:19.276Z",
+    "runId": "2026-09-24T22-07-06-203Z-5508b58",
+    "startedAt": "2026-09-24T22:07:10.797Z",
     "status": "ok"
   },
   "schemaVersion": 1,
