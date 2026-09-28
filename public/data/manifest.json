@@ -1,5 +1,5 @@
 {
-  "commit": "98b108f",
+  "commit": "12619d6",
   "displayName": "Bluecore Watcher",
   "entities": [
     {
@@ -19,14 +19,14 @@
     }
   ],
   "environmentId": "bluecore",
-  "generatedAt": "2026-09-24T22:07:45.694Z",
+  "generatedAt": "2026-09-28T22:07:58.521Z",
   "health": {
     "degraded": 0,
     "failed": 0,
     "ok": 13,
     "overall": "ok"
   },
-  "runId": "2026-09-24T22-07-06-203Z-5508b58",
+  "runId": "2026-09-28T22-07-47-037Z-67d8fd4",
   "schemaVersion": 1,
   "sections": [
     {
@@ -56,7 +56,7 @@
       "id": "bluecore-sec-filings",
       "label": "BlueCore Energy — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:06.548Z",
+      "lastSuccessAt": "2026-09-28T22:07:47.947Z",
       "path": "sections/company/bluecore-sec-filings.json",
       "sectionId": "company",
       "ttlHours": 48
@@ -66,7 +66,7 @@
       "id": "bluecore-newsroom",
       "label": "BlueCore Energy — Latest News",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:06.728Z",
+      "lastSuccessAt": "2026-09-28T22:07:48.065Z",
       "path": "sections/company/bluecore-newsroom.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -76,7 +76,7 @@
       "id": "bluecore-careers",
       "label": "BlueCore Energy — Open Roles",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:07.719Z",
+      "lastSuccessAt": "2026-09-28T22:07:49.345Z",
       "path": "sections/company/bluecore-careers.json",
       "sectionId": "company",
       "ttlHours": 168
@@ -86,7 +86,7 @@
       "id": "oklo-sec-filings",
       "label": "Oklo Inc. — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:08.290Z",
+      "lastSuccessAt": "2026-09-28T22:07:49.362Z",
       "path": "sections/competitive/oklo-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -96,7 +96,7 @@
       "id": "nuscale-sec-filings",
       "label": "NuScale Power — Latest SEC Filing",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:10.278Z",
+      "lastSuccessAt": "2026-09-28T22:07:51.364Z",
       "path": "sections/competitive/nuscale-sec-filings.json",
       "sectionId": "competitive",
       "ttlHours": 48
@@ -106,7 +106,7 @@
       "id": "oklo-press-releases",
       "label": "Oklo Inc. — Latest Press Releases",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:10.797Z",
+      "lastSuccessAt": "2026-09-28T22:07:51.659Z",
       "path": "sections/competitive/oklo-press-releases.json",
       "sectionId": "competitive",
       "ttlHours": 168
@@ -116,7 +116,7 @@
       "id": "nuscale-press-releases",
       "label": "NuScale Power Corporation — Latest Press Releases",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:11.077Z",
+      "lastSuccessAt": "2026-09-28T22:07:51.876Z",
       "path": "sections/competitive/nuscale-press-releases.json",
       "sectionId": "competitive",
       "ttlHours": 168
@@ -126,7 +126,7 @@
       "id": "fr-smr-mentions",
       "label": "Federal Register — SMR Mentions (All Agencies)",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:11.381Z",
+      "lastSuccessAt": "2026-09-28T22:07:52.079Z",
       "path": "sections/competitive/fr-smr-mentions.json",
       "sectionId": "competitive",
       "ttlHours": 168
@@ -136,7 +136,7 @@
       "id": "fr-nrc-smr",
       "label": "Federal Register — NRC SMR Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:12.219Z",
+      "lastSuccessAt": "2026-09-28T22:07:53.032Z",
       "path": "sections/regulatory/fr-nrc-smr.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -146,7 +146,7 @@
       "id": "fr-doe-nuclear",
       "label": "Federal Register — DOE Advanced Nuclear Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:13.159Z",
+      "lastSuccessAt": "2026-09-28T22:07:53.932Z",
       "path": "sections/regulatory/fr-doe-nuclear.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -156,7 +156,7 @@
       "id": "fr-maritime-reactor",
       "label": "Federal Register — Maritime/Coast Guard Reactor Documents",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:14.151Z",
+      "lastSuccessAt": "2026-09-28T22:07:54.935Z",
       "path": "sections/regulatory/fr-maritime-reactor.json",
       "sectionId": "regulatory",
       "ttlHours": 168
@@ -166,7 +166,7 @@
       "id": "eia-ca-industrial-price",
       "label": "EIA — CA Industrial Retail Electricity Price",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:17.881Z",
+      "lastSuccessAt": "2026-09-28T22:07:57.350Z",
       "path": "sections/market/eia-ca-industrial-price.json",
       "sectionId": "market",
       "ttlHours": 1440
@@ -176,7 +176,7 @@
       "id": "usaspending-advanced-reactor-awards",
       "label": "USAspending — Advanced Reactor Contract Awards",
       "lastRunStatus": "ok",
-      "lastSuccessAt": "2026-09-24T22:07:45.693Z",
+      "lastSuccessAt": "2026-09-28T22:07:58.521Z",
       "path": "sections/market/usaspending-advanced-reactor-awards.json",
       "sectionId": "market",
       "ttlHours": 168
