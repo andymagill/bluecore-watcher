@@ -55,8 +55,20 @@ jobs:
       # So the agent's own `npm test` (which exercises
       # src/gate/smoke-render.ts's real chromium.launch()) works without
       # it needing network access to fetch a browser build.
+      - name: Cache Playwright browsers
+        id: playwright-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Install Chromium (for smoke-render tests)
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
         run: npx playwright install --with-deps chromium
+
+      - name: Install Chromium OS dependencies
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        run: npx playwright install-deps chromium
 
       # Gives the agent a live snapshot of every target to work from,
       # captured here (outside the firewall, with EIA_API_KEY available as
