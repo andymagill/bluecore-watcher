@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
         "contentHash": "sha256:96f917b523ed334b6106db4a2463b5f64898c734317480f566be3c979dc3dc52",
-        "extractedAt": "2026-09-29T22:07:58.329Z",
+        "extractedAt": "2026-10-02T01:14:49.406Z",
         "rawText": "25.11",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -49,7 +49,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
         "contentHash": "sha256:98b406b78c37f88e77f31ea7b275fd6df9e9a46ddc9cae2564bd6827cd425ee2",
-        "extractedAt": "2026-09-29T22:07:58.329Z",
+        "extractedAt": "2026-10-02T01:14:49.406Z",
         "rawText": "2026-07",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -65,12 +65,12 @@
   "entityId": "bluecore-energy",
   "label": "EIA — CA Industrial Retail Electricity Price",
   "run": {
-    "completedAt": "2026-09-29T22:07:58.329Z",
-    "durationMs": 2058,
+    "completedAt": "2026-10-02T01:14:49.406Z",
+    "durationMs": 2018,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-09-29T22-07-48-028Z-658978d",
-    "startedAt": "2026-09-29T22:07:56.271Z",
+    "runId": "2026-10-02T01-14-39-406Z-d128a55",
+    "startedAt": "2026-10-02T01:14:47.388Z",
     "status": "ok"
   },
   "schemaVersion": 1,
