@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-02T01:14:43.517Z",
+        "changedAt": "2026-10-03T00:52:50.961Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-09-29T22:07:52.184Z",
-        "previousValue": "4/A"
+        "previousExtractedAt": "2026-10-02T01:14:43.517Z",
+        "previousValue": "144"
       },
-      "displayValue": "144",
+      "displayValue": "4",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:5ec1a0c99d428601ce42b407ae9c675e0836a8ba591c8ca6e2a2cf5563d97ff0",
-        "extractedAt": "2026-10-02T01:14:43.517Z",
-        "rawText": "144",
+        "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
+        "extractedAt": "2026-10-03T00:52:50.961Z",
+        "rawText": "4",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "144"
+      "value": "4"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-02T01:14:43.517Z",
+        "changedAt": "2026-10-03T00:52:50.961Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-09-29T22:07:52.184Z",
-        "previousValue": "2026-09-11T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-02T01:14:43.517Z",
+        "previousValue": "2026-10-01T00:00:00.000Z"
       },
-      "displayValue": "01 Oct 2026",
+      "displayValue": "02 Oct 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:e016178c36337a2ec1a2e658f8827b48620231e909ac7486ca8a58ba51903b78",
-        "extractedAt": "2026-10-02T01:14:43.517Z",
-        "rawText": "2026-10-01",
+        "contentHash": "sha256:29a5102cbb3f93bd68adca6fde6ebf310c8cac6c96dcf112f90208ca7b4b1360",
+        "extractedAt": "2026-10-03T00:52:50.961Z",
+        "rawText": "2026-10-02",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-01T00:00:00.000Z"
+      "value": "2026-10-02T00:00:00.000Z"
     },
     {
       "delta": null,
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@9:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[9] date:$.filings.recent.filingDate[9] acc:$.filings.recent.accessionNumber[9] doc:$.filings.recent.primaryDocument[9]",
         "contentHash": "sha256:2a44e274f48933da3611779503d7546697c70e8c18aca07fe4a9139e8da4fa8b",
-        "extractedAt": "2026-10-02T01:14:43.518Z",
+        "extractedAt": "2026-10-03T00:52:50.961Z",
         "rawText": "{\"acc\":\"0001104659-26-094073\",\"date\":\"2026-08-11\",\"doc\":\"tm2622138d2_8k.htm\",\"items\":\"1.01,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-10-02T01:14:43.520Z",
-    "durationMs": 1967,
+    "completedAt": "2026-10-03T00:52:50.964Z",
+    "durationMs": 2006,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-02T01-14-39-406Z-d128a55",
-    "startedAt": "2026-10-02T01:14:41.553Z",
+    "runId": "2026-10-03T00-52-46-889Z-65a9ad6",
+    "startedAt": "2026-10-03T00:52:48.958Z",
     "status": "ok"
   },
   "schemaVersion": 1,
