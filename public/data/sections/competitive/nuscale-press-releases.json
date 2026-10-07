@@ -1,11 +1,20 @@
 {
   "blocks": [
     {
-      "delta": null,
+      "delta": {
+        "added": [
+          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}"
+        ],
+        "changedAt": "2026-10-07T01:10:55.834Z",
+        "count": 3,
+        "kind": "set",
+        "previousCount": 3,
+        "removed": []
+      },
       "displayValue": [
+        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
         "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026",
-        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026",
-        "[NuScale Power Reports Second Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-second-quarter-2026-results) — 05 Aug 2026"
+        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -17,12 +26,12 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:4f77f1a690430b9dd5c3c531020f1a4ff2f2a1457935c5e2ce6c3f184307cc74",
-        "extractedAt": "2026-10-06T02:01:21.521Z",
+        "contentHash": "sha256:3c3730f0d74bd659440ecd33e1495b56493bace6c85f91834a2cf8bc1c1d42b9",
+        "extractedAt": "2026-10-07T01:10:55.834Z",
         "rawText": [
+          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}",
           "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}",
-          "{\"date\":\"Tue, 25 Aug 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program\",\"title\":\"NuScale Power Deploys Nuclear-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program\"}",
-          "{\"date\":\"Wed, 05 Aug 2026 20:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-second-quarter-2026-results\",\"title\":\"NuScale Power Reports Second Quarter 2026 Results\"}"
+          "{\"date\":\"Tue, 25 Aug 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program\",\"title\":\"NuScale Power Deploys Nuclear-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program\"}"
         ],
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -33,23 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
         "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026",
-        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026",
-        "[NuScale Power Reports Second Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-second-quarter-2026-results) — 05 Aug 2026"
+        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026"
       ]
     },
     {
-      "delta": null,
-      "displayValue": "01 Sep 2026",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-10-07T01:10:55.835Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-10-06T02:01:21.522Z",
+        "previousValue": "2026-09-01T10:50:01.000Z"
+      },
+      "displayValue": "06 Oct 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:791c0527ccda26b8df5230709819111916f58680782ad3940eddb72a0a8e0316",
-        "extractedAt": "2026-10-06T02:01:21.522Z",
-        "rawText": "Tue, 01 Sep 2026 10:50:01 GMT",
+        "contentHash": "sha256:f5baba8e10d3259d6851245865ca0802538aa4306fa7810c04621ea6b11778d2",
+        "extractedAt": "2026-10-07T01:10:55.835Z",
+        "rawText": "Tue, 06 Oct 2026 10:50:00 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
       "status": "ok",
@@ -58,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-09-01T10:50:01.000Z"
+      "value": "2026-10-06T10:50:00.000Z"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-06T02:01:21.522Z",
-    "durationMs": 217,
+    "completedAt": "2026-10-07T01:10:55.835Z",
+    "durationMs": 323,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-06T02-01-16-866Z-63cc954",
-    "startedAt": "2026-10-06T02:01:21.305Z",
+    "runId": "2026-10-07T01-10-50-966Z-7f1df96",
+    "startedAt": "2026-10-07T01:10:55.512Z",
     "status": "ok"
   },
   "schemaVersion": 1,
