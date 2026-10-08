@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
         "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-10-07T01:10:53.086Z",
+        "extractedAt": "2026-10-08T22:07:38.507Z",
         "rawText": "4",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -33,23 +33,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-07T01:10:53.086Z",
+        "changedAt": "2026-10-08T22:07:38.507Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-06T02:01:18.960Z",
-        "previousValue": "2026-10-05T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-07T01:10:53.086Z",
+        "previousValue": "2026-10-06T00:00:00.000Z"
       },
-      "displayValue": "06 Oct 2026",
+      "displayValue": "08 Oct 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:3196761fda76db89e040532e85eb7f8b3f423e6cfffc086875a375e50c413ec2",
-        "extractedAt": "2026-10-07T01:10:53.086Z",
-        "rawText": "2026-10-06",
+        "contentHash": "sha256:c0bec6f048ee7734e6c1eb093122a2b0a0bcd2862a9b8c7dbf95287ee392df1f",
+        "extractedAt": "2026-10-08T22:07:38.507Z",
+        "rawText": "2026-10-08",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-06T00:00:00.000Z"
+      "value": "2026-10-08T00:00:00.000Z"
     },
     {
       "delta": null,
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@7:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[7] date:$.filings.recent.filingDate[7] acc:$.filings.recent.accessionNumber[7] doc:$.filings.recent.primaryDocument[7]",
         "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5",
-        "extractedAt": "2026-10-07T01:10:53.087Z",
+        "extractedAt": "2026-10-08T22:07:38.507Z",
         "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-10-07T01:10:53.089Z",
-    "durationMs": 553,
+    "completedAt": "2026-10-08T22:07:38.510Z",
+    "durationMs": 258,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-07T01-10-50-966Z-7f1df96",
-    "startedAt": "2026-10-07T01:10:52.536Z",
+    "runId": "2026-10-08T22-07-36-434Z-aefe2f4",
+    "startedAt": "2026-10-08T22:07:38.252Z",
     "status": "ok"
   },
   "schemaVersion": 1,

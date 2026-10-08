@@ -27,7 +27,7 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:3c3730f0d74bd659440ecd33e1495b56493bace6c85f91834a2cf8bc1c1d42b9",
-        "extractedAt": "2026-10-07T01:10:55.834Z",
+        "extractedAt": "2026-10-08T22:07:41.342Z",
         "rawText": [
           "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}",
           "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:f5baba8e10d3259d6851245865ca0802538aa4306fa7810c04621ea6b11778d2",
-        "extractedAt": "2026-10-07T01:10:55.835Z",
+        "extractedAt": "2026-10-08T22:07:41.343Z",
         "rawText": "Tue, 06 Oct 2026 10:50:00 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -81,12 +81,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-07T01:10:55.835Z",
-    "durationMs": 323,
+    "completedAt": "2026-10-08T22:07:41.344Z",
+    "durationMs": 388,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-07T01-10-50-966Z-7f1df96",
-    "startedAt": "2026-10-07T01:10:55.512Z",
+    "runId": "2026-10-08T22-07-36-434Z-aefe2f4",
+    "startedAt": "2026-10-08T22:07:40.956Z",
     "status": "ok"
   },
   "schemaVersion": 1,
