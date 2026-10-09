@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-06T02:01:18.959Z",
+        "changedAt": "2026-10-09T22:07:22.614Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-03T00:52:48.953Z",
-        "previousValue": "144"
+        "previousExtractedAt": "2026-10-08T22:07:38.507Z",
+        "previousValue": "4"
       },
-      "displayValue": "4",
+      "displayValue": "144",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-10-08T22:07:38.507Z",
-        "rawText": "4",
+        "contentHash": "sha256:5ec1a0c99d428601ce42b407ae9c675e0836a8ba591c8ca6e2a2cf5563d97ff0",
+        "extractedAt": "2026-10-09T22:07:22.614Z",
+        "rawText": "144",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "4"
+      "value": "144"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-08T22:07:38.507Z",
+        "changedAt": "2026-10-09T22:07:22.614Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-07T01:10:53.086Z",
-        "previousValue": "2026-10-06T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-08T22:07:38.507Z",
+        "previousValue": "2026-10-08T00:00:00.000Z"
       },
-      "displayValue": "08 Oct 2026",
+      "displayValue": "09 Oct 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:c0bec6f048ee7734e6c1eb093122a2b0a0bcd2862a9b8c7dbf95287ee392df1f",
-        "extractedAt": "2026-10-08T22:07:38.507Z",
-        "rawText": "2026-10-08",
+        "contentHash": "sha256:c894114fbc6a6bec76419aa2d9ebfdb7d19ddc9212c0d59b25aadf488b032a1c",
+        "extractedAt": "2026-10-09T22:07:22.614Z",
+        "rawText": "2026-10-09",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-08T00:00:00.000Z"
+      "value": "2026-10-09T00:00:00.000Z"
     },
     {
       "delta": null,
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@7:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[7] date:$.filings.recent.filingDate[7] acc:$.filings.recent.accessionNumber[7] doc:$.filings.recent.primaryDocument[7]",
         "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5",
-        "extractedAt": "2026-10-08T22:07:38.507Z",
+        "extractedAt": "2026-10-09T22:07:22.615Z",
         "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-10-08T22:07:38.510Z",
-    "durationMs": 258,
+    "completedAt": "2026-10-09T22:07:22.618Z",
+    "durationMs": 24,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-08T22-07-36-434Z-aefe2f4",
-    "startedAt": "2026-10-08T22:07:38.252Z",
+    "runId": "2026-10-09T22-07-19-693Z-50bef32",
+    "startedAt": "2026-10-09T22:07:22.594Z",
     "status": "ok"
   },
   "schemaVersion": 1,
