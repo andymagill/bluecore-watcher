@@ -1,17 +1,25 @@
 {
   "blocks": [
     {
-      "delta": null,
-      "displayValue": "**DEF\\-LOGIX INC** — CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING — [award record](https://www.usaspending.gov/award/CONT_AWD_31310026C0015_3100_-NONE-_-NONE-)",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-10-10T22:07:38.052Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-10-09T22:07:32.312Z",
+        "previousValue": "**DEF\\-LOGIX INC** — CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING — [award record](https://www.usaspending.gov/award/CONT_AWD_31310026C0015_3100_-NONE-_-NONE-)"
+      },
+      "displayValue": "**WEBSTER GROUP INC, THE** — PLANNING AND MANAGEMENT OF SMALL MODULAR REACTOR \\(SMR\\) TECHNICAL WORKSHOPS — [award record](https://www.usaspending.gov/award/CONT_AWD_19GE5026F0463_1900_GS07F0461T_4730)",
       "failingSince": null,
       "key": "latest_award",
       "label": "Latest Award",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#recipient:$.results[0]['Recipient Name'] desc:$.results[0].Description id:$.results[0].generated_internal_id",
-        "contentHash": "sha256:614ccae8ce0d2e3bb4dc8e98c81c18d11c352343fee7f4e12cb80f3575f09d0a",
-        "extractedAt": "2026-10-09T22:07:32.312Z",
-        "rawText": "{\"desc\":\"CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING\",\"id\":\"CONT_AWD_31310026C0015_3100_-NONE-_-NONE-\",\"recipient\":\"DEF-LOGIX INC\"}",
+        "contentHash": "sha256:233ae6ce67652d32fdd8eb2750552530c975ac035028cbb9863063f97fe9b1ac",
+        "extractedAt": "2026-10-10T22:07:38.052Z",
+        "rawText": "{\"desc\":\"PLANNING AND MANAGEMENT OF SMALL MODULAR REACTOR (SMR) TECHNICAL WORKSHOPS\",\"id\":\"CONT_AWD_19GE5026F0463_1900_GS07F0461T_4730\",\"recipient\":\"WEBSTER GROUP INC, THE\"}",
         "sourceUrl": "https://api.usaspending.gov/api/v2/search/spending_by_award/"
       },
       "status": "ok",
@@ -20,20 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "**DEF\\-LOGIX INC** — CYBERSECURITY OF NOVEL TECHNOLOGY IMPLEMENTATIONS IN OPERATING AND NEW ADVANCED REACTORS ARTIFICIAL INTELLIGENCE AND MACHINE LEARNING — [award record](https://www.usaspending.gov/award/CONT_AWD_31310026C0015_3100_-NONE-_-NONE-)"
+      "value": "**WEBSTER GROUP INC, THE** — PLANNING AND MANAGEMENT OF SMALL MODULAR REACTOR \\(SMR\\) TECHNICAL WORKSHOPS — [award record](https://www.usaspending.gov/award/CONT_AWD_19GE5026F0463_1900_GS07F0461T_4730)"
     },
     {
-      "delta": null,
-      "displayValue": "249,978 USD",
+      "delta": {
+        "absolute": 14287.359999999986,
+        "changedAt": "2026-10-10T22:07:38.052Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 5.715446959332416,
+        "previousExtractedAt": "2026-10-09T22:07:32.313Z",
+        "previousValue": 249978
+      },
+      "displayValue": "264,265.36 USD",
       "failingSince": null,
       "key": "latest_award_amount",
       "label": "Latest Award Amount",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Award Amount']",
-        "contentHash": "sha256:b7bcc85cf5acc4b2318289ffb5a5eea9df516769fb5f7b2c2085d9493844a183",
-        "extractedAt": "2026-10-09T22:07:32.313Z",
-        "rawText": "249978",
+        "contentHash": "sha256:9c05af42dfa55aee60a321375711571118b32c1ce7f10a93484030ea57a41be2",
+        "extractedAt": "2026-10-10T22:07:38.052Z",
+        "rawText": "264265.36",
         "sourceUrl": "https://api.usaspending.gov/api/v2/search/spending_by_award/"
       },
       "status": "ok",
@@ -43,20 +59,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": 249978
+      "value": 264265.36
     },
     {
-      "delta": null,
-      "displayValue": "Nuclear Regulatory Commission",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-10-10T22:07:38.052Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-10-09T22:07:32.313Z",
+        "previousValue": "Nuclear Regulatory Commission"
+      },
+      "displayValue": "Department of State",
       "failingSince": null,
       "key": "latest_award_agency",
       "label": "Latest Award Agency",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Awarding Agency']",
-        "contentHash": "sha256:9b0c2c9921d455a0f1e92ed30b6c41dd3bb9a4c67712119127abd1807b049598",
-        "extractedAt": "2026-10-09T22:07:32.313Z",
-        "rawText": "Nuclear Regulatory Commission",
+        "contentHash": "sha256:066b1b9fe8463307ff8b68ac9ef3ada0bcab132eb7cf87c38c15888506b6eb68",
+        "extractedAt": "2026-10-10T22:07:38.052Z",
+        "rawText": "Department of State",
         "sourceUrl": "https://api.usaspending.gov/api/v2/search/spending_by_award/"
       },
       "status": "ok",
@@ -65,20 +89,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "Nuclear Regulatory Commission"
+      "value": "Department of State"
     },
     {
-      "delta": null,
-      "displayValue": "27 Aug 2026",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-10-10T22:07:38.052Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-10-09T22:07:32.313Z",
+        "previousValue": "2026-08-27T00:00:00.000Z"
+      },
+      "displayValue": "23 Sep 2026",
       "failingSince": null,
       "key": "latest_award_date",
       "label": "Latest Award Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://api.usaspending.gov/api/v2/search/spending_by_award/#$.results[0]['Base Obligation Date']",
-        "contentHash": "sha256:cde101dfb8021e2cce1b076db6d4a8ed2c0f64d8e7f94609ea70d51d6760074a",
-        "extractedAt": "2026-10-09T22:07:32.313Z",
-        "rawText": "2026-08-27",
+        "contentHash": "sha256:e39095f3e0511fd9d7d25108973643220c32856231ae2b1fdaa97621a4a62d35",
+        "extractedAt": "2026-10-10T22:07:38.052Z",
+        "rawText": "2026-09-23",
         "sourceUrl": "https://api.usaspending.gov/api/v2/search/spending_by_award/"
       },
       "status": "ok",
@@ -87,18 +119,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-08-27T00:00:00.000Z"
+      "value": "2026-09-23T00:00:00.000Z"
     }
   ],
   "entityId": "bluecore-energy",
   "label": "USAspending — Advanced Reactor Contract Awards",
   "run": {
-    "completedAt": "2026-10-09T22:07:32.313Z",
-    "durationMs": 2442,
+    "completedAt": "2026-10-10T22:07:38.052Z",
+    "durationMs": 770,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-09T22-07-19-693Z-50bef32",
-    "startedAt": "2026-10-09T22:07:29.871Z",
+    "runId": "2026-10-10T22-07-27-356Z-8fe0d8a",
+    "startedAt": "2026-10-10T22:07:37.282Z",
     "status": "ok"
   },
   "schemaVersion": 1,

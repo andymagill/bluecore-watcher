@@ -18,7 +18,7 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:1d0b35e75e5c36c8e103f42ace9e5854838ce08770d2f488bd5681a0fddae2be",
-        "extractedAt": "2026-10-09T22:07:24.911Z",
+        "extractedAt": "2026-10-10T22:07:32.044Z",
         "rawText": [
           "{\"date\":\"Fri, 07 Aug 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Second Quarter 2026 Financial Results and Business Update\"}",
           "{\"date\":\"Thu, 06 Aug 2026 08:15:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year\",\"title\":\"Oklo's Groves Reactor Achieves First Criticality in Under a Year\"}",
@@ -48,7 +48,7 @@
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:ab596ec2b8260236fcde82753d5d4e2a69feabd441b92897ff40c29f76272ecf",
-        "extractedAt": "2026-10-09T22:07:24.913Z",
+        "extractedAt": "2026-10-10T22:07:32.046Z",
         "rawText": "Fri, 07 Aug 2026 07:00:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -64,12 +64,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-09T22:07:24.914Z",
-    "durationMs": 303,
+    "completedAt": "2026-10-10T22:07:32.047Z",
+    "durationMs": 504,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-09T22-07-19-693Z-50bef32",
-    "startedAt": "2026-10-09T22:07:24.611Z",
+    "runId": "2026-10-10T22-07-27-356Z-8fe0d8a",
+    "startedAt": "2026-10-10T22:07:31.543Z",
     "status": "ok"
   },
   "schemaVersion": 1,
