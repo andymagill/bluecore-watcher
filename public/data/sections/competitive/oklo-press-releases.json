@@ -1,11 +1,20 @@
 {
   "blocks": [
     {
-      "delta": null,
+      "delta": {
+        "added": [
+          "{\"date\":\"Tue, 13 Oct 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-to-advance-groves-2-forge-as-part-of-u-s-department-of-energys-nuclear-energy-launch-pad-se\",\"title\":\"Oklo to Advance Groves-2 Forge as Part of U.S. Department of Energy’s Nuclear Energy Launch Pad Selection\"}"
+        ],
+        "changedAt": "2026-10-13T22:06:51.610Z",
+        "count": 3,
+        "kind": "set",
+        "previousCount": 3,
+        "removed": []
+      },
       "displayValue": [
+        "[Oklo to Advance Groves\\-2 Forge as Part of U\\.S\\. Department of Energy’s Nuclear Energy Launch Pad Selection](https://oklo.com/newsroom/oklo-to-advance-groves-2-forge-as-part-of-u-s-department-of-energys-nuclear-energy-launch-pad-se) — 13 Oct 2026",
         "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
-        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
-        "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -17,12 +26,12 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:1d0b35e75e5c36c8e103f42ace9e5854838ce08770d2f488bd5681a0fddae2be",
-        "extractedAt": "2026-10-10T22:07:32.044Z",
+        "contentHash": "sha256:d523eba1447fab4110c9c2a2272e6e60297016bbb84f709ebe0e80c5d991c117",
+        "extractedAt": "2026-10-13T22:06:51.610Z",
         "rawText": [
+          "{\"date\":\"Tue, 13 Oct 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-to-advance-groves-2-forge-as-part-of-u-s-department-of-energys-nuclear-energy-launch-pad-se\",\"title\":\"Oklo to Advance Groves-2 Forge as Part of U.S. Department of Energy’s Nuclear Energy Launch Pad Selection\"}",
           "{\"date\":\"Fri, 07 Aug 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Second Quarter 2026 Financial Results and Business Update\"}",
-          "{\"date\":\"Thu, 06 Aug 2026 08:15:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year\",\"title\":\"Oklo's Groves Reactor Achieves First Criticality in Under a Year\"}",
-          "{\"date\":\"Mon, 27 Jul 2026 06:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call\"}"
+          "{\"date\":\"Thu, 06 Aug 2026 08:15:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year\",\"title\":\"Oklo's Groves Reactor Achieves First Criticality in Under a Year\"}"
         ],
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -33,23 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[Oklo to Advance Groves\\-2 Forge as Part of U\\.S\\. Department of Energy’s Nuclear Energy Launch Pad Selection](https://oklo.com/newsroom/oklo-to-advance-groves-2-forge-as-part-of-u-s-department-of-energys-nuclear-energy-launch-pad-se) — 13 Oct 2026",
         "[Oklo Publishes Second Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-second-quarter-2026-financial-results-and-business-update) — 07 Aug 2026",
-        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026",
-        "[Oklo Announces Date for Second Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-second-quarter-2026-financial-results-and-business-update-call) — 27 Jul 2026"
+        "[Oklo's Groves Reactor Achieves First Criticality in Under a Year](https://oklo.com/newsroom/oklos-groves-reactor-achieves-first-criticality-in-under-a-year) — 06 Aug 2026"
       ]
     },
     {
-      "delta": null,
-      "displayValue": "07 Aug 2026",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-10-13T22:06:51.612Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-10-10T22:07:32.046Z",
+        "previousValue": "2026-08-07T07:00:00.000Z"
+      },
+      "displayValue": "13 Oct 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:ab596ec2b8260236fcde82753d5d4e2a69feabd441b92897ff40c29f76272ecf",
-        "extractedAt": "2026-10-10T22:07:32.046Z",
-        "rawText": "Fri, 07 Aug 2026 07:00:00 GMT",
+        "contentHash": "sha256:1ea47d0ab77473b9598da3efec1b7d25d7abd59224aa376dc324cead614d23e9",
+        "extractedAt": "2026-10-13T22:06:51.612Z",
+        "rawText": "Tue, 13 Oct 2026 07:00:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
       "status": "ok",
@@ -58,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-08-07T07:00:00.000Z"
+      "value": "2026-10-13T07:00:00.000Z"
     }
   ],
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-10T22:07:32.047Z",
-    "durationMs": 504,
+    "completedAt": "2026-10-13T22:06:51.614Z",
+    "durationMs": 718,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-10T22-07-27-356Z-8fe0d8a",
-    "startedAt": "2026-10-10T22:07:31.543Z",
+    "runId": "2026-10-13T22-06-39-343Z-4986852",
+    "startedAt": "2026-10-13T22:06:50.896Z",
     "status": "ok"
   },
   "schemaVersion": 1,
