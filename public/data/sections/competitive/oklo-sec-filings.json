@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-15T22:06:58.481Z",
+        "changedAt": "2026-10-19T22:07:32.719Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-14T22:07:21.993Z",
-        "previousValue": "144"
+        "previousExtractedAt": "2026-10-18T22:06:22.952Z",
+        "previousValue": "4"
       },
-      "displayValue": "4",
+      "displayValue": "144",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-10-18T22:06:22.952Z",
-        "rawText": "4",
+        "contentHash": "sha256:5ec1a0c99d428601ce42b407ae9c675e0836a8ba591c8ca6e2a2cf5563d97ff0",
+        "extractedAt": "2026-10-19T22:07:32.719Z",
+        "rawText": "144",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "4"
+      "value": "144"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-15T22:06:58.481Z",
+        "changedAt": "2026-10-19T22:07:32.720Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-14T22:07:21.993Z",
-        "previousValue": "2026-10-14T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-18T22:06:22.952Z",
+        "previousValue": "2026-10-15T00:00:00.000Z"
       },
-      "displayValue": "15 Oct 2026",
+      "displayValue": "19 Oct 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:e85c5195b5dcc29e439fdf1a5d3f53644ef01abbdb95edc20ddbf20d215c9711",
-        "extractedAt": "2026-10-18T22:06:22.952Z",
-        "rawText": "2026-10-15",
+        "contentHash": "sha256:0612bf54f17f599c40f4da3e1de6fdb1902183535fe5ba6a6513231b041922a9",
+        "extractedAt": "2026-10-19T22:07:32.720Z",
+        "rawText": "2026-10-19",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-15T00:00:00.000Z"
+      "value": "2026-10-19T00:00:00.000Z"
     },
     {
       "delta": null,
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@7:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[7] date:$.filings.recent.filingDate[7] acc:$.filings.recent.accessionNumber[7] doc:$.filings.recent.primaryDocument[7]",
         "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5",
-        "extractedAt": "2026-10-18T22:06:22.952Z",
+        "extractedAt": "2026-10-19T22:07:32.720Z",
         "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-10-18T22:06:22.956Z",
-    "durationMs": 95,
+    "completedAt": "2026-10-19T22:07:32.723Z",
+    "durationMs": 80,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-18T22-06-11-057Z-9376614",
-    "startedAt": "2026-10-18T22:06:22.861Z",
+    "runId": "2026-10-19T22-07-30-591Z-edd1d0d",
+    "startedAt": "2026-10-19T22:07:32.643Z",
     "status": "ok"
   },
   "schemaVersion": 1,
