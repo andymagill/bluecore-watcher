@@ -27,7 +27,7 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
         "contentHash": "sha256:81f2f7c7e053e50fa50342c50a18a0c957f5047952922d0d5a82eee51a971569",
-        "extractedAt": "2026-10-19T22:07:31.518Z",
+        "extractedAt": "2026-10-20T22:06:59.490Z",
         "rawText": [
           "{\"category\":\"Press Release\",\"date\":\"October 13, 2026\",\"title\":\"Bluecore Energy Secures Low-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U.S.\",\"url\":\"/post/bluecore-energy-secures-low-enriched-uranium\"}",
           "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:1ce01fa2119044503aba41568718784a86a160ac7c612530cf10f81d3a5ca04e",
-        "extractedAt": "2026-10-19T22:07:31.525Z",
+        "extractedAt": "2026-10-20T22:06:59.495Z",
         "rawText": "October 13, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -81,12 +81,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-10-19T22:07:31.526Z",
-    "durationMs": 303,
+    "completedAt": "2026-10-20T22:06:59.496Z",
+    "durationMs": 236,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-19T22-07-30-591Z-edd1d0d",
-    "startedAt": "2026-10-19T22:07:31.223Z",
+    "runId": "2026-10-20T22-06-58-841Z-1d7044b",
+    "startedAt": "2026-10-20T22:06:59.260Z",
     "status": "ok"
   },
   "schemaVersion": 1,
