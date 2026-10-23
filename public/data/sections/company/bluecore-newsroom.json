@@ -3,18 +3,18 @@
     {
       "delta": {
         "added": [
-          "{\"category\":\"Press Release\",\"date\":\"October 13, 2026\",\"title\":\"Bluecore Energy Secures Low-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U.S.\",\"url\":\"/post/bluecore-energy-secures-low-enriched-uranium\"}"
+          "{\"category\":\"In the News\",\"date\":\"October 22, 2026\",\"title\":\"Inside the U.S. Push to Put Nuclear Reactors in Ports and on Cargo Ships\",\"url\":\"https://www.wsj.com/business/logistics/us-nuclear-reactors-cargo-ships-ports-50ac9dd1\"}"
         ],
-        "changedAt": "2026-10-13T22:06:40.327Z",
+        "changedAt": "2026-10-23T22:06:36.889Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
         "removed": []
       },
       "displayValue": [
+        "[Inside the U\\.S\\. Push to Put Nuclear Reactors in Ports and on Cargo Ships](https://www.wsj.com/business/logistics/us-nuclear-reactors-cargo-ships-ports-50ac9dd1) — In the News, 22 Oct 2026",
         "[Bluecore Energy Secures Low\\-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U\\.S\\.](https://www.bluecore.energy/post/bluecore-energy-secures-low-enriched-uranium) — Press Release, 13 Oct 2026",
-        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026",
-        "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026"
+        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026"
       ],
       "failingSince": null,
       "key": "recent_posts",
@@ -26,12 +26,12 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(2) > a",
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
-        "contentHash": "sha256:81f2f7c7e053e50fa50342c50a18a0c957f5047952922d0d5a82eee51a971569",
-        "extractedAt": "2026-10-22T22:17:03.059Z",
+        "contentHash": "sha256:fe94a4dda0c1416c1fcdfbde363507d02c953acb5201df9098682d75f4ca2c4b",
+        "extractedAt": "2026-10-23T22:06:36.889Z",
         "rawText": [
+          "{\"category\":\"In the News\",\"date\":\"October 22, 2026\",\"title\":\"Inside the U.S. Push to Put Nuclear Reactors in Ports and on Cargo Ships\",\"url\":\"https://www.wsj.com/business/logistics/us-nuclear-reactors-cargo-ships-ports-50ac9dd1\"}",
           "{\"category\":\"Press Release\",\"date\":\"October 13, 2026\",\"title\":\"Bluecore Energy Secures Low-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U.S.\",\"url\":\"/post/bluecore-energy-secures-low-enriched-uranium\"}",
-          "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}",
-          "{\"category\":\"Press Release\",\"date\":\"September 8, 2026\",\"title\":\"Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach\",\"url\":\"/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach\"}"
+          "{\"category\":\"Insight\",\"date\":\"September 22, 2026\",\"title\":\"Bluecore Energy Summit: Building the Future of Maritime Energy\",\"url\":\"/post/bluecore-energy-summit-building-the-future-of-maritime-energy\"}"
         ],
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -42,31 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[Inside the U\\.S\\. Push to Put Nuclear Reactors in Ports and on Cargo Ships](https://www.wsj.com/business/logistics/us-nuclear-reactors-cargo-ships-ports-50ac9dd1) — In the News, 22 Oct 2026",
         "[Bluecore Energy Secures Low\\-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U\\.S\\.](https://www.bluecore.energy/post/bluecore-energy-secures-low-enriched-uranium) — Press Release, 13 Oct 2026",
-        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026",
-        "[Maritime Administrator Tours Bluecore Energy Research Headquarters at the Port of Long Beach](https://www.bluecore.energy/post/maritime-administrator-tours-bluecore-energy-headquarters-port-of-long-beach) — Press Release, 08 Sep 2026"
+        "[Bluecore Energy Summit: Building the Future of Maritime Energy](https://www.bluecore.energy/post/bluecore-energy-summit-building-the-future-of-maritime-energy) — Insight, 22 Sep 2026"
       ]
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-13T22:06:40.333Z",
+        "changedAt": "2026-10-23T22:06:36.895Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-10T22:07:28.239Z",
-        "previousValue": "2026-09-22T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-22T22:17:03.064Z",
+        "previousValue": "2026-10-13T00:00:00.000Z"
       },
-      "displayValue": "13 Oct 2026",
+      "displayValue": "22 Oct 2026",
       "failingSince": null,
       "key": "latest_post_date",
       "label": "Latest Post Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
-        "contentHash": "sha256:1ce01fa2119044503aba41568718784a86a160ac7c612530cf10f81d3a5ca04e",
-        "extractedAt": "2026-10-22T22:17:03.064Z",
-        "rawText": "October 13, 2026",
+        "contentHash": "sha256:b30f3696dc4a074974c9fe226241634081754d2e61ef3aab14d49839891b6ee4",
+        "extractedAt": "2026-10-23T22:06:36.895Z",
+        "rawText": "October 22, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
       "status": "ok",
@@ -75,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-13T00:00:00.000Z"
+      "value": "2026-10-22T00:00:00.000Z"
     }
   ],
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-10-22T22:17:03.065Z",
-    "durationMs": 378,
+    "completedAt": "2026-10-23T22:06:36.896Z",
+    "durationMs": 325,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-22T22-17-01-212Z-291f362",
-    "startedAt": "2026-10-22T22:17:02.687Z",
+    "runId": "2026-10-23T22-06-36-224Z-bcb9eb0",
+    "startedAt": "2026-10-23T22:06:36.571Z",
     "status": "ok"
   },
   "schemaVersion": 1,
