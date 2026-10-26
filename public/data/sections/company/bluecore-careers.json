@@ -2,24 +2,24 @@
   "blocks": [
     {
       "delta": {
-        "absolute": -2,
-        "changedAt": "2026-10-22T22:17:03.513Z",
-        "direction": "down",
+        "absolute": 1,
+        "changedAt": "2026-10-26T22:07:30.844Z",
+        "direction": "up",
         "kind": "scalar",
-        "percent": -25,
-        "previousExtractedAt": "2026-10-20T22:07:02.236Z",
-        "previousValue": 8
+        "percent": 16.666666666666664,
+        "previousExtractedAt": "2026-10-23T22:06:37.535Z",
+        "previousValue": 6
       },
-      "displayValue": "6 roles",
+      "displayValue": "7 roles",
       "failingSince": null,
       "key": "open_roles_count",
       "label": "Open Roles",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://api.lever.co/v0/postings/bluecore-energy?mode=json#$.length",
-        "contentHash": "sha256:e7f6c011776e8db7cd330b54174fd76f7d0216b612387a5ffcfb81e6f0919683",
-        "extractedAt": "2026-10-23T22:06:37.535Z",
-        "rawText": "6",
+        "contentHash": "sha256:7902699be42c8a8e46fbbb4501726517e86b22c56a189f7625a6da49081b2451",
+        "extractedAt": "2026-10-26T22:07:30.844Z",
+        "rawText": "7",
         "sourceUrl": "https://api.lever.co/v0/postings/bluecore-energy?mode=json"
       },
       "status": "ok",
@@ -29,18 +29,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": 6
+      "value": 7
     }
   ],
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Open Roles",
   "run": {
-    "completedAt": "2026-10-23T22:06:37.539Z",
-    "durationMs": 643,
+    "completedAt": "2026-10-26T22:07:30.848Z",
+    "durationMs": 5796,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-23T22-06-36-224Z-bcb9eb0",
-    "startedAt": "2026-10-23T22:06:36.896Z",
+    "runId": "2026-10-26T22-07-24-419Z-1e29bd6",
+    "startedAt": "2026-10-26T22:07:25.052Z",
     "status": "ok"
   },
   "schemaVersion": 1,

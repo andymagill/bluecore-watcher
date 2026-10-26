@@ -27,7 +27,7 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:113b6f5fbed5a89c7a1699fa3b4d31aa9ff5c683d9ac8838338b56c8f1ff4b9b",
-        "extractedAt": "2026-10-23T22:06:40.836Z",
+        "extractedAt": "2026-10-26T22:07:33.329Z",
         "rawText": [
           "{\"date\":\"Fri, 23 Oct 2026 08:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}",
           "{\"date\":\"Tue, 13 Oct 2026 07:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-to-advance-groves-2-forge-as-part-of-u-s-department-of-energys-nuclear-energy-launch-pad-se\",\"title\":\"Oklo to Advance Groves-2 Forge as Part of U.S. Department of Energy’s Nuclear Energy Launch Pad Selection\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:20c255f6bedb594b8329a309cd8dac92c01e7bb639340ff9d244e21139eff7b5",
-        "extractedAt": "2026-10-23T22:06:40.838Z",
+        "extractedAt": "2026-10-26T22:07:33.331Z",
         "rawText": "Fri, 23 Oct 2026 08:00:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -81,12 +81,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-23T22:06:40.840Z",
-    "durationMs": 531,
+    "completedAt": "2026-10-26T22:07:33.333Z",
+    "durationMs": 445,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-23T22-06-36-224Z-bcb9eb0",
-    "startedAt": "2026-10-23T22:06:40.309Z",
+    "runId": "2026-10-26T22-07-24-419Z-1e29bd6",
+    "startedAt": "2026-10-26T22:07:32.888Z",
     "status": "ok"
   },
   "schemaVersion": 1,
