@@ -27,7 +27,7 @@
           "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(3) > a"
         ],
         "contentHash": "sha256:fe94a4dda0c1416c1fcdfbde363507d02c953acb5201df9098682d75f4ca2c4b",
-        "extractedAt": "2026-10-26T22:07:25.044Z",
+        "extractedAt": "2026-10-29T22:05:50.179Z",
         "rawText": [
           "{\"category\":\"In the News\",\"date\":\"October 22, 2026\",\"title\":\"Inside the U.S. Push to Put Nuclear Reactors in Ports and on Cargo Ships\",\"url\":\"https://www.wsj.com/business/logistics/us-nuclear-reactors-cargo-ships-ports-50ac9dd1\"}",
           "{\"category\":\"Press Release\",\"date\":\"October 13, 2026\",\"title\":\"Bluecore Energy Secures Low-Enriched Uranium Located at the Largest Commercial Nuclear Fuel Facility in the U.S.\",\"url\":\"/post/bluecore-energy-secures-low-enriched-uranium\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.bluecore.energy/news-insights#html > body > div:nth-of-type(4) > div > div:nth-of-type(2) > div > div:nth-of-type(1) > a > div:nth-of-type(3) > div:nth-of-type(1)",
         "contentHash": "sha256:b30f3696dc4a074974c9fe226241634081754d2e61ef3aab14d49839891b6ee4",
-        "extractedAt": "2026-10-26T22:07:25.051Z",
+        "extractedAt": "2026-10-29T22:05:50.186Z",
         "rawText": "October 22, 2026",
         "sourceUrl": "https://www.bluecore.energy/news-insights"
       },
@@ -81,12 +81,12 @@
   "entityId": "bluecore-energy",
   "label": "BlueCore Energy — Latest News",
   "run": {
-    "completedAt": "2026-10-26T22:07:25.052Z",
-    "durationMs": 194,
+    "completedAt": "2026-10-29T22:05:50.187Z",
+    "durationMs": 181,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-26T22-07-24-419Z-1e29bd6",
-    "startedAt": "2026-10-26T22:07:24.858Z",
+    "runId": "2026-10-29T22-05-49-041Z-b153679",
+    "startedAt": "2026-10-29T22:05:50.006Z",
     "status": "ok"
   },
   "schemaVersion": 1,

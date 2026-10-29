@@ -3,18 +3,18 @@
     {
       "delta": {
         "added": [
-          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}"
+          "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}"
         ],
-        "changedAt": "2026-10-07T01:10:55.834Z",
+        "changedAt": "2026-10-29T22:05:54.742Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
         "removed": []
       },
       "displayValue": [
+        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
         "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
-        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026",
-        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026"
+        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -26,12 +26,12 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:3c3730f0d74bd659440ecd33e1495b56493bace6c85f91834a2cf8bc1c1d42b9",
-        "extractedAt": "2026-10-26T22:07:33.491Z",
+        "contentHash": "sha256:038441c268253a45ce562a9271d5d9b16382c088272d3192010959ed0eb43341",
+        "extractedAt": "2026-10-29T22:05:54.742Z",
         "rawText": [
+          "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}",
           "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}",
-          "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}",
-          "{\"date\":\"Tue, 25 Aug 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program\",\"title\":\"NuScale Power Deploys Nuclear-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program\"}"
+          "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}"
         ],
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -42,31 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
         "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
-        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026",
-        "[NuScale Power Deploys Nuclear\\-Specific AI from NPX and Nuclearn to Speed Development of Its Advanced Reactor Program](https://www.nuscalepower.com/press-releases/2026/nuscale-power-deploys-nuclear-specific-ai-from-npx-and-nuclearn-to-speed-development-of-its-advanced-reactor-program) — 25 Aug 2026"
+        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026"
       ]
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-07T01:10:55.835Z",
+        "changedAt": "2026-10-29T22:05:54.743Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-06T02:01:21.522Z",
-        "previousValue": "2026-09-01T10:50:01.000Z"
+        "previousExtractedAt": "2026-10-26T22:07:33.492Z",
+        "previousValue": "2026-10-06T10:50:00.000Z"
       },
-      "displayValue": "06 Oct 2026",
+      "displayValue": "29 Oct 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:f5baba8e10d3259d6851245865ca0802538aa4306fa7810c04621ea6b11778d2",
-        "extractedAt": "2026-10-26T22:07:33.492Z",
-        "rawText": "Tue, 06 Oct 2026 10:50:00 GMT",
+        "contentHash": "sha256:43b7b781ca03ce06a526d31bf58ef00b73d296f512e71042d6d7a40ceedb4be4",
+        "extractedAt": "2026-10-29T22:05:54.743Z",
+        "rawText": "Thu, 29 Oct 2026 10:50:01 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
       "status": "ok",
@@ -75,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-06T10:50:00.000Z"
+      "value": "2026-10-29T10:50:01.000Z"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-26T22:07:33.493Z",
-    "durationMs": 160,
+    "completedAt": "2026-10-29T22:05:54.744Z",
+    "durationMs": 162,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-26T22-07-24-419Z-1e29bd6",
-    "startedAt": "2026-10-26T22:07:33.333Z",
+    "runId": "2026-10-29T22-05-49-041Z-b153679",
+    "startedAt": "2026-10-29T22:05:54.582Z",
     "status": "ok"
   },
   "schemaVersion": 1,
