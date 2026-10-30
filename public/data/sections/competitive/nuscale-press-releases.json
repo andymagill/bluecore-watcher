@@ -27,7 +27,7 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:038441c268253a45ce562a9271d5d9b16382c088272d3192010959ed0eb43341",
-        "extractedAt": "2026-10-29T22:05:54.742Z",
+        "extractedAt": "2026-10-30T22:04:32.301Z",
         "rawText": [
           "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}",
           "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:43b7b781ca03ce06a526d31bf58ef00b73d296f512e71042d6d7a40ceedb4be4",
-        "extractedAt": "2026-10-29T22:05:54.743Z",
+        "extractedAt": "2026-10-30T22:04:32.303Z",
         "rawText": "Thu, 29 Oct 2026 10:50:01 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -81,12 +81,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-10-29T22:05:54.744Z",
-    "durationMs": 162,
+    "completedAt": "2026-10-30T22:04:32.303Z",
+    "durationMs": 155,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-29T22-05-49-041Z-b153679",
-    "startedAt": "2026-10-29T22:05:54.582Z",
+    "runId": "2026-10-30T22-04-27-825Z-e6c8a50",
+    "startedAt": "2026-10-30T22:04:32.148Z",
     "status": "ok"
   },
   "schemaVersion": 1,

@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-03T00:52:50.961Z",
+        "changedAt": "2026-10-30T22:04:31.940Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-02T01:14:43.517Z",
-        "previousValue": "144"
+        "previousExtractedAt": "2026-10-29T22:05:54.264Z",
+        "previousValue": "4"
       },
-      "displayValue": "4",
+      "displayValue": "SCHEDULE 13G",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-10-29T22:05:54.264Z",
-        "rawText": "4",
+        "contentHash": "sha256:2da4fbe93e0a9b7236623d68b5af8a5dd8179c6627e2d3bf9613020b4be3c603",
+        "extractedAt": "2026-10-30T22:04:31.940Z",
+        "rawText": "SCHEDULE 13G",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "4"
+      "value": "SCHEDULE 13G"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-06T02:01:20.956Z",
+        "changedAt": "2026-10-30T22:04:31.940Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-03T00:52:50.961Z",
-        "previousValue": "2026-10-02T00:00:00.000Z"
+        "previousExtractedAt": "2026-10-29T22:05:54.264Z",
+        "previousValue": "2026-10-05T00:00:00.000Z"
       },
-      "displayValue": "05 Oct 2026",
+      "displayValue": "30 Oct 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:d4a556f7dbf159f188099ef40f99e1d5e30251d293acdcece479a68d0e8179ce",
-        "extractedAt": "2026-10-29T22:05:54.264Z",
-        "rawText": "2026-10-05",
+        "contentHash": "sha256:c9c37f3f041ea4694d0764b4b1dbf3d53551e7be57c4a4823ed2b6981db13c90",
+        "extractedAt": "2026-10-30T22:04:31.940Z",
+        "rawText": "2026-10-30",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-05T00:00:00.000Z"
+      "value": "2026-10-30T00:00:00.000Z"
     },
     {
       "delta": null,
@@ -70,7 +70,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@9:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[9] date:$.filings.recent.filingDate[9] acc:$.filings.recent.accessionNumber[9] doc:$.filings.recent.primaryDocument[9]",
         "contentHash": "sha256:2a44e274f48933da3611779503d7546697c70e8c18aca07fe4a9139e8da4fa8b",
-        "extractedAt": "2026-10-29T22:05:54.264Z",
+        "extractedAt": "2026-10-30T22:04:31.940Z",
         "rawText": "{\"acc\":\"0001104659-26-094073\",\"date\":\"2026-08-11\",\"doc\":\"tm2622138d2_8k.htm\",\"items\":\"1.01,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -86,12 +86,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-10-29T22:05:54.268Z",
-    "durationMs": 1982,
+    "completedAt": "2026-10-30T22:04:31.944Z",
+    "durationMs": 2058,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-10-29T22-05-49-041Z-b153679",
-    "startedAt": "2026-10-29T22:05:52.286Z",
+    "runId": "2026-10-30T22-04-27-825Z-e6c8a50",
+    "startedAt": "2026-10-30T22:04:29.886Z",
     "status": "ok"
   },
   "schemaVersion": 1,
