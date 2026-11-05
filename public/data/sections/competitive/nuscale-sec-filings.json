@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-30T22:04:31.940Z",
+        "changedAt": "2026-11-05T22:05:35.150Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-29T22:05:54.264Z",
-        "previousValue": "4"
+        "previousExtractedAt": "2026-11-04T22:05:25.044Z",
+        "previousValue": "SCHEDULE 13G"
       },
-      "displayValue": "SCHEDULE 13G",
+      "displayValue": "8-K",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:2da4fbe93e0a9b7236623d68b5af8a5dd8179c6627e2d3bf9613020b4be3c603",
-        "extractedAt": "2026-11-04T22:05:25.044Z",
-        "rawText": "SCHEDULE 13G",
+        "contentHash": "sha256:ea3009a3aa07ab3715eecaca26bcdb504ce372e7d8783a0e05a640e2b5031fe4",
+        "extractedAt": "2026-11-05T22:05:35.150Z",
+        "rawText": "8-K",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "SCHEDULE 13G"
+      "value": "8-K"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-30T22:04:31.940Z",
+        "changedAt": "2026-11-05T22:05:35.151Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-29T22:05:54.264Z",
-        "previousValue": "2026-10-05T00:00:00.000Z"
+        "previousExtractedAt": "2026-11-04T22:05:25.045Z",
+        "previousValue": "2026-10-30T00:00:00.000Z"
       },
-      "displayValue": "30 Oct 2026",
+      "displayValue": "05 Nov 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:c9c37f3f041ea4694d0764b4b1dbf3d53551e7be57c4a4823ed2b6981db13c90",
-        "extractedAt": "2026-11-04T22:05:25.045Z",
-        "rawText": "2026-10-30",
+        "contentHash": "sha256:cd3af2c65bc838d00637730aa75aa2389d0873d6dc560ca2017ccd9da51f1bc4",
+        "extractedAt": "2026-11-05T22:05:35.151Z",
+        "rawText": "2026-11-05",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -58,20 +58,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-30T00:00:00.000Z"
+      "value": "2026-11-05T00:00:00.000Z"
     },
     {
-      "delta": null,
-      "displayValue": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-08\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000110465926094073/tm2622138d2_8k.htm)",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-11-05T22:05:35.151Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-11-04T22:05:25.045Z",
+        "previousValue": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-08\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000110465926094073/tm2622138d2_8k.htm)"
+      },
+      "displayValue": "**Results of Operations and Financial Condition; Financial Statements and Exhibits** filed 2026\\-11\\-05 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000182296626000089/smr-20261105.htm)",
       "failingSince": null,
       "key": "latest_8k",
       "label": "Latest 8-K",
       "presenter": "markdown",
       "provenance": {
-        "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@9:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[9] date:$.filings.recent.filingDate[9] acc:$.filings.recent.accessionNumber[9] doc:$.filings.recent.primaryDocument[9]",
-        "contentHash": "sha256:2a44e274f48933da3611779503d7546697c70e8c18aca07fe4a9139e8da4fa8b",
-        "extractedAt": "2026-11-04T22:05:25.045Z",
-        "rawText": "{\"acc\":\"0001104659-26-094073\",\"date\":\"2026-08-11\",\"doc\":\"tm2622138d2_8k.htm\",\"items\":\"1.01,9.01\"}",
+        "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@0:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[0] date:$.filings.recent.filingDate[0] acc:$.filings.recent.accessionNumber[0] doc:$.filings.recent.primaryDocument[0]",
+        "contentHash": "sha256:e32688f38a80938450281e016e2876957cf55330b100a55602ad839ad04f36fb",
+        "extractedAt": "2026-11-05T22:05:35.151Z",
+        "rawText": "{\"acc\":\"0001822966-26-000089\",\"date\":\"2026-11-05\",\"doc\":\"smr-20261105.htm\",\"items\":\"2.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -80,18 +88,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-08\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000110465926094073/tm2622138d2_8k.htm)"
+      "value": "**Results of Operations and Financial Condition; Financial Statements and Exhibits** filed 2026\\-11\\-05 — [primary document](https://www.sec.gov/Archives/edgar/data/1822966/000182296626000089/smr-20261105.htm)"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-11-04T22:05:25.047Z",
-    "durationMs": 1922,
+    "completedAt": "2026-11-05T22:05:35.154Z",
+    "durationMs": 1981,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-04T22-05-19-990Z-ed5a889",
-    "startedAt": "2026-11-04T22:05:23.125Z",
+    "runId": "2026-11-05T22-05-31-047Z-a0f8594",
+    "startedAt": "2026-11-05T22:05:33.173Z",
     "status": "ok"
   },
   "schemaVersion": 1,

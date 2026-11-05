@@ -3,18 +3,18 @@
     {
       "delta": {
         "added": [
-          "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}"
+          "{\"date\":\"Thu, 05 Nov 2026 21:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results\",\"title\":\"NuScale Power Reports Third Quarter 2026 Results\"}"
         ],
-        "changedAt": "2026-10-29T22:05:54.742Z",
+        "changedAt": "2026-11-05T22:05:35.983Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
         "removed": []
       },
       "displayValue": [
+        "[NuScale Power Reports Third Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results) — 05 Nov 2026",
         "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
-        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
-        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026"
+        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -26,12 +26,12 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:038441c268253a45ce562a9271d5d9b16382c088272d3192010959ed0eb43341",
-        "extractedAt": "2026-11-04T22:05:25.650Z",
+        "contentHash": "sha256:06c04ed35ab980397fd7c23ce1c66cb8315aadf11e164a863c2135f637e682ac",
+        "extractedAt": "2026-11-05T22:05:35.983Z",
         "rawText": [
+          "{\"date\":\"Thu, 05 Nov 2026 21:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results\",\"title\":\"NuScale Power Reports Third Quarter 2026 Results\"}",
           "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}",
-          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}",
-          "{\"date\":\"Tue, 01 Sep 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component\",\"title\":\"NuScale Power and MillenniTEK Advance Manufacturing Technology for First-of-a-Kind Reactor Safety Component\"}"
+          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}"
         ],
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -42,31 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[NuScale Power Reports Third Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results) — 05 Nov 2026",
         "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
-        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026",
-        "[NuScale Power and MillenniTEK Advance Manufacturing Technology for First\\-of\\-a\\-Kind Reactor Safety Component](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-millennitek-advance-manufacturing-technology-for-first-of-a-kind-reactor-safety-component) — 01 Sep 2026"
+        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026"
       ]
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-29T22:05:54.743Z",
+        "changedAt": "2026-11-05T22:05:35.985Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-26T22:07:33.492Z",
-        "previousValue": "2026-10-06T10:50:00.000Z"
+        "previousExtractedAt": "2026-11-04T22:05:25.651Z",
+        "previousValue": "2026-10-29T10:50:01.000Z"
       },
-      "displayValue": "29 Oct 2026",
+      "displayValue": "05 Nov 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:43b7b781ca03ce06a526d31bf58ef00b73d296f512e71042d6d7a40ceedb4be4",
-        "extractedAt": "2026-11-04T22:05:25.651Z",
-        "rawText": "Thu, 29 Oct 2026 10:50:01 GMT",
+        "contentHash": "sha256:fe0028a145667bc1598d4a9de77ffd22d3230c9762460d91b56fdbc48e170abc",
+        "extractedAt": "2026-11-05T22:05:35.985Z",
+        "rawText": "Thu, 05 Nov 2026 21:15:02 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
       "status": "ok",
@@ -75,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-10-29T10:50:01.000Z"
+      "value": "2026-11-05T21:15:02.000Z"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-04T22:05:25.652Z",
-    "durationMs": 240,
+    "completedAt": "2026-11-05T22:05:35.986Z",
+    "durationMs": 275,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-04T22-05-19-990Z-ed5a889",
-    "startedAt": "2026-11-04T22:05:25.412Z",
+    "runId": "2026-11-05T22-05-31-047Z-a0f8594",
+    "startedAt": "2026-11-05T22:05:35.711Z",
     "status": "ok"
   },
   "schemaVersion": 1,
