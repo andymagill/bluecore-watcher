@@ -10,7 +10,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#$.count",
         "contentHash": "sha256:031b4af5197ec30a926f48cf40e11a7dbc470048a21e4003b7a3c07c5dab1baa",
-        "extractedAt": "2026-11-05T22:05:38.123Z",
+        "extractedAt": "2026-11-06T22:05:11.693Z",
         "rawText": "51",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
       },
@@ -33,7 +33,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#title:$.results[0].title url:$.results[0].html_url",
         "contentHash": "sha256:8619ca1727f4c1f79d11f293e7065c60b0ce3bf5b3abd10498b38121051115ad",
-        "extractedAt": "2026-11-05T22:05:38.124Z",
+        "extractedAt": "2026-11-06T22:05:11.694Z",
         "rawText": "{\"title\":\"Plan of Action Under the Defense Production Act (Market-Integrated Fuel Utilization Committee)\",\"url\":\"https://www.federalregister.gov/documents/2026/08/10/2026-16225/plan-of-action-under-the-defense-production-act-market-integrated-fuel-utilization-committee\"}",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
       },
@@ -55,7 +55,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#$.results[0].type",
         "contentHash": "sha256:65659145569b894bd67d06e685509c2decc5b2ac5e18700c085a253506b0fb75",
-        "extractedAt": "2026-11-05T22:05:38.124Z",
+        "extractedAt": "2026-11-06T22:05:11.694Z",
         "rawText": "Notice",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
       },
@@ -77,7 +77,7 @@
       "provenance": {
         "anchor": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest#$.results[0].publication_date",
         "contentHash": "sha256:f7f6076e9bcd47f5545e670534cca8cb1eae755aa17dbb64c7dd7021d518027f",
-        "extractedAt": "2026-11-05T22:05:38.124Z",
+        "extractedAt": "2026-11-06T22:05:11.694Z",
         "rawText": "2026-08-10",
         "sourceUrl": "https://www.federalregister.gov/api/v1/documents.json?conditions%5Bagencies%5D%5B%5D=energy-department&conditions%5Bterm%5D=%22advanced+nuclear%22&per_page=1&order=newest"
       },
@@ -93,12 +93,12 @@
   "entityId": "bluecore-energy",
   "label": "Federal Register — DOE Advanced Nuclear Documents",
   "run": {
-    "completedAt": "2026-11-05T22:05:38.124Z",
-    "durationMs": 960,
+    "completedAt": "2026-11-06T22:05:11.694Z",
+    "durationMs": 999,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-05T22-05-31-047Z-a0f8594",
-    "startedAt": "2026-11-05T22:05:37.164Z",
+    "runId": "2026-11-06T22-05-04-715Z-e89609d",
+    "startedAt": "2026-11-06T22:05:10.695Z",
     "status": "ok"
   },
   "schemaVersion": 1,
