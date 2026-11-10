@@ -3,10 +3,11 @@
     {
       "delta": {
         "added": [
-          "{\"date\":\"Fri, 06 Nov 2026 07:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
-          "{\"date\":\"Fri, 06 Nov 2026 07:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}"
+          "{\"date\":\"Fri, 06 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
+          "{\"date\":\"Fri, 06 Nov 2026 12:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}",
+          "{\"date\":\"Fri, 23 Oct 2026 12:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}"
         ],
-        "changedAt": "2026-11-06T22:05:09.300Z",
+        "changedAt": "2026-11-10T22:05:43.036Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
@@ -27,12 +28,12 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:44b97a824fdeb9fefc1f982b3daa6be9ac6b9cb6283f4b78682b0fe5077c6798",
-        "extractedAt": "2026-11-06T22:05:09.300Z",
+        "contentHash": "sha256:8c672016f84bf52b6faf6405f2c2888ac6862ad683db2030bec16e467bdf3bdb",
+        "extractedAt": "2026-11-10T22:05:43.036Z",
         "rawText": [
-          "{\"date\":\"Fri, 06 Nov 2026 07:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
-          "{\"date\":\"Fri, 06 Nov 2026 07:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}",
-          "{\"date\":\"Fri, 23 Oct 2026 08:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}"
+          "{\"date\":\"Fri, 06 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
+          "{\"date\":\"Fri, 06 Nov 2026 12:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}",
+          "{\"date\":\"Fri, 23 Oct 2026 12:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}"
         ],
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -51,12 +52,12 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-06T22:05:09.302Z",
+        "changedAt": "2026-11-10T22:05:43.038Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-05T22:05:35.709Z",
-        "previousValue": "2026-10-23T08:00:00.000Z"
+        "previousExtractedAt": "2026-11-06T22:05:09.302Z",
+        "previousValue": "2026-11-06T07:30:00.000Z"
       },
       "displayValue": "06 Nov 2026",
       "failingSince": null,
@@ -65,9 +66,9 @@
       "presenter": "metric",
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:0216f96698657412bba7a62a883173dda7b5ae1b8ee171becb2f90b4d5257dec",
-        "extractedAt": "2026-11-06T22:05:09.302Z",
-        "rawText": "Fri, 06 Nov 2026 07:30:00 GMT",
+        "contentHash": "sha256:3cf6a1bb405063a3a3fbc9ac818c16b1df6642d370ccd9c4fe02ec3fdc52ce1a",
+        "extractedAt": "2026-11-10T22:05:43.038Z",
+        "rawText": "Fri, 06 Nov 2026 12:30:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
       "status": "ok",
@@ -76,18 +77,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-11-06T07:30:00.000Z"
+      "value": "2026-11-06T12:30:00.000Z"
     }
   ],
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-06T22:05:09.304Z",
-    "durationMs": 499,
+    "completedAt": "2026-11-10T22:05:43.039Z",
+    "durationMs": 383,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-06T22-05-04-715Z-e89609d",
-    "startedAt": "2026-11-06T22:05:08.805Z",
+    "runId": "2026-11-10T22-05-30-871Z-594ede2",
+    "startedAt": "2026-11-10T22:05:42.656Z",
     "status": "ok"
   },
   "schemaVersion": 1,
