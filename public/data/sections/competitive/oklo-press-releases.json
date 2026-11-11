@@ -3,20 +3,18 @@
     {
       "delta": {
         "added": [
-          "{\"date\":\"Fri, 06 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
-          "{\"date\":\"Fri, 06 Nov 2026 12:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}",
-          "{\"date\":\"Fri, 23 Oct 2026 12:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}"
+          "{\"date\":\"Wed, 11 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-1-to-begin-research-and-demonstration-phase-after-being-cleared-by-u-s-department-o\",\"title\":\"Oklo’s Groves-1 to Begin Research and Demonstration Phase after being Cleared by U.S. Department of Energy for Unrestricted Operations\"}"
         ],
-        "changedAt": "2026-11-10T22:05:43.036Z",
+        "changedAt": "2026-11-11T22:05:18.088Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
         "removed": []
       },
       "displayValue": [
+        "[Oklo’s Groves\\-1 to Begin Research and Demonstration Phase after being Cleared by U\\.S\\. Department of Energy for Unrestricted Operations](https://oklo.com/newsroom/oklos-groves-1-to-begin-research-and-demonstration-phase-after-being-cleared-by-u-s-department-o) — 11 Nov 2026",
         "[Oklo Publishes Third Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update) — 06 Nov 2026",
-        "[Oklo, U\\.S\\. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments](https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep) — 06 Nov 2026",
-        "[Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call) — 23 Oct 2026"
+        "[Oklo, U\\.S\\. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments](https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep) — 06 Nov 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -28,12 +26,12 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:8c672016f84bf52b6faf6405f2c2888ac6862ad683db2030bec16e467bdf3bdb",
-        "extractedAt": "2026-11-10T22:05:43.036Z",
+        "contentHash": "sha256:01d3c453da4ced49c2994a687ae9ef71236df64525c70c16a362fa422aff3343",
+        "extractedAt": "2026-11-11T22:05:18.088Z",
         "rawText": [
+          "{\"date\":\"Wed, 11 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-1-to-begin-research-and-demonstration-phase-after-being-cleared-by-u-s-department-o\",\"title\":\"Oklo’s Groves-1 to Begin Research and Demonstration Phase after being Cleared by U.S. Department of Energy for Unrestricted Operations\"}",
           "{\"date\":\"Fri, 06 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update\",\"title\":\"Oklo Publishes Third Quarter 2026 Financial Results and Business Update\"}",
-          "{\"date\":\"Fri, 06 Nov 2026 12:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}",
-          "{\"date\":\"Fri, 23 Oct 2026 12:00:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call\",\"title\":\"Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call\"}"
+          "{\"date\":\"Fri, 06 Nov 2026 12:29:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep\",\"title\":\"Oklo, U.S. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments\"}"
         ],
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -44,31 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[Oklo’s Groves\\-1 to Begin Research and Demonstration Phase after being Cleared by U\\.S\\. Department of Energy for Unrestricted Operations](https://oklo.com/newsroom/oklos-groves-1-to-begin-research-and-demonstration-phase-after-being-cleared-by-u-s-department-o) — 11 Nov 2026",
         "[Oklo Publishes Third Quarter 2026 Financial Results and Business Update](https://oklo.com/newsroom/oklo-publishes-third-quarter-2026-financial-results-and-business-update) — 06 Nov 2026",
-        "[Oklo, U\\.S\\. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments](https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep) — 06 Nov 2026",
-        "[Oklo Announces Date for Third Quarter 2026 Financial Results and Business Update Call](https://oklo.com/newsroom/oklo-announces-date-for-third-quarter-2026-financial-results-and-business-update-call) — 23 Oct 2026"
+        "[Oklo, U\\.S\\. Forged Rings Partner to Advance Domestic Manufacturing for Future Aurora Powerhouse Deployments](https://oklo.com/newsroom/oklo-u-s-forged-rings-partner-to-advance-domestic-manufacturing-for-future-aurora-powerhouse-dep) — 06 Nov 2026"
       ]
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-10T22:05:43.038Z",
+        "changedAt": "2026-11-11T22:05:18.090Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-06T22:05:09.302Z",
-        "previousValue": "2026-11-06T07:30:00.000Z"
+        "previousExtractedAt": "2026-11-10T22:05:43.038Z",
+        "previousValue": "2026-11-06T12:30:00.000Z"
       },
-      "displayValue": "06 Nov 2026",
+      "displayValue": "11 Nov 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:3cf6a1bb405063a3a3fbc9ac818c16b1df6642d370ccd9c4fe02ec3fdc52ce1a",
-        "extractedAt": "2026-11-10T22:05:43.038Z",
-        "rawText": "Fri, 06 Nov 2026 12:30:00 GMT",
+        "contentHash": "sha256:248edbbc086cd2cf483239d39ab4ae21683ce8953438c86d92d654919c11b8e4",
+        "extractedAt": "2026-11-11T22:05:18.090Z",
+        "rawText": "Wed, 11 Nov 2026 12:30:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
       "status": "ok",
@@ -77,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-11-06T12:30:00.000Z"
+      "value": "2026-11-11T12:30:00.000Z"
     }
   ],
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-10T22:05:43.039Z",
-    "durationMs": 383,
+    "completedAt": "2026-11-11T22:05:18.092Z",
+    "durationMs": 580,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-10T22-05-30-871Z-594ede2",
-    "startedAt": "2026-11-10T22:05:42.656Z",
+    "runId": "2026-11-11T22-05-13-440Z-3d5d42e",
+    "startedAt": "2026-11-11T22:05:17.512Z",
     "status": "ok"
   },
   "schemaVersion": 1,
