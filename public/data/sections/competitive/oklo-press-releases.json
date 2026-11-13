@@ -27,7 +27,7 @@
           "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:b49693b8e6cbf8d453a55771448f96f7c3d2ab41125e35631160e85789054946",
-        "extractedAt": "2026-11-12T22:05:03.242Z",
+        "extractedAt": "2026-11-13T22:04:47.400Z",
         "rawText": [
           "{\"date\":\"Thu, 12 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklo-centrus-secure-fuel-supply-for-aurora-powerhouse-deployment-in-ohio\",\"title\":\"Oklo, Centrus Secure Fuel Supply for Aurora Powerhouse Deployment in Ohio\"}",
           "{\"date\":\"Wed, 11 Nov 2026 12:30:00 GMT\",\"link\":\"https://oklo.com/newsroom/oklos-groves-1-to-begin-research-and-demonstration-phase-after-being-cleared-by-u-s-department-o\",\"title\":\"Oklo’s Groves-1 to Begin Research and Demonstration Phase after being Cleared by U.S. Department of Energy for Unrestricted Operations\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://oklo.com/newsroom/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:cf29fe53990b50b79a187f6f85d6e0464557591ebaafd1349e480a240e19cfb5",
-        "extractedAt": "2026-11-12T22:05:03.244Z",
+        "extractedAt": "2026-11-13T22:04:47.401Z",
         "rawText": "Thu, 12 Nov 2026 12:30:00 GMT",
         "sourceUrl": "https://oklo.com/newsroom/rss.xml"
       },
@@ -81,12 +81,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-12T22:05:03.245Z",
-    "durationMs": 445,
+    "completedAt": "2026-11-13T22:04:47.402Z",
+    "durationMs": 453,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-12T22-04-58-671Z-ee16562",
-    "startedAt": "2026-11-12T22:05:02.800Z",
+    "runId": "2026-11-13T22-04-42-855Z-5c217ef",
+    "startedAt": "2026-11-13T22:04:46.949Z",
     "status": "ok"
   },
   "schemaVersion": 1,

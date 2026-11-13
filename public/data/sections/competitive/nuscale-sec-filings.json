@@ -3,23 +3,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-06T22:05:08.800Z",
+        "changedAt": "2026-11-13T22:04:46.947Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-05T22:05:35.150Z",
-        "previousValue": "8-K"
+        "previousExtractedAt": "2026-11-12T22:05:02.798Z",
+        "previousValue": "10-Q"
       },
-      "displayValue": "10-Q",
+      "displayValue": "SCHEDULE 13G/A",
       "failingSince": null,
       "key": "latest_filing_form",
       "label": "Latest Filing Type",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.form[0]",
-        "contentHash": "sha256:3ae38e4f39b6b9a77fdb7a3c79df76b6ec2df8922e93db9aa0cf2a2a8952d1aa",
-        "extractedAt": "2026-11-12T22:05:02.798Z",
-        "rawText": "10-Q",
+        "contentHash": "sha256:52c739a9e2679e7839e4286c8a99df997416aaf233984635efd3cbf3bcfbfc58",
+        "extractedAt": "2026-11-13T22:04:46.947Z",
+        "rawText": "SCHEDULE 13G/A",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -28,28 +28,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "10-Q"
+      "value": "SCHEDULE 13G/A"
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-05T22:05:35.151Z",
+        "changedAt": "2026-11-13T22:04:46.947Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-04T22:05:25.045Z",
-        "previousValue": "2026-10-30T00:00:00.000Z"
+        "previousExtractedAt": "2026-11-12T22:05:02.798Z",
+        "previousValue": "2026-11-05T00:00:00.000Z"
       },
-      "displayValue": "05 Nov 2026",
+      "displayValue": "13 Nov 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:cd3af2c65bc838d00637730aa75aa2389d0873d6dc560ca2017ccd9da51f1bc4",
-        "extractedAt": "2026-11-12T22:05:02.798Z",
-        "rawText": "2026-11-05",
+        "contentHash": "sha256:6f7794831f4fc5f5dc6a0614bab8bb5fedbf302eed30c91eb683e91244c5890c",
+        "extractedAt": "2026-11-13T22:04:46.947Z",
+        "rawText": "2026-11-13",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
       "status": "ok",
@@ -58,7 +58,7 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-11-05T00:00:00.000Z"
+      "value": "2026-11-13T00:00:00.000Z"
     },
     {
       "delta": {
@@ -78,7 +78,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001822966.json#index@0:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[0] date:$.filings.recent.filingDate[0] acc:$.filings.recent.accessionNumber[0] doc:$.filings.recent.primaryDocument[0]",
         "contentHash": "sha256:e32688f38a80938450281e016e2876957cf55330b100a55602ad839ad04f36fb",
-        "extractedAt": "2026-11-12T22:05:02.798Z",
+        "extractedAt": "2026-11-13T22:04:46.947Z",
         "rawText": "{\"acc\":\"0001822966-26-000089\",\"date\":\"2026-11-05\",\"doc\":\"smr-20261105.htm\",\"items\":\"2.02,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001822966.json"
       },
@@ -94,12 +94,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-11-12T22:05:02.800Z",
-    "durationMs": 1990,
+    "completedAt": "2026-11-13T22:04:46.949Z",
+    "durationMs": 1976,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-12T22-04-58-671Z-ee16562",
-    "startedAt": "2026-11-12T22:05:00.810Z",
+    "runId": "2026-11-13T22-04-42-855Z-5c217ef",
+    "startedAt": "2026-11-13T22:04:44.973Z",
     "status": "ok"
   },
   "schemaVersion": 1,
