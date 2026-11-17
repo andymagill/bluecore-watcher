@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
         "contentHash": "sha256:4b227777d4dd1fc61c6f884f48641d02b4d121d3fd328cb08b5531fcacdabf8a",
-        "extractedAt": "2026-11-16T22:05:06.377Z",
+        "extractedAt": "2026-11-17T22:05:18.876Z",
         "rawText": "4",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -33,23 +33,23 @@
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-16T22:05:06.377Z",
+        "changedAt": "2026-11-17T22:05:18.877Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-13T22:04:44.971Z",
-        "previousValue": "2026-11-13T00:00:00.000Z"
+        "previousExtractedAt": "2026-11-16T22:05:06.377Z",
+        "previousValue": "2026-11-16T00:00:00.000Z"
       },
-      "displayValue": "16 Nov 2026",
+      "displayValue": "17 Nov 2026",
       "failingSince": null,
       "key": "latest_filing_date",
       "label": "Latest Filing Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
-        "contentHash": "sha256:af40659fc9f7a95a6d28bf85dff7f9e3865db1fa6117e171a314718eb4593b4d",
-        "extractedAt": "2026-11-16T22:05:06.377Z",
-        "rawText": "2026-11-16",
+        "contentHash": "sha256:749763b3c8999e0bdc5ab8b8bb1b770bc93742e8335207548ea5c7b5e9ac219e",
+        "extractedAt": "2026-11-17T22:05:18.877Z",
+        "rawText": "2026-11-17",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -58,20 +58,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-11-16T00:00:00.000Z"
+      "value": "2026-11-17T00:00:00.000Z"
     },
     {
-      "delta": null,
-      "displayValue": "**Entry into a Material Definitive Agreement; Termination of a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-09\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000110465926106897/tm2625056d1_8k.htm)",
+      "delta": {
+        "absolute": 0,
+        "changedAt": "2026-11-17T22:05:18.877Z",
+        "direction": "up",
+        "kind": "scalar",
+        "percent": 0,
+        "previousExtractedAt": "2026-11-16T22:05:06.377Z",
+        "previousValue": "**Entry into a Material Definitive Agreement; Termination of a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-09\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000110465926106897/tm2625056d1_8k.htm)"
+      },
+      "displayValue": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-11\\-17 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000184905626000055/oklo-20261111.htm)",
       "failingSince": null,
       "key": "latest_8k",
       "label": "Latest 8-K",
       "presenter": "markdown",
       "provenance": {
-        "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@7:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[7] date:$.filings.recent.filingDate[7] acc:$.filings.recent.accessionNumber[7] doc:$.filings.recent.primaryDocument[7]",
-        "contentHash": "sha256:d1e4325dca0d39f26187a92bdb1c3fa3eeaef44889519f52019f6fd2237973d5",
-        "extractedAt": "2026-11-16T22:05:06.377Z",
-        "rawText": "{\"acc\":\"0001104659-26-106897\",\"date\":\"2026-09-11\",\"doc\":\"tm2625056d1_8k.htm\",\"items\":\"1.01,1.02,9.01\"}",
+        "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@4:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[4] date:$.filings.recent.filingDate[4] acc:$.filings.recent.accessionNumber[4] doc:$.filings.recent.primaryDocument[4]",
+        "contentHash": "sha256:c793106fea4b427970b45ca544926af54ec781c37ae0673a6553ff7cd6bcfa1a",
+        "extractedAt": "2026-11-17T22:05:18.877Z",
+        "rawText": "{\"acc\":\"0001849056-26-000055\",\"date\":\"2026-11-17\",\"doc\":\"oklo-20261111.htm\",\"items\":\"1.01,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
       "status": "ok",
@@ -80,18 +88,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "**Entry into a Material Definitive Agreement; Termination of a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-09\\-11 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000110465926106897/tm2625056d1_8k.htm)"
+      "value": "**Entry into a Material Definitive Agreement; Financial Statements and Exhibits** filed 2026\\-11\\-17 — [primary document](https://www.sec.gov/Archives/edgar/data/1849056/000184905626000055/oklo-20261111.htm)"
     }
   ],
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-11-16T22:05:06.380Z",
-    "durationMs": 1043,
+    "completedAt": "2026-11-17T22:05:18.880Z",
+    "durationMs": 728,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-16T22-05-04-172Z-162e3a5",
-    "startedAt": "2026-11-16T22:05:05.337Z",
+    "runId": "2026-11-17T22-05-16-834Z-d61830b",
+    "startedAt": "2026-11-17T22:05:18.152Z",
     "status": "ok"
   },
   "schemaVersion": 1,
