@@ -3,18 +3,18 @@
     {
       "delta": {
         "added": [
-          "{\"date\":\"Thu, 05 Nov 2026 21:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results\",\"title\":\"NuScale Power Reports Third Quarter 2026 Results\"}"
+          "{\"date\":\"Wed, 18 Nov 2026 11:50:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-implements-everstars-gordian-ai-platform-to-accelerate-commercial-reactor-deployment\",\"title\":\"NuScale Power Implements Everstar’s Gordian AI Platform to Accelerate Commercial Reactor Deployment\"}"
         ],
-        "changedAt": "2026-11-05T22:05:35.983Z",
+        "changedAt": "2026-11-18T22:05:38.553Z",
         "count": 3,
         "kind": "set",
         "previousCount": 3,
         "removed": []
       },
       "displayValue": [
+        "[NuScale Power Implements Everstar’s Gordian AI Platform to Accelerate Commercial Reactor Deployment](https://www.nuscalepower.com/press-releases/2026/nuscale-power-implements-everstars-gordian-ai-platform-to-accelerate-commercial-reactor-deployment) — 18 Nov 2026",
         "[NuScale Power Reports Third Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results) — 05 Nov 2026",
-        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
-        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026"
+        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026"
       ],
       "failingSince": null,
       "key": "recent_releases",
@@ -26,12 +26,12 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(2)",
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
-        "contentHash": "sha256:06c04ed35ab980397fd7c23ce1c66cb8315aadf11e164a863c2135f637e682ac",
-        "extractedAt": "2026-11-17T22:05:21.941Z",
+        "contentHash": "sha256:5c4bc079c26539a8faea7df273ff2328a004fed37338fb7f473ae1343a2f98ca",
+        "extractedAt": "2026-11-18T22:05:38.553Z",
         "rawText": [
+          "{\"date\":\"Wed, 18 Nov 2026 11:50:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-implements-everstars-gordian-ai-platform-to-accelerate-commercial-reactor-deployment\",\"title\":\"NuScale Power Implements Everstar’s Gordian AI Platform to Accelerate Commercial Reactor Deployment\"}",
           "{\"date\":\"Thu, 05 Nov 2026 21:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results\",\"title\":\"NuScale Power Reports Third Quarter 2026 Results\"}",
-          "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}",
-          "{\"date\":\"Tue, 06 Oct 2026 10:50:00 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call\",\"title\":\"NuScale Power to Hold Third Quarter 2026 Earnings Conference Call\"}"
+          "{\"date\":\"Thu, 29 Oct 2026 10:50:01 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module\",\"title\":\"NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™\"}"
         ],
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -42,31 +42,31 @@
         "warnings": []
       },
       "value": [
+        "[NuScale Power Implements Everstar’s Gordian AI Platform to Accelerate Commercial Reactor Deployment](https://www.nuscalepower.com/press-releases/2026/nuscale-power-implements-everstars-gordian-ai-platform-to-accelerate-commercial-reactor-deployment) — 18 Nov 2026",
         "[NuScale Power Reports Third Quarter 2026 Results](https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results) — 05 Nov 2026",
-        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026",
-        "[NuScale Power to Hold Third Quarter 2026 Earnings Conference Call](https://www.nuscalepower.com/press-releases/2026/nuscale-power-to-hold-third-quarter-2026-earnings-conference-call) — 06 Oct 2026"
+        "[NuScale Power and Doosan Enerbility Sign Agreement for Manufacturing of NuScale Power Module™](https://www.nuscalepower.com/press-releases/2026/nuscale-power-and-doosan-enerbility-sign-agreement-for-manufacturing-of-nuscale-power-module) — 29 Oct 2026"
       ]
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-11-05T22:05:35.985Z",
+        "changedAt": "2026-11-18T22:05:38.554Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-11-04T22:05:25.651Z",
-        "previousValue": "2026-10-29T10:50:01.000Z"
+        "previousExtractedAt": "2026-11-17T22:05:21.943Z",
+        "previousValue": "2026-11-05T21:15:02.000Z"
       },
-      "displayValue": "05 Nov 2026",
+      "displayValue": "18 Nov 2026",
       "failingSince": null,
       "key": "latest_release_date",
       "label": "Latest Release Date",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
-        "contentHash": "sha256:fe0028a145667bc1598d4a9de77ffd22d3230c9762460d91b56fdbc48e170abc",
-        "extractedAt": "2026-11-17T22:05:21.943Z",
-        "rawText": "Thu, 05 Nov 2026 21:15:02 GMT",
+        "contentHash": "sha256:fb308202c6e1d34babf01bdcd430d050d4c47845903f45a9c07886c441b364f6",
+        "extractedAt": "2026-11-18T22:05:38.554Z",
+        "rawText": "Wed, 18 Nov 2026 11:50:02 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
       "status": "ok",
@@ -75,18 +75,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-11-05T21:15:02.000Z"
+      "value": "2026-11-18T11:50:02.000Z"
     }
   ],
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-17T22:05:21.943Z",
-    "durationMs": 358,
+    "completedAt": "2026-11-18T22:05:38.555Z",
+    "durationMs": 209,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-17T22-05-16-834Z-d61830b",
-    "startedAt": "2026-11-17T22:05:21.585Z",
+    "runId": "2026-11-18T22-05-31-687Z-0514a2f",
+    "startedAt": "2026-11-18T22:05:38.346Z",
     "status": "ok"
   },
   "schemaVersion": 1,

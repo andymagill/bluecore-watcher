@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
         "contentHash": "sha256:7b7066aadfda98f01b5415fe48bb8e26bf74af8ee59e906857302a6c0c0c13e5",
-        "extractedAt": "2026-11-17T22:05:25.649Z",
+        "extractedAt": "2026-11-18T22:05:42.415Z",
         "rawText": "24.12",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -49,7 +49,7 @@
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
         "contentHash": "sha256:bba7f87bbe02fc24dd607349eadec7e07935c1301e30150820088e380e3e023b",
-        "extractedAt": "2026-11-17T22:05:25.649Z",
+        "extractedAt": "2026-11-18T22:05:42.415Z",
         "rawText": "2026-08",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
@@ -65,12 +65,12 @@
   "entityId": "bluecore-energy",
   "label": "EIA — CA Industrial Retail Electricity Price",
   "run": {
-    "completedAt": "2026-11-17T22:05:25.650Z",
-    "durationMs": 523,
+    "completedAt": "2026-11-18T22:05:42.415Z",
+    "durationMs": 743,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-17T22-05-16-834Z-d61830b",
-    "startedAt": "2026-11-17T22:05:25.127Z",
+    "runId": "2026-11-18T22-05-31-687Z-0514a2f",
+    "startedAt": "2026-11-18T22:05:41.672Z",
     "status": "ok"
   },
   "schemaVersion": 1,
