@@ -1,12 +1,39 @@
 {
-  "entries": [],
-  "generatedAt": "2026-11-19T22:05:16.102Z",
-  "runId": "2026-11-19T22-05-06-499Z-0dc5cb7",
+  "entries": [
+    {
+      "consecutiveFailures": 1,
+      "errorClass": "ASSERTION_FAILED",
+      "extractorKey": "latest_document_date",
+      "failingSelector": "$.results[0].publication_date",
+      "firstSeenAt": "2026-11-21T22:04:48.699Z",
+      "httpStatus": 200,
+      "message": "maxFutureDays: 2026-11-23T00:00:00.000Z is more than 1 day(s) past now (2026-11-21T22:04:44.063Z)",
+      "servingCachedFrom": "2026-11-19T22:05:11.361Z",
+      "stack": null,
+      "status": "failed",
+      "targetId": "fr-smr-mentions"
+    },
+    {
+      "consecutiveFailures": 1,
+      "errorClass": "ASSERTION_FAILED",
+      "extractorKey": "latest_document_date",
+      "failingSelector": "$.results[0].publication_date",
+      "firstSeenAt": "2026-11-21T22:04:48.699Z",
+      "httpStatus": 200,
+      "message": "maxFutureDays: 2026-11-23T00:00:00.000Z is more than 1 day(s) past now (2026-11-21T22:04:44.953Z)",
+      "servingCachedFrom": "2026-11-19T22:05:12.069Z",
+      "stack": null,
+      "status": "failed",
+      "targetId": "fr-nrc-smr"
+    }
+  ],
+  "generatedAt": "2026-11-21T22:04:48.699Z",
+  "runId": "2026-11-21T22-04-39-067Z-3f25ff7",
   "schemaVersion": 1,
   "summary": {
     "degraded": 0,
-    "failed": 0,
-    "ok": 13,
+    "failed": 2,
+    "ok": 11,
     "oldestDataAgeHours": 0,
     "targets": 13,
     "targetsPastCeiling": 0
