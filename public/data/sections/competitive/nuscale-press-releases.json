@@ -27,7 +27,7 @@
           "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(3)"
         ],
         "contentHash": "sha256:5c4bc079c26539a8faea7df273ff2328a004fed37338fb7f473ae1343a2f98ca",
-        "extractedAt": "2026-11-23T22:05:13.001Z",
+        "extractedAt": "2026-11-24T22:05:25.141Z",
         "rawText": [
           "{\"date\":\"Wed, 18 Nov 2026 11:50:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-implements-everstars-gordian-ai-platform-to-accelerate-commercial-reactor-deployment\",\"title\":\"NuScale Power Implements Everstar’s Gordian AI Platform to Accelerate Commercial Reactor Deployment\"}",
           "{\"date\":\"Thu, 05 Nov 2026 21:15:02 GMT\",\"link\":\"https://www.nuscalepower.com/press-releases/2026/nuscale-power-reports-third-quarter-2026-results\",\"title\":\"NuScale Power Reports Third Quarter 2026 Results\"}",
@@ -65,7 +65,7 @@
       "provenance": {
         "anchor": "https://www.nuscalepower.com/press-releases/rss.xml#rss > channel > item:nth-of-type(1) > pubDate",
         "contentHash": "sha256:fb308202c6e1d34babf01bdcd430d050d4c47845903f45a9c07886c441b364f6",
-        "extractedAt": "2026-11-23T22:05:13.002Z",
+        "extractedAt": "2026-11-24T22:05:25.142Z",
         "rawText": "Wed, 18 Nov 2026 11:50:02 GMT",
         "sourceUrl": "https://www.nuscalepower.com/press-releases/rss.xml"
       },
@@ -81,12 +81,12 @@
   "entityId": "nuscale-power",
   "label": "NuScale Power Corporation — Latest Press Releases",
   "run": {
-    "completedAt": "2026-11-23T22:05:13.003Z",
-    "durationMs": 171,
+    "completedAt": "2026-11-24T22:05:25.143Z",
+    "durationMs": 197,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-23T22-05-08-109Z-eda39d1",
-    "startedAt": "2026-11-23T22:05:12.832Z",
+    "runId": "2026-11-24T22-05-20-462Z-8c4a249",
+    "startedAt": "2026-11-24T22:05:24.946Z",
     "status": "ok"
   },
   "schemaVersion": 1,

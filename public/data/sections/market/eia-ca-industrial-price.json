@@ -2,24 +2,24 @@
   "blocks": [
     {
       "delta": {
-        "absolute": -0.9899999999999984,
-        "changedAt": "2026-10-23T22:06:45.077Z",
-        "direction": "down",
+        "absolute": 0.05000000000000071,
+        "changedAt": "2026-11-24T22:05:28.666Z",
+        "direction": "up",
         "kind": "scalar",
-        "percent": -3.942652329749098,
-        "previousExtractedAt": "2026-10-22T22:17:40.905Z",
-        "previousValue": 25.11
+        "percent": 0.20729684908789678,
+        "previousExtractedAt": "2026-11-23T22:05:17.155Z",
+        "previousValue": 24.12
       },
-      "displayValue": "24.12 ¢/kWh",
+      "displayValue": "24.17 ¢/kWh",
       "failingSince": null,
       "key": "retail_price_industrial",
       "label": "CA Industrial Retail Price",
       "presenter": "metric",
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].price",
-        "contentHash": "sha256:7b7066aadfda98f01b5415fe48bb8e26bf74af8ee59e906857302a6c0c0c13e5",
-        "extractedAt": "2026-11-23T22:05:17.155Z",
-        "rawText": "24.12",
+        "contentHash": "sha256:3a8efbdda83d3b6ad7b01e713622d94d95c9f0f3ab65b5fd9e9606f1c59be527",
+        "extractedAt": "2026-11-24T22:05:28.666Z",
+        "rawText": "24.17",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
       "status": "ok",
@@ -29,28 +29,28 @@
         "passed": true,
         "warnings": []
       },
-      "value": 24.12
+      "value": 24.17
     },
     {
       "delta": {
         "absolute": 0,
-        "changedAt": "2026-10-23T22:06:45.078Z",
+        "changedAt": "2026-11-24T22:05:28.666Z",
         "direction": "up",
         "kind": "scalar",
         "percent": 0,
-        "previousExtractedAt": "2026-10-22T22:17:40.905Z",
-        "previousValue": "2026-07"
+        "previousExtractedAt": "2026-11-23T22:05:17.156Z",
+        "previousValue": "2026-08"
       },
-      "displayValue": "2026-08",
+      "displayValue": "2026-09",
       "failingSince": null,
       "key": "price_period",
       "label": "Price Period",
       "presenter": "markdown",
       "provenance": {
         "anchor": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1#$.response.data[0].period",
-        "contentHash": "sha256:bba7f87bbe02fc24dd607349eadec7e07935c1301e30150820088e380e3e023b",
-        "extractedAt": "2026-11-23T22:05:17.156Z",
-        "rawText": "2026-08",
+        "contentHash": "sha256:3cd7a29c430069c9bc94f0db3659592d73ed664c7f38d2b0fd9038db674f6c01",
+        "extractedAt": "2026-11-24T22:05:28.666Z",
+        "rawText": "2026-09",
         "sourceUrl": "https://api.eia.gov/v2/electricity/retail-sales/data/?frequency=monthly&data%5B0%5D=price&facets%5Bstateid%5D%5B%5D=CA&facets%5Bsectorid%5D%5B%5D=IND&sort%5B0%5D%5Bcolumn%5D=period&sort%5B0%5D%5Bdirection%5D=desc&length=1"
       },
       "status": "ok",
@@ -59,18 +59,18 @@
         "passed": true,
         "warnings": []
       },
-      "value": "2026-08"
+      "value": "2026-09"
     }
   ],
   "entityId": "bluecore-energy",
   "label": "EIA — CA Industrial Retail Electricity Price",
   "run": {
-    "completedAt": "2026-11-23T22:05:17.156Z",
-    "durationMs": 1084,
+    "completedAt": "2026-11-24T22:05:28.666Z",
+    "durationMs": 413,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-23T22-05-08-109Z-eda39d1",
-    "startedAt": "2026-11-23T22:05:16.072Z",
+    "runId": "2026-11-24T22-05-20-462Z-8c4a249",
+    "startedAt": "2026-11-24T22:05:28.253Z",
     "status": "ok"
   },
   "schemaVersion": 1,
