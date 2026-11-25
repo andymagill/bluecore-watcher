@@ -18,7 +18,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.form[0]",
         "contentHash": "sha256:498a5992a45cccadc5248e2877cd367d7a457e547d0d0658f58b558705f0b070",
-        "extractedAt": "2026-11-24T22:05:22.521Z",
+        "extractedAt": "2026-11-25T22:05:27.613Z",
         "rawText": "4/A",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -48,7 +48,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#$.filings.recent.filingDate[0]",
         "contentHash": "sha256:a433c8ba83101c75c5b5b9199a033e85a6b3d665ef460418c99e77abffb6fded",
-        "extractedAt": "2026-11-24T22:05:22.522Z",
+        "extractedAt": "2026-11-25T22:05:27.613Z",
         "rawText": "2026-11-24",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -78,7 +78,7 @@
       "provenance": {
         "anchor": "https://data.sec.gov/submissions/CIK0001849056.json#index@4:$.filings.recent.form[?(@ === \"8-K\")]~ items:$.filings.recent.items[4] date:$.filings.recent.filingDate[4] acc:$.filings.recent.accessionNumber[4] doc:$.filings.recent.primaryDocument[4]",
         "contentHash": "sha256:c793106fea4b427970b45ca544926af54ec781c37ae0673a6553ff7cd6bcfa1a",
-        "extractedAt": "2026-11-24T22:05:22.522Z",
+        "extractedAt": "2026-11-25T22:05:27.614Z",
         "rawText": "{\"acc\":\"0001849056-26-000055\",\"date\":\"2026-11-17\",\"doc\":\"oklo-20261111.htm\",\"items\":\"1.01,9.01\"}",
         "sourceUrl": "https://data.sec.gov/submissions/CIK0001849056.json"
       },
@@ -94,12 +94,12 @@
   "entityId": "oklo-inc",
   "label": "Oklo Inc. — Latest SEC Filing",
   "run": {
-    "completedAt": "2026-11-24T22:05:22.526Z",
-    "durationMs": 917,
+    "completedAt": "2026-11-25T22:05:27.617Z",
+    "durationMs": 525,
     "httpStatus": 200,
     "renderer": "static",
-    "runId": "2026-11-24T22-05-20-462Z-8c4a249",
-    "startedAt": "2026-11-24T22:05:21.609Z",
+    "runId": "2026-11-25T22-05-25-534Z-cc54379",
+    "startedAt": "2026-11-25T22:05:27.092Z",
     "status": "ok"
   },
   "schemaVersion": 1,

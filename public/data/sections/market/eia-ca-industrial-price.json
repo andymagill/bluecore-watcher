@@ -65,13 +65,13 @@
   "entityId": "bluecore-energy",
   "label": "EIA — CA Industrial Retail Electricity Price",
   "run": {
-    "completedAt": "2026-11-24T22:05:28.666Z",
-    "durationMs": 413,
-    "httpStatus": 200,
+    "completedAt": "2026-11-25T22:06:19.404Z",
+    "durationMs": 46020,
+    "httpStatus": null,
     "renderer": "static",
-    "runId": "2026-11-24T22-05-20-462Z-8c4a249",
-    "startedAt": "2026-11-24T22:05:28.253Z",
-    "status": "ok"
+    "runId": "2026-11-25T22-05-25-534Z-cc54379",
+    "startedAt": "2026-11-25T22:05:33.384Z",
+    "status": "failed_cached"
   },
   "schemaVersion": 1,
   "sectionId": "market",
